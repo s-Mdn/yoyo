@@ -127,6 +127,18 @@ function restoreVioce(data) {
   })
 }
 
+/**
+ * @description 更新商品
+ * @param {object} data 
+ * @returns 
+ */
+function updateGoods(data) {
+  return request({
+    url: `/api/commodity/${data.id}`,
+    method: 'PATCH',
+    data
+  })
+}
 
 
 export {
@@ -139,5 +151,6 @@ export {
   updataPlayGoods,
   checkSensitiveWord,
   addGoods,
-  restoreVioce
+  restoreVioce,
+  updateGoods
 }

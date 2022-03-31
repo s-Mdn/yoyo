@@ -201,7 +201,8 @@ class GoodsInfo extends React.Component {
       image: [],
       name: goodsName,
       price: goodsPrice,
-      introduce
+      introduce,
+      id: this.props.location.query.goods.id
     }
 
     dataSource.forEach((e, i) => {
@@ -220,7 +221,7 @@ class GoodsInfo extends React.Component {
 
     let response = null
     try {
-      response = await API.goodsManageApi.addGoods(data)
+      response = await API.goodsManageApi.updateGoods(data)
     } catch (error) {
       message.warning((error && error.message) || '语音正则合成中，请稍后在做修改！')
       return false
@@ -279,6 +280,7 @@ class GoodsInfo extends React.Component {
   }
 
   async componentDidMount() {
+    console.log(this.props.location.query)
     if (!this.props.location.query.isAdd) {
       const {
         word_list: introduce,
