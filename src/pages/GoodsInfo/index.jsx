@@ -1,18 +1,22 @@
 import React from 'react';
 import { Radio, Upload, Input, Table, Select, message } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, CloseCircleTwoTone } from '@ant-design/icons';
+
 import utils from '@/utils';
 import API from '@/services';
 import './index.less';
 
-const {common: { downloadUrlFile }} = utils
+const {
+  common: { downloadUrlFile },
+  validate: { isImage },
+} = utils
+
 class GoodsInfo extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      fileList: [],
-      // 图片
-      images: [],
+      // 添加的商品列表图
+      goodsList: [],
       // tabel数据头
       columns: [
         {
@@ -151,21 +155,30 @@ class GoodsInfo extends React.Component {
   }
 
   // Upload回调
-  handleChange = async ({ fileList, file }) => {
-    await this.setState({ images: fileList })
+  handleChange =  ({ fileList, file }) => {
+    if(file.status === 'done') {
+      this.state.goodsList.push(file.response.data)
+      this.setState({goodsList: this.state.goodsList})
+    }
   };
+
+  // 删除商品
+  handleDeleteGoods = (i) => {
+    this.state.goodsList.splice(i, 1)
+    this.setState({goodsList: this.state.goodsList})
+  }
 
   // 添加商品
   handleAddGoods = async () => {
-    const { images, introduce, goodsName, goodsPrice } = this.state;
-    if ((images.length === 0) || (!introduce || !goodsName || !goodsPrice)) {
+    const { goodsList, introduce, goodsName, goodsPrice } = this.state;
+    if ((goodsList.length === 0) || (!introduce || !goodsName || !goodsPrice)) {
       message.warning('请添加完整的商品信息！');
       return false;
     }
 
     let response = null;
     const data = {
-      image: images.map(e => { return e.response.data }),
+      image: goodsList.map(e => { return e.response.data }),
       introduce,
       name: goodsName,
       price: goodsPrice,
@@ -187,9 +200,9 @@ class GoodsInfo extends React.Component {
 
   // 更新商品
   handleUpdataGoods = async () => {
-    const { goodsName, goodsPrice, introduce, images, dataSource } = this.state
+    const { goodsName, goodsPrice, introduce, goodsList, dataSource } = this.state
 
-    if ((images.length === 0) || (!goodsName || !goodsName || !introduce)) {
+    if ((goodsList.length === 0) || (!goodsName || !goodsName || !introduce)) {
       message.warning('请添加商品信息！')
       return false
     }
@@ -198,7 +211,7 @@ class GoodsInfo extends React.Component {
       tag_list: [],
       speed_list: [],
       simple_sentence_id_list: [],
-      image: [],
+      image: goodsList,
       name: goodsName,
       price: goodsPrice,
       introduce,
@@ -211,13 +224,6 @@ class GoodsInfo extends React.Component {
       data.simple_sentence_id_list.push(dataSource[i].sentenceId)
     })
 
-    images.forEach(e => {
-      if (e.url && e.status === 'done') {
-        data.image.push(e.url)
-      } else {
-        data.image.push(e.response.data)
-      }
-    })
 
     let response = null
     try {
@@ -228,6 +234,11 @@ class GoodsInfo extends React.Component {
     }
     if(response && response.code===200 && response.data) {
       message.success('修改成功！')
+
+      let timeOut = setTimeout(()=>{
+        clearTimeout(timeOut)
+        this.props.history.goBack()
+      }, 1500)
     }
   }
 
@@ -275,13 +286,11 @@ class GoodsInfo extends React.Component {
 
   // 下载语音
   handleVioceDowload = async (url) => {
-    // window.open(url.voice)
     downloadUrlFile(url.voice)
   }
 
   async componentDidMount() {
-    console.log(this.props.location.query)
-    if (!this.props.location.query.isAdd) {
+    if (!this.props.location?.query?.isAdd) {
       const {
         word_list: introduce,
         action_tag_list: label,
@@ -292,7 +301,9 @@ class GoodsInfo extends React.Component {
         name,
         price,
         introduce: introduceTxt
-      } = this.props.location.query.goods;
+      } = this.props.location?.query?.goods;
+
+      // tabel数据源
       const dataSource = [];
       label.forEach((e, i) => {
         dataSource.push({
@@ -308,16 +319,13 @@ class GoodsInfo extends React.Component {
         });
       });
 
-      let images = [];
-      image.forEach((e) => {
-        images.push({ status: 'done', url: e });
-      });
+
       this.setState({
         dataSource,
         goodsName: name,
+        goodsList: image,
         goodsPrice: price,
         introduce: introduceTxt,
-        images,
         isAdd: this.props.location.query.isAdd
       });
     } else {
@@ -325,19 +333,19 @@ class GoodsInfo extends React.Component {
         isAdd: this.props.location.query.isAdd
       })
     }
-
   }
 
   render() {
     const {
-      images,
       columns,
       dataSource,
       goodsName,
       goodsPrice,
       introduce,
+      goodsList,
       isAdd
     } = this.state;
+
     const uploadButton = (
       <div>
         <PlusOutlined />
@@ -352,7 +360,6 @@ class GoodsInfo extends React.Component {
             <div className='font_20 flex items-center text-black font-semibold w_140'>
               <span className='ml-3'>编辑商品</span>
             </div>
-            {/* <div className='ml-8'>语音合成完成的标记</div> */}
           </div>
           <div className='content'>
             <div className='content_upload flex'>
@@ -360,20 +367,40 @@ class GoodsInfo extends React.Component {
               <div className='upload-area'>
                 <div className='upload_type mb-2'>
                   <Radio.Group defaultValue={1}>
-                    <Radio value={1}>上传图片</Radio>
-                    {/* <Radio value={2}>上传视频</Radio> */}
+                    <Radio value={1}>上传图片/视频</Radio>
                   </Radio.Group>
                 </div>
-                <div className='upload'>
+                <div className='flex'>
+                  <div className='goods_wrap flex flex-wrap'>
+                    {
+                      goodsList.map((e, i) => (
+                        <div className={['w_100px h_100px border relative', i>0 && 'ml_15px'].join(' ')}  key={e}>
+                          <div className='w-full h-full overflow-hidden border_radius_5px'>
+                            {
+                              isImage(e)? (<img src={e} alt='' className='w-full h-full'/>) : (<video className='w-full h-full object-fit' src={e}/>)
+                            }
+                          </div>
+                          <div className='absolute top-0 _right_7px _top_7px z-20 flex justify-center items-center' onClick={()=>this.handleDeleteGoods(i)}>
+                            <CloseCircleTwoTone twoToneColor='#ee6843'/>
+                          </div>
+                        </div>
+                      ))
+                    }
+
+                  </div>
                   <Upload
-                    fileList={images}
+                    showUploadList={false}
                     data={this.data}
                     action={`${process.env.REACT_APP_API}/api/common/upload`}
-                    listType='picture-card'
+                    accept='.jpg, .png, .gif, .webp, .bmp, .mp4, .wav,'
                     multiple={true}
                     onChange={this.handleChange}
                   >
-                    {images.length >= 8 ? null : uploadButton}
+                    <div className={['w_100px h_100px border_radius_5px border flex justify-center items-center flex-col', goodsList.length && 'ml_15px'].join(' ')}>
+                      <PlusOutlined />
+                      <div style={{ marginTop: 8 }}>Upload</div>
+                    </div>
+
                   </Upload>
                 </div>
               </div>

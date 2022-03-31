@@ -560,7 +560,7 @@ const AutoPlay = (props) => {
                           className='absolute _top_7px _right_7px flex justify-center items-center z-50'
                           onClick={() => handleDeleteBackgound(u.id)}
                         >
-                          <CloseCircleTwoTone />
+                          <CloseCircleTwoTone twoToneColor='#ee6843'/>
                         </div>
                       )}
                     </div>

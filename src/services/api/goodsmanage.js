@@ -62,11 +62,11 @@ function increasePlays(data) {
 }
 
 /**
- * @description 编辑播放列表
+ * @description 获取已选中的播放列表
  * @param {object} data
  * @returns
  */
-function editPlays(data) {
+function selectGoodsList(data) {
   return request({
     url: '/api/play_list/get_commodity',
     method: 'GET',
@@ -129,8 +129,8 @@ function restoreVioce(data) {
 
 /**
  * @description 更新商品
- * @param {object} data 
- * @returns 
+ * @param {object} data
+ * @returns
  */
 function updateGoods(data) {
   return request({
@@ -147,7 +147,7 @@ export {
   deleteGoods,
   deletePlay,
   increasePlays,
-  editPlays,
+  selectGoodsList,
   updataPlayGoods,
   checkSensitiveWord,
   addGoods,

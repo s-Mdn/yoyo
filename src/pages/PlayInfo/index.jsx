@@ -74,6 +74,7 @@ class PlayInfo extends React.Component {
     });
   };
 
+  // 保存成功清空所有内容
   handleClearContent = () => {
     const { goodsList, chosenList } = this.state;
     goodsList.forEach(e => {
@@ -112,7 +113,7 @@ class PlayInfo extends React.Component {
       commodity_list: this.state.chosenList.map(e=>e.id),
       name: this.state.goodsName,
       user: this.props.user,
-      
+
     }
     try {
       if(this.props?.location?.query) {
@@ -139,6 +140,7 @@ class PlayInfo extends React.Component {
     }
   };
 
+  // 获取商品列表
   getGoodsList = async () => {
     let response = null;
     const data = {
@@ -166,11 +168,12 @@ class PlayInfo extends React.Component {
     }
   };
 
-  getHasPlaysList = async (id) => {
+  // 获取已经选中的商品
+  getSelectedGoods = async (id) => {
     let response = null;
     const data = { play_list_id: id };
     try {
-      response = await API.goodsManageApi.editPlays(data)
+      response = await API.goodsManageApi.selectGoodsList(data)
     } catch (error) {
       return false
     }
@@ -197,7 +200,7 @@ class PlayInfo extends React.Component {
     const { query } = this.props.location
     if( query ) {
       this.setState({goodsName: query.goodsName})
-      this.getHasPlaysList(query.id)
+      this.getSelectedGoods(query.id)
     }
   }
 
@@ -360,7 +363,7 @@ class PlayInfo extends React.Component {
                 保 存
               </button>
             ) : (
-              <button 
+              <button
                 className='px-8 rounded bg-gray-300 height_30px'
                 onClick={this.handleSubmit}
               >
