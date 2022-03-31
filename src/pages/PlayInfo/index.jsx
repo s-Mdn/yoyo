@@ -111,22 +111,29 @@ class PlayInfo extends React.Component {
     const data = {
       commodity_list: this.state.chosenList.map(e=>e.id),
       name: this.state.goodsName,
-      user: this.props.user
+      user: this.props.user,
+      
     }
     try {
-      response = await API.goodsManageApi.increasePlays(data)
+      if(this.props?.location?.query) {
+        data.id = this.props.location.query.id
+        response = await API.goodsManageApi.updataPlayGoods(data)
+      } else {
+        response = await API.goodsManageApi.increasePlays(data)
+      }
     } catch (error) {
-      message.error('添加失败！')
+      message.error('保存失败！')
       return false
     }
 
     if( response && response.code === 200) {
-      message.success('添加成功！')
+      message.success('保存成功！')
       const that = this
 
       // 延迟清空数据
       let timeOut = setTimeout(()=>{
         that.handleClearContent()
+        this.props.history.goBack()
         clearTimeout(timeOut)
       }, 1500)
     }
@@ -353,7 +360,10 @@ class PlayInfo extends React.Component {
                 保 存
               </button>
             ) : (
-              <button className='px-8 rounded bg-gray-300 height_30px'>
+              <button 
+                className='px-8 rounded bg-gray-300 height_30px'
+                onClick={this.handleSubmit}
+              >
                 保 存
               </button>
             )}

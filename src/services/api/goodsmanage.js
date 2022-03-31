@@ -80,9 +80,9 @@ function editPlays(data) {
  * @param {string} id
  * @returns
  */
-function updataPlayGoods(data, id) {
+function updataPlayGoods(data) {
   return request({
-    url: `/api/play_list/${id}`,
+    url: `/api/play_list/${data.id}`,
     method: 'PATCH',
     data
   })
