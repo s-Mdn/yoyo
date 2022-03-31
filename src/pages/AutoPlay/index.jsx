@@ -654,7 +654,7 @@ const AutoPlay = (props) => {
               setReverse((reverse) => !reverse);
             }}
           >
-            {/* {reverse ? '横屏' : '竖屏'} */}
+            {reverse ? '横屏' : '竖屏'}
           </div>
         </div>
         <div className='h_60px rounded bg-white mt_15px flex items-center justify-center px-4 box-border'>

@@ -59,8 +59,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1175,
     height: 875,
-    // frame: false,
-    // titleBarStyle: 'hidden', // 隐藏边框
+    frame: false,
+    titleBarStyle: 'hidden', // 隐藏边框
     center: true,
     webPreferences: {
       nodeIntegration: true,
@@ -140,7 +140,7 @@ function launchVideoProcess(flag) {
 }
 
 function onReady() {
-  // launchVideoProcess()
+  launchVideoProcess()
   createWindow()
   checkUpdate()
 }
