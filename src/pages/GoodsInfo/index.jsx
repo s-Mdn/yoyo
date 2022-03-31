@@ -346,13 +346,6 @@ class GoodsInfo extends React.Component {
       isAdd
     } = this.state;
 
-    const uploadButton = (
-      <div>
-        <PlusOutlined />
-        <div style={{ marginTop: 8 }}>Upload</div>
-      </div>
-    );
-
     return (
       <div className='h-full overflow-hidden goodsinfo'>
         <div className='flex-1 bg-white goods_h-full p-6'>
