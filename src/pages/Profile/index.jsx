@@ -105,7 +105,6 @@ class Profile extends React.Component {
 
   render() {
     const { avatar, nickName, resetName, hidePhoneNum } = this.state
-    console.log(this.props)
     const { radioValue, handleRadioChange } = this.props
     return (
       <div className='profile overflow-hidden box-border'>

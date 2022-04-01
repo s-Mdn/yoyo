@@ -23,7 +23,7 @@ import background_five_hor from '@/assets/images/background-5-5.png'
 
 const {
   type: { toString },
-  validate: { validURL },
+  validate: { validURL, isImage },
 } = utils;
 const {play: { stop, start }} = action;
 
@@ -106,7 +106,7 @@ const AutoPlay = (props) => {
       return false;
     }
 
-    if (response && response.code === 200 && response.data.length > 0) {
+    if (response && response.code === 200) {
       setGoodsList(response.data);
     }
   };
@@ -120,7 +120,7 @@ const AutoPlay = (props) => {
       return false;
     }
 
-    if (response && response.code === 200 && response.data.content.length > 0) {
+    if (response && response.code === 200) {
       response.data.content.forEach((option) => {
         option.label = option.name;
         option.value = option.id;
@@ -479,24 +479,24 @@ const AutoPlay = (props) => {
         <div className='goods relative box-border pr-4 goods_h'>
           {goodsList.length > 0 ? (
             <div className='flex flex-wrap'>
-              {goodsList.map((good) => {
+              {goodsList.map((e, i) => {
                 return (
                   <div
                     className='flex flex-col goods_item  w_80 ml-4 mb-4'
-                    key={good.id}
+                    key={e.id}
                   >
-                    {good.image?.length ? (
+                    {isImage(e.image[i]) ? (
                       <div
                         className='h_80 cursor-pointer rounded overflow-hidden'
                         onClick={() => {
-                          setGoodsUrl(good.image && good.image[0]);
+                          setGoodsUrl(e.image[i]);
                           setGoodsWav('');
-                          localStorage.setItem('goodsUrl', good.image[0])
+                          localStorage.setItem('goodsUrl', e.image[i])
                           localStorage.removeItem('goodsWav')
                         }}
                       >
                         <img
-                          src={good.image && good.image[0]}
+                          src={e.image[i]}
                           alt=''
                           className='rounded'
                         />
@@ -505,21 +505,21 @@ const AutoPlay = (props) => {
                       <div
                         className='h_80 cursor-pointer rounded overflow-hidden'
                         onClick={() => {
-                          setGoodsWav(good.video_url);
+                          setGoodsWav(e.image[i]);
                           setGoodsUrl('');
-                          localStorage.setItem('goodsWav', good.video_url)
+                          localStorage.setItem('goodsWav', e.image[i])
                           localStorage.removeItem('goodsUrl')
                         }}
                       >
                         <video
-                          src={good.video_url}
+                          src={e.image[i]}
                           alt=''
                           className='rounded w-full h-full object-fit'
                         />
                       </div>
                     )}
                     <div className='text-overflow font_12 mt-1 px-1'>
-                      {good.name}
+                      {e.name}
                     </div>
                   </div>
                 );
