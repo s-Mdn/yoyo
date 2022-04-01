@@ -46,7 +46,7 @@ function checkUpdate() {
         app.quit()
       }
     })
-  })  
+  })
 }
 
 if (!isDev(process.env.NODE_ENV)) {

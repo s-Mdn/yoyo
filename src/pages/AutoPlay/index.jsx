@@ -329,47 +329,46 @@ const AutoPlay = (props) => {
   const handleScale = (dom, winDom) => {
     const o = document.getElementsByClassName(dom)[0];
     const c = document.getElementsByClassName(winDom)[0];
+    let r = !reverse? (o.offsetWidth / o.offsetHeight / 10).toFixed(6) : (o.offsetHeight / o.offsetWidth / 10).toFixed(6)
 
     o.onmousewheel = function (e) {
       //获取图片的宽高
       const offsetWidth = o.offsetWidth;
       const offsetHeight = o.offsetHeight;
-
       if (e.wheelDelta > 0) {
-        const setWidth = offsetWidth + offsetWidth * 0.05;
-        const setHeight = offsetHeight + offsetHeight * 0.05;
+        const setWidth = offsetWidth + offsetWidth * r;
+        const setHeight = offsetHeight + offsetHeight * r
 
-        // 限制最大缩放
-        if (setWidth < c.offsetWidth) {
-          // 横屏状态的高度处理
-          if (reverse && o.offsetHeight >= c.offsetHeight) {
-            o.style.width = o.style.width;
-            o.style.height = c.offsetHeight + 'px';
-          } else {
-            o.style.width = setWidth + 'px';
-            o.style.height = setHeight + 'px';
+        o.style.width = setWidth + 'px'
+        o.style.height = setHeight + 'px';
+
+        // 竖屏状态下，图片的缩放宽度如果大于等于限制窗口的宽度，即不可以在放大，横屏则人物的缩放的高度如果大于等于窗口的高度，则不可在放大
+        if(!reverse) {
+          // 限宽
+          if(setWidth >= c.offsetWidth) {
+            o.style.width = c.offsetWidth + 'px'
+            o.style.height = (c.offsetWidth / (r * 10)) + 'px'
           }
         } else {
-          o.style.width = c.offsetWidth + 'px';
+          // 限高
+          if(setHeight >= c.offsetHeight){
+            o.style.height = c.offsetHeight + 'px'
+            o.style.width = (c.offsetHeight / (r * 10)) + 'px'
+          }
         }
 
-        // 横向模式下高度不能超过容器的高度
-        if (!reverse && o.offsetHeight >= c.offsetHeight) {
-          o.style.height = c.offsetHeight + 'px';
+        // 限制上下位置
+        if(c.offsetHeight <= o.offsetHeight + o.offsetTop) {
+          o.style.top = c.offsetHeight - o.offsetHeight + 'px'
         }
 
-        // 限制横向不能超出位置
-        if (o.offsetLeft + o.offsetWidth >= c.offsetWidth) {
-          o.style.left = c.offsetWidth - o.offsetWidth + 'px';
-        }
-
-        // 限制竖向不超出范围
-        if (o.offsetTop + o.offsetHeight >= c.offsetHeight) {
-          o.style.top = c.offsetHeight - o.offsetHeight + 'px';
+        // 限制左右位置
+        if(c.offsetWidth <= o.offsetWidth + o.offsetLeft) {
+          o.style.left = c.offsetWidth - o.offsetWidth + 'px'
         }
       } else {
-        o.style.width = offsetWidth - offsetWidth * 0.05 + 'px';
-        o.style.height = offsetHeight - offsetHeight * 0.05 + 'px';
+        o.style.width = offsetWidth - offsetWidth * r + 'px';
+        o.style.height = offsetHeight - offsetHeight * r + 'px';
       }
     };
   };
@@ -605,7 +604,7 @@ const AutoPlay = (props) => {
                 <img
                   src={yoyo}
                   alt=''
-                  className='absolute top_calc w_35vh h_60vh person'
+                  className='absolute top_calc w_35vh h_60vh person '
                   onDragStart={(e) => handleDragStart(e, 'person', 'winVer')}
                 />
               </div>
@@ -624,7 +623,7 @@ const AutoPlay = (props) => {
                 className='w-full h_230 relative winHorizont overflow-hidden'
                 style={{ backgroundSize: '100%, 100%' }}
               >
-                <img src={defaultBackground} alt='' />
+                <img src={defaultBackground} alt='' className='w-full h-full'/>
                 {/* 人物 */}
                 <img
                   src={yoyo}
