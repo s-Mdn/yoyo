@@ -148,10 +148,10 @@ class GoodsManage extends React.Component {
       return(
         <>
           {
-            g.image? (<img src={g.image[0]} alt=''/>):(
-              <div className='w_100 h_100 rounded overflow-hidden  border box-border'>
-                <video className='w-full h-full object-fit' src={g.video_url} />
-              </div>
+            isImage(g.image[0])? (
+              <img src={g.image[0]} alt=''/>
+            ):(
+              <video className='w-full h-full object-fit' src={g.image[0]} />
             )
           }
           <div className='absolute left-0 top-0 z-10'>

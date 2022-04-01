@@ -103,7 +103,6 @@ const Login = (props) => {
             </div>
           </Form.Item>
         </div>
-
         <div className='warm_texttext-gray-400 mb-7 flex justify-between items-center'>
           <div>
             <Checkbox
