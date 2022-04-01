@@ -485,18 +485,18 @@ const AutoPlay = (props) => {
                     className='flex flex-col goods_item  w_80 ml-4 mb-4'
                     key={e.id}
                   >
-                    {isImage(e.image[i]) ? (
+                    {isImage(e.image[0]) ? (
                       <div
                         className='h_80 cursor-pointer rounded overflow-hidden'
                         onClick={() => {
-                          setGoodsUrl(e.image[i]);
+                          setGoodsUrl(e.image[0]);
                           setGoodsWav('');
-                          localStorage.setItem('goodsUrl', e.image[i])
+                          localStorage.setItem('goodsUrl', e.image[0])
                           localStorage.removeItem('goodsWav')
                         }}
                       >
                         <img
-                          src={e.image[i]}
+                          src={e.image[0]}
                           alt=''
                           className='rounded'
                         />
@@ -505,14 +505,14 @@ const AutoPlay = (props) => {
                       <div
                         className='h_80 cursor-pointer rounded overflow-hidden'
                         onClick={() => {
-                          setGoodsWav(e.image[i]);
+                          setGoodsWav(e.image[0]);
                           setGoodsUrl('');
-                          localStorage.setItem('goodsWav', e.image[i])
+                          localStorage.setItem('goodsWav', e.video_url)
                           localStorage.removeItem('goodsUrl')
                         }}
                       >
                         <video
-                          src={e.image[i]}
+                          src={e.image[0] || e.video_url}
                           alt=''
                           className='rounded w-full h-full object-fit'
                         />
