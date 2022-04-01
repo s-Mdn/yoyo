@@ -86,6 +86,13 @@ class Profile extends React.Component {
   handleRadioChange = (e) => {
     console.log(e.target.value)
   }
+
+  // 退出
+  handleLogOut = () => {
+    localStorage.clear()
+    window.location.reload();
+  }
+
   // 上传图片参数
   data = (file) => {
     const suffix = file.name.slice(file.name.lastIndexOf('.'));
@@ -238,6 +245,9 @@ class Profile extends React.Component {
                 </div>
               </div>
             </div>
+          </div>
+          <div className='w-full text-center'>
+            <div className='rounded-full py-2 bg-FF8462 w_150px m-auto mt-10 text-white' onClick={this.handleLogOut}>退 出</div>
           </div>
         </div>
       </div>
