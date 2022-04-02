@@ -1,16 +1,14 @@
 import React from 'react';
 import { Input, message, Pagination } from 'antd';
-import { CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
+import { CloseCircleTwoTone } from '@ant-design/icons';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { connect } from 'react-redux';
+import {nanoid} from 'nanoid'
 import utils from '@/utils';
 import API from '@/services';
 import './index.less';
 
-const {
-  validate: { isImage },
-} = utils;
-
+const {validate: { isImage }} = utils;
 class PlayInfo extends React.Component {
   constructor(props) {
     super(props);
@@ -21,7 +19,7 @@ class PlayInfo extends React.Component {
       goodsList: [],
       chosenList: [],
       goodsName: '',
-      droppableId: 'droppable'
+      droppableId: 'droppable',
     };
   }
 
@@ -37,23 +35,18 @@ class PlayInfo extends React.Component {
 
   // 选中已有商品
   handleChoseGoods = (index) => {
-    const { goodsList, chosenList } = this.state;
-    const goods = goodsList.slice(index, index+1)
-    // 增加 key
-    goods[0].key = new Date().getTime() + Math.floor(Math.random() * 100)
+    let { goodsList, chosenList } = this.state
+    const goods = JSON.parse(JSON.stringify(goodsList.slice(index, index+1)))
+    goods[0].key = Date.now() + chosenList.length
 
-    chosenList.push(...goods)
-    this.setState({ chosenList: this.state.chosenList });
+    chosenList.push(goods[0])
+    this.setState({chosenList: this.state.chosenList })
   };
 
   // 删除选中删除
-  handleDeleteChosen = (id) => {
-    const chosenList = this.state.chosenList.filter((e) => {
-      return e.id !== id;
-    });
-    this.setState({
-      chosenList,
-    });
+  handleDeleteChosen = (i) => {
+    this.state.chosenList.splice(i, 1)
+    this.setState({chosenList: this.state.chosenList })
   };
 
   // 保存成功清空所有内容
@@ -154,8 +147,8 @@ class PlayInfo extends React.Component {
       return false
     }
     if ( response && response.code === 200) {
-      response.data.forEach(e => {
-        e.key = new Date().getTime() + Math.floor(Math.random() * 100)
+      response.data.forEach((e, i) => {
+        e.key = nanoid()
       })
       this.setState({
         chosenList: response.data,
@@ -284,7 +277,7 @@ class PlayInfo extends React.Component {
                                   <div
                                     className='absolute top-7px right-7px h-auto flex items-center'
                                     onClick={() =>
-                                      this.handleDeleteChosen(e.id)
+                                      this.handleDeleteChosen(i)
                                     }
                                   >
                                     <CloseCircleTwoTone twoToneColor='#ee6843' />
