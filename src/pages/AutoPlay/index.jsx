@@ -193,46 +193,45 @@ const AutoPlay = (props) => {
   // 通过 ws 连接视频处理服务器
   const connectVideoProcess = () => {
     const { localServerWsClient: client } = window;
-    sendGoodsToServe(client, goodsList);
-    // // 背景图
-    // let bg = validURL(defaultBackground) ? defaultBackground : `../build${defaultBackground}`;
+    // 背景图
+    let bg = validURL(defaultBackground) ? defaultBackground : `../build${defaultBackground}`;
 
-    // if (process.env.NODE_ENV !== 'development') {
-    //   bg = validURL(defaultBackground)
-    //     ? defaultBackground
-    //     : `../app.asar.unpacked${defaultBackground}`;
-    // }
+    if (process.env.NODE_ENV !== 'development') {
+      bg = validURL(defaultBackground)
+        ? defaultBackground
+        : `../app.asar.unpacked${defaultBackground}`;
+    }
 
-    // // 背景图 和 清晰度
-    // const Initialize = 'start->' + toString({ bg, clarity: ' MEDIUM' });
+    // 背景图 和 清晰度
+    const Initialize = 'start->' + toString({ bg, clarity: ' MEDIUM' });
 
-    // if (client) {
-    //   client.send(Initialize);
-    //   sendGoodsToServe(client, goodsList);
-    // } else {
-    //   const client = new W3CWebSocket(localServerUrl);
-    //   // 用于指定连接失败后的回调函数
-    //   client.onerror = (error) => {
-    //     message.info({
-    //       icon: <></>,
-    //       top: 0,
-    //       content: '服务连接失败，请检查网路！',
-    //     });
-    //   };
+    if (client) {
+      client.send(Initialize);
+      sendGoodsToServe(client, goodsList);
+    } else {
+      const client = new W3CWebSocket(localServerUrl);
+      // 用于指定连接失败后的回调函数
+      client.onerror = (error) => {
+        message.info({
+          icon: <></>,
+          top: 0,
+          content: '服务连接失败，请检查网路！',
+        });
+      };
 
-    //   // 用于指定连接成功后的回调函数y
-    //   client.onopen = () => {
-    //     client.send(Initialize);
-    //     sendGoodsToServe(client, goodsList);
-    //     window.localServerWsClient = client;
-    //   };
+      // 用于指定连接成功后的回调函数y
+      client.onopen = () => {
+        client.send(Initialize);
+        sendGoodsToServe(client, goodsList);
+        window.localServerWsClient = client;
+      };
 
-    //   // 用于指定连接关闭后的回调函数
-    //   client.onclose = () => {
-    //     handlePlay(stop());
-    //     window.localServerWsClient = null;
-    //   };
-    // }
+      // 用于指定连接关闭后的回调函数
+      client.onclose = () => {
+        handlePlay(stop());
+        window.localServerWsClient = null;
+      };
+    }
   };
 
   // 断开视频处理服务器
@@ -252,7 +251,7 @@ const AutoPlay = (props) => {
       video_url: e.video_url || null,
       speed_list: e.speed_list,
       wav_url_list: e.wav_url_list,
-      image: e.image.filter(e=>{ return isImage(e)}),
+      image:e.image || null,
       is_landscape: reverse,
       resize: false,
       window: !reverse
@@ -265,6 +264,7 @@ const AutoPlay = (props) => {
         ? getPersonPositions('person', 'winVer')
         : getPersonPositions('person', 'winHorizont'),
     }));
+    console.log(data)
     client.send('sequence->' + toString(data));
   };
 
