@@ -54,6 +54,8 @@ class GoodsInfo extends React.Component {
                       { label: '开场', value: '开场' },
                       { label: '自然', value: '自然' },
                       { label: '赞美', value: '赞美' },
+                      { label: '欢迎', value: '欢迎' },
+                      { label: '感谢', value: '感谢' },
                     ]}
                   />
                 </div>
