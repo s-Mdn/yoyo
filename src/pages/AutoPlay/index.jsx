@@ -506,9 +506,9 @@ const AutoPlay = (props) => {
                       <div
                         className='h_80 cursor-pointer rounded overflow-hidden'
                         onClick={() => {
-                          setGoodsWav(e.image[0]);
+                          setGoodsWav(e.video_url);
                           setGoodsUrl('');
-                          localStorage.setItem('goodsWav', e.image[0])
+                          localStorage.setItem('goodsWav', video_url)
                           localStorage.removeItem('goodsUrl')
                         }}
                       >
@@ -546,7 +546,6 @@ const AutoPlay = (props) => {
                     <div
                       className='w_80 ml-4 mb-4 border h_80 rounded  cursor-pointer relative'
                       onClick={() => {
-                        // setDefaultImage(u.image)
                         setBackgoundID(u.id)
                         localStorage.setItem('id', u.id)
                       }}
