@@ -107,7 +107,6 @@ const AutoPlay = (props) => {
     }
 
     if (response && response.code === 200) {
-      console.log(response.data)
       setGoodsList(response.data);
     }
   };
@@ -194,6 +193,7 @@ const AutoPlay = (props) => {
   // 通过 ws 连接视频处理服务器
   const connectVideoProcess = () => {
     const { localServerWsClient: client } = window;
+
     // 背景图
     let bg = validURL(defaultBackground) ? defaultBackground : `../build${defaultBackground}`;
 
@@ -203,7 +203,7 @@ const AutoPlay = (props) => {
         : `../app.asar.unpacked${defaultBackground}`;
     }
 
-    // 背景图 和 清晰图
+    // 背景图 和 清晰度
     const Initialize = 'start->' + toString({ bg, clarity: ' MEDIUM' });
 
     if (client) {
@@ -248,10 +248,10 @@ const AutoPlay = (props) => {
     let data = goodsList.map((e) => ({
       action_tag_list: e.action_tag_list,
       word_list: e.word_list || null,
-      video_url: e.video_url || null,
+      video_url: e.image.filter(e=>{ return( !isImage(e))})[0] || null,
       speed_list: e.speed_list,
       wav_url_list: e.wav_url_list,
-      image: e.image,
+      image: e.image.filter(e=>{ return isImage(e)}),
       is_landscape: reverse,
       resize: false,
       window: !reverse
@@ -264,7 +264,7 @@ const AutoPlay = (props) => {
         ? getPersonPositions('person', 'winVer')
         : getPersonPositions('person', 'winHorizont'),
     }));
-
+    console.log(data)
     client.send('sequence->' + toString(data));
   };
 
@@ -508,7 +508,7 @@ const AutoPlay = (props) => {
                         onClick={() => {
                           setGoodsWav(e.image[0]);
                           setGoodsUrl('');
-                          localStorage.setItem('goodsWav', e.video_url)
+                          localStorage.setItem('goodsWav', e.image[0])
                           localStorage.removeItem('goodsUrl')
                         }}
                       >
@@ -658,7 +658,7 @@ const AutoPlay = (props) => {
           </div>
         </div>
         <div className='h_60px rounded bg-white mt_15px flex items-center justify-center px-4 box-border'>
-          {goodsUrl ? (
+          {goodsUrl || goodsWav ? (
             <button
               className='bg-FF8462 px-6 py-1.5 rounded-full text-white'
               onClick={handleVideoProcess}
