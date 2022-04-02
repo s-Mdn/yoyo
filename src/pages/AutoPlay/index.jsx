@@ -508,7 +508,7 @@ const AutoPlay = (props) => {
                         onClick={() => {
                           setGoodsWav(e.video_url);
                           setGoodsUrl('');
-                          localStorage.setItem('goodsWav', video_url)
+                          localStorage.setItem('goodsWav', e.video_url)
                           localStorage.removeItem('goodsUrl')
                         }}
                       >
