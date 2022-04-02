@@ -178,7 +178,7 @@ class GoodsInfo extends React.Component {
 
     let response = null;
     const data = {
-      image: goodsList.map(e => { return e.response.data }),
+      image: goodsList.map(e => { return e }),
       introduce,
       name: goodsName,
       price: goodsPrice,

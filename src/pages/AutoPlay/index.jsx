@@ -107,6 +107,7 @@ const AutoPlay = (props) => {
     }
 
     if (response && response.code === 200) {
+      console.log(response.data)
       setGoodsList(response.data);
     }
   };

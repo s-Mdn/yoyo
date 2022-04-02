@@ -3,8 +3,13 @@ import { Input, message, Pagination } from 'antd';
 import { CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { connect } from 'react-redux';
+import utils from '@/utils';
 import API from '@/services';
 import './index.less';
+
+const {
+  validate: { isImage },
+} = utils;
 
 class PlayInfo extends React.Component {
   constructor(props) {
@@ -33,53 +38,27 @@ class PlayInfo extends React.Component {
   // 选中已有商品
   handleChoseGoods = (index) => {
     const { goodsList, chosenList } = this.state;
-    goodsList[index].choseState = !goodsList[index].choseState;
+    const goods = goodsList.slice(index, index+1)
+    // 增加 key
+    goods[0].key = new Date().getTime() + Math.floor(Math.random() * 100)
 
-    // 筛选选中的
-    let idx;
-    goodsList.forEach((e) => {
-      const isChosen = chosenList.some((v) => {
-        return v.id === e.id;
-      });
-      if (e.choseState && !isChosen) {
-        chosenList.push(e);
-      } else if (!e.choseState && isChosen) {
-        idx = chosenList.findIndex((c) => {
-          return c.id === e.id;
-        });
-        chosenList.splice(idx, 1);
-      }
-    });
-
-    this.setState({
-      chosenList: this.state.chosenList,
-      goodsList: this.state.goodsList,
-    });
+    chosenList.push(...goods)
+    this.setState({ chosenList: this.state.chosenList });
   };
 
   // 删除选中删除
   handleDeleteChosen = (id) => {
-    const { goodsList } = this.state;
     const chosenList = this.state.chosenList.filter((e) => {
       return e.id !== id;
     });
-    goodsList.forEach((e) => {
-      if (e.id === id) {
-        e.choseState = false;
-      }
-    });
     this.setState({
       chosenList,
-      goodsList: this.state.goodsList,
     });
   };
 
   // 保存成功清空所有内容
   handleClearContent = () => {
     const { goodsList, chosenList } = this.state;
-    goodsList.forEach(e => {
-      e.choseState = false
-    })
     chosenList.splice(0, chosenList.length);
     this.setState({
       goodsList,
@@ -158,9 +137,6 @@ class PlayInfo extends React.Component {
       const {
         data: { pagination, content },
       } = response;
-      content.forEach((e) => {
-        e.choseState = false;
-      });
       this.setState({
         total: pagination.total,
         goodsList: content,
@@ -177,21 +153,13 @@ class PlayInfo extends React.Component {
     } catch (error) {
       return false
     }
-    if ( response && response.code === 200 && response.data.length > 0 ) {
-      const { data } = response
-      const { goodsList } = this.state
-      data.forEach(e=>{
-        e.choseState = true;
-        goodsList.some(c => {
-          return c.choseState = c.id === e.id
-        })
+    if ( response && response.code === 200) {
+      response.data.forEach(e => {
+        e.key = new Date().getTime() + Math.floor(Math.random() * 100)
       })
-
       this.setState({
-        chosenList: data,
-        goodsList: this.state.goodsList
+        chosenList: response.data,
       });
-
     }
   }
 
@@ -246,27 +214,17 @@ class PlayInfo extends React.Component {
                       onClick={() => this.handleChoseGoods(i)}
                     >
                       <div className='w_100px h_100px rounded overflow-hidden border'>
-                        {e.image ? (
-                          <img
-                            alt=''
-                            src={e.image[0]}
-                            className='cursor-pointer'
-                          />
-                        ) : (
-                          <video
-                            className='object-fit h-full w-full'
-                            src={e.video_url}
-                          />
-                        )}
+                        {
+                          isImage(e.image[0])?(
+                            <img alt='' src={e.image[0]} className='cursor-pointer' />
+                          ):(
+                            <video src={e.image[0]} className='object-fit h-full w-full' />
+                          )
+                        }
                       </div>
                       <div className='text-overflow w_100px px-1 font_12 mt-1 text-center'>
                         {e.name}
                       </div>
-                      {e.choseState && (
-                        <div className='absolute top-7px right-7px flex justify-center items-center'>
-                          <CheckCircleTwoTone twoToneColor='#ee6843' />
-                        </div>
-                      )}
                     </div>
                   );
                 })}
@@ -302,7 +260,7 @@ class PlayInfo extends React.Component {
                       >
                         {chosenList.map((e, i) => {
                           return (
-                            <Draggable key={e && e.id} draggableId={e && [e.id].toString()} index={i}>
+                            <Draggable key={e.key} draggableId={[e.key].toString()} index={i}>
                               {(provided, snapshot) => (
                                 <div
                                   ref={provided.innerRef}
@@ -312,18 +270,13 @@ class PlayInfo extends React.Component {
                                   key={e.id}
                                 >
                                   <div className='w_100px h_100px rounded overflow-hidden border'>
-                                    {e.image ? (
-                                      <img
-                                        alt=''
-                                        src={e.image[0]}
-                                        className='cursor-pointer'
-                                      />
-                                    ) : (
-                                      <video
-                                        className='object-fit h-full w-full'
-                                        src={e.video_url}
-                                      />
-                                    )}
+                                    {
+                                      isImage(e.image[0])?(
+                                        <img src={e.image[0]} className='cursor-pointer' alt='' />
+                                      ):(
+                                        <video src={e.image[0]} className='object-fit h-full w-full' />
+                                      )
+                                    }
                                   </div>
                                   <div className='text-overflow w_100px px-1 font_12 mt-1 text-center'>
                                     {e.name}
