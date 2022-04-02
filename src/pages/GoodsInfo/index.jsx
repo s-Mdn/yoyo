@@ -9,7 +9,7 @@ import './index.less';
 const {
   common: { downloadUrlFile },
   validate: { isImage },
-} = utils
+} = utils;
 
 class GoodsInfo extends React.Component {
   constructor(props) {
@@ -112,15 +112,17 @@ class GoodsInfo extends React.Component {
             return (
               <div className='w-full flex items-center justify-center font_12'>
                 <Upload
-                  beforeUpload={({ file }) => { this.handleUploadBefore(i) }}
+                  beforeUpload={({ file }) => {
+                    this.handleUploadBefore(i);
+                  }}
                   onChange={({ file }) => this.handleUpdateVioce(i, file)}
                   showUploadList={false}
                   maxCount={1}
                   data={{ preffix: 1 }}
                   action={`${process.env.REACT_APP_API}/api/commodity/voice_replace`}
-                  accept='audio/ogg,audio/mp3,audio/wav,audio/m4a,audio/flac'>
-                  <div className='flex items-center justify-center h-7 w-20 border rounded mr-4'
-                  >
+                  accept='audio/ogg,audio/mp3,audio/wav,audio/m4a,audio/flac'
+                >
+                  <div className='flex items-center justify-center h-7 w-20 border rounded mr-4'>
                     <span className='font_12'>替换语音</span>
                   </div>
                 </Upload>
@@ -150,39 +152,47 @@ class GoodsInfo extends React.Component {
       // 商品介绍
       introduce: '',
       // 增加或编辑
-      isAdd: false
+      isAdd: false,
+      // 选中的radio
+      selectRadio: 1,
     };
   }
 
   // Upload回调
-  handleChange =  ({ fileList, file }) => {
-    if(file.status === 'done') {
-      this.state.goodsList.push(file.response.data)
-      this.setState({goodsList: this.state.goodsList})
+  handleChange = ({ fileList, file }) => {
+    if (file.status === 'done') {
+      this.state.goodsList.push(file.response.data);
+      this.setState({ goodsList: this.state.goodsList });
     }
   };
 
   // 删除商品
   handleDeleteGoods = (i) => {
-    this.state.goodsList.splice(i, 1)
-    this.setState({goodsList: this.state.goodsList})
-  }
+    this.state.goodsList.splice(i, 1);
+    this.setState({ goodsList: this.state.goodsList });
+  };
 
   // 添加商品
   handleAddGoods = async () => {
-    const { goodsList, introduce, goodsName, goodsPrice } = this.state;
-    if ((goodsList.length === 0) || (!introduce || !goodsName || !goodsPrice)) {
+    const { goodsList, introduce, goodsName, goodsPrice, selectRadio } = this.state;
+    if (goodsList.length === 0 || !introduce || !goodsName || !goodsPrice) {
       message.warning('请添加完整的商品信息！');
       return false;
     }
 
     let response = null;
     const data = {
-      image: goodsList.map(e => { return e }),
+      image: goodsList.map((e) => {
+        return e;
+      }),
       introduce,
       name: goodsName,
       price: goodsPrice,
     };
+    if(selectRadio == 2) {
+      delete data.image
+      data.video_url = goodsList[0]
+    }
     try {
       response = await API.goodsManageApi.addGoods(data);
     } catch (error) {
@@ -200,11 +210,12 @@ class GoodsInfo extends React.Component {
 
   // 更新商品
   handleUpdataGoods = async () => {
-    const { goodsName, goodsPrice, introduce, goodsList, dataSource } = this.state
+    const { goodsName, goodsPrice, introduce, goodsList, dataSource } =
+      this.state;
 
-    if ((goodsList.length === 0) || (!goodsName || !goodsName || !introduce)) {
-      message.warning('请添加商品信息！')
-      return false
+    if (goodsList.length === 0 || !goodsName || !goodsName || !introduce) {
+      message.warning('请添加商品信息！');
+      return false;
     }
 
     const data = {
@@ -215,34 +226,35 @@ class GoodsInfo extends React.Component {
       name: goodsName,
       price: goodsPrice,
       introduce,
-      id: this.props.location.query.goods.id
-    }
+      id: this.props.location.query.goods.id,
+    };
 
     dataSource.forEach((e, i) => {
-      data.tag_list.push(dataSource[i].label)
-      data.speed_list.push(dataSource[i].speedNum)
-      data.simple_sentence_id_list.push(dataSource[i].sentenceId)
-    })
+      data.tag_list.push(dataSource[i].label);
+      data.speed_list.push(dataSource[i].speedNum);
+      data.simple_sentence_id_list.push(dataSource[i].sentenceId);
+    });
 
-
-    let response = null
+    let response = null;
     try {
-      response = await API.goodsManageApi.updateGoods(data)
+      response = await API.goodsManageApi.updateGoods(data);
     } catch (error) {
-      message.warning((error && error.message) || '语音正则合成中，请稍后在做修改！')
-      return false
+      message.warning(
+        (error && error.message) || '语音正则合成中，请稍后在做修改！'
+      );
+      return false;
     }
-    if(response && response.code===200 && response.data) {
-      message.success('修改成功！')
+    if (response && response.code === 200 && response.data) {
+      message.success('修改成功！');
 
-      let timeOut = setTimeout(()=>{
-        clearTimeout(timeOut)
-        this.props.history.goBack()
-      }, 1500)
+      let timeOut = setTimeout(() => {
+        clearTimeout(timeOut);
+        this.props.history.goBack();
+      }, 1500);
     }
-  }
+  };
 
-  //  参数
+  // 图片参数
   data = (file) => {
     const suffix = file.name.slice(file.name.lastIndexOf('.'));
     return {
@@ -251,43 +263,51 @@ class GoodsInfo extends React.Component {
     };
   };
 
+  // 视频参数
+  videoData = (file) => {
+    const suffix = file.name.slice(file.name.lastIndexOf('.'));
+    return {
+      suffix: suffix,
+    };
+  };
+
   // 更新音频
   handleUpdateVioce = (i, file) => {
-    const { dataSource } = this.state
-    const that = this
+    const { dataSource } = this.state;
+    const that = this;
     if (file.status === 'done') {
-      dataSource[i].updateStatus = false
+      dataSource[i].updateStatus = false;
       this.setState({ dataSource: this.state.dataSource });
       let timeOut = setTimeout(() => {
-        that.props.history.goBack()
-        clearTimeout(timeOut)
-      }, 1000)
+        that.props.history.goBack();
+        clearTimeout(timeOut);
+      }, 1000);
     }
-  }
+  };
 
   // 上传前
   handleUploadBefore = (i) => {
-    const { dataSource } = this.state
-    dataSource[i].updateStatus = true
+    const { dataSource } = this.state;
+    dataSource[i].updateStatus = true;
     this.setState({ dataSource: this.state.dataSource });
-  }
+  };
 
   // 音频复原
   handleVioceRecover = async (id) => {
     const data = {
-      simple_id: id
-    }
+      simple_id: id,
+    };
     try {
-      await API.goodsManageApi.restoreVioce(data)
+      await API.goodsManageApi.restoreVioce(data);
     } catch (error) {
-      return false
+      return false;
     }
   };
 
   // 下载语音
   handleVioceDowload = async (url) => {
-    downloadUrlFile(url.voice)
-  }
+    downloadUrlFile(url.voice);
+  };
 
   async componentDidMount() {
     if (!this.props.location?.query?.isAdd) {
@@ -302,7 +322,6 @@ class GoodsInfo extends React.Component {
         price,
         introduce: introduceTxt
       } = this.props.location?.query?.goods;
-
       // tabel数据源
       const dataSource = [];
       label.forEach((e, i) => {
@@ -318,8 +337,6 @@ class GoodsInfo extends React.Component {
           updateStatus: false,
         });
       });
-
-
       this.setState({
         dataSource,
         goodsName: name,
@@ -343,7 +360,8 @@ class GoodsInfo extends React.Component {
       goodsPrice,
       introduce,
       goodsList,
-      isAdd
+      isAdd,
+      selectRadio,
     } = this.state;
 
     return (
@@ -359,42 +377,91 @@ class GoodsInfo extends React.Component {
               <span className='w_140 text-right mr-4'>商品展示</span>
               <div className='upload-area'>
                 <div className='upload_type mb-2'>
-                  <Radio.Group defaultValue={1}>
-                    <Radio value={1}>上传图片/视频</Radio>
+                  <Radio.Group
+                    defaultValue={selectRadio}
+                    onChange={(e) => {
+                      this.setState({
+                        selectRadio: e.target.value,
+                        goodsList: []
+                      });
+                    }}
+                  >
+                    <Radio value={1}>上传图片</Radio>
+                    <Radio value={2}>上传视频</Radio>
                   </Radio.Group>
                 </div>
                 <div className='flex'>
                   <div className='goods_wrap flex flex-wrap'>
-                    {
-                      goodsList.map((e, i) => (
-                        <div className={['w_100px h_100px border relative', i>0 && 'ml_15px'].join(' ')}  key={e}>
-                          <div className='w-full h-full overflow-hidden border_radius_5px'>
-                            {
-                              isImage(e)? (<img src={e} alt='' className='w-full h-full'/>) : (<video className='w-full h-full object-fit' src={e}/>)
-                            }
-                          </div>
-                          <div className='absolute top-0 _right_7px _top_7px z-20 flex justify-center items-center' onClick={()=>this.handleDeleteGoods(i)}>
-                            <CloseCircleTwoTone twoToneColor='#ee6843'/>
-                          </div>
+                    {goodsList.map((e, i) => (
+                      <div
+                        className={[
+                          'w_100px h_100px border relative',
+                          i > 0 && 'ml_15px',
+                        ].join(' ')}
+                        key={e}
+                      >
+                        <div className='w-full h-full overflow-hidden border_radius_5px'>
+                          {isImage(e) ? (
+                            <img src={e} alt='' className='w-full h-full' />
+                          ) : (
+                            <video
+                              className='w-full h-full object-fit'
+                              src={e}
+                            />
+                          )}
                         </div>
-                      ))
-                    }
-
+                        <div
+                          className='absolute top-0 _right_7px _top_7px z-20 flex justify-center items-center'
+                          onClick={() => this.handleDeleteGoods(i)}
+                        >
+                          <CloseCircleTwoTone twoToneColor='#ee6843' />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <Upload
-                    showUploadList={false}
-                    data={this.data}
-                    action={`${process.env.REACT_APP_API}/api/common/upload`}
-                    accept='.jpg, .png, .gif, .webp, .bmp, .mp4, .wav,'
-                    multiple={true}
-                    onChange={this.handleChange}
-                  >
-                    <div className={['w_100px h_100px border_radius_5px border flex justify-center items-center flex-col', goodsList.length && 'ml_15px'].join(' ')}>
-                      <PlusOutlined />
-                      <div style={{ marginTop: 8 }}>Upload</div>
-                    </div>
-
-                  </Upload>
+                  {selectRadio == 1 ? (
+                    <Upload
+                      showUploadList={false}
+                      data={this.data}
+                      action={`${process.env.REACT_APP_API}/api/common/upload`}
+                      accept='.jpg, .png, .gif, .webp, .bmp,'
+                      multiple={true}
+                      onChange={this.handleChange}
+                    >
+                      <div
+                        className={[
+                          'w_100px h_100px border_radius_5px border flex justify-center items-center flex-col',
+                          goodsList.length && 'ml_15px',
+                        ].join(' ')}
+                      >
+                        <PlusOutlined />
+                        <div style={{ marginTop: 8 }}>Upload</div>
+                      </div>
+                    </Upload>
+                  ) : (
+                    <>
+                      {!goodsList.length && selectRadio == 2 && (
+                        <Upload
+                          showUploadList={false}
+                          data={this.videoData}
+                          action={`${process.env.REACT_APP_API}/api/common/upload`}
+                          accept='.mp4, .avi .flv'
+                          multiple={true}
+                          onChange={this.handleChange}
+                        >
+                          <div
+                            className={[
+                              'w_100px h_100px border_radius_5px border flex justify-center items-center flex-col',
+                              goodsList.length && 'ml_15px',
+                            ].join(' ')}
+                          >
+                            <PlusOutlined />
+                            <div style={{ marginTop: 8 }}>Upload</div>
+                          </div>
+                        </Upload>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -435,20 +502,18 @@ class GoodsInfo extends React.Component {
               <div className='ml_156 font_12'>介绍文案以句号为段落结束</div>
             </div>
           </div>
-          {
-            dataSource.length > 0 && (
-              <div className='tabel_voice mt-12 ml-3 '>
-                {
-                  <Table
-                    pagination={false}
-                    columns={columns}
-                    dataSource={dataSource}
-                    className='text-center font_12'
-                  />
-                }
-              </div>
-            )
-          }
+          {dataSource.length > 0 && (
+            <div className='tabel_voice mt-12 ml-3 '>
+              {
+                <Table
+                  pagination={false}
+                  columns={columns}
+                  dataSource={dataSource}
+                  className='text-center font_12'
+                />
+              }
+            </div>
+          )}
 
           <div className='footer flex justify-center mt-20'>
             <button

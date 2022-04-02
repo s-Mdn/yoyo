@@ -208,10 +208,10 @@ class PlayInfo extends React.Component {
                     >
                       <div className='w_100px h_100px rounded overflow-hidden border'>
                         {
-                          isImage(e.image[0])?(
+                          e.image && isImage(e.image[0])?(
                             <img alt='' src={e.image[0]} className='cursor-pointer' />
                           ):(
-                            <video src={e.image[0]} className='object-fit h-full w-full' />
+                            <video src={e.video_url} className='object-fit h-full w-full' />
                           )
                         }
                       </div>
@@ -264,10 +264,10 @@ class PlayInfo extends React.Component {
                                 >
                                   <div className='w_100px h_100px rounded overflow-hidden border'>
                                     {
-                                      isImage(e.image[0])?(
+                                      e.image && isImage(e.image[0])?(
                                         <img src={e.image[0]} className='cursor-pointer' alt='' />
                                       ):(
-                                        <video src={e.image[0]} className='object-fit h-full w-full' />
+                                        <video src={e.video_url} className='object-fit h-full w-full' />
                                       )
                                     }
                                   </div>

@@ -193,46 +193,46 @@ const AutoPlay = (props) => {
   // 通过 ws 连接视频处理服务器
   const connectVideoProcess = () => {
     const { localServerWsClient: client } = window;
+    sendGoodsToServe(client, goodsList);
+    // // 背景图
+    // let bg = validURL(defaultBackground) ? defaultBackground : `../build${defaultBackground}`;
 
-    // 背景图
-    let bg = validURL(defaultBackground) ? defaultBackground : `../build${defaultBackground}`;
+    // if (process.env.NODE_ENV !== 'development') {
+    //   bg = validURL(defaultBackground)
+    //     ? defaultBackground
+    //     : `../app.asar.unpacked${defaultBackground}`;
+    // }
 
-    if (process.env.NODE_ENV !== 'development') {
-      bg = validURL(defaultBackground)
-        ? defaultBackground
-        : `../app.asar.unpacked${defaultBackground}`;
-    }
+    // // 背景图 和 清晰度
+    // const Initialize = 'start->' + toString({ bg, clarity: ' MEDIUM' });
 
-    // 背景图 和 清晰度
-    const Initialize = 'start->' + toString({ bg, clarity: ' MEDIUM' });
+    // if (client) {
+    //   client.send(Initialize);
+    //   sendGoodsToServe(client, goodsList);
+    // } else {
+    //   const client = new W3CWebSocket(localServerUrl);
+    //   // 用于指定连接失败后的回调函数
+    //   client.onerror = (error) => {
+    //     message.info({
+    //       icon: <></>,
+    //       top: 0,
+    //       content: '服务连接失败，请检查网路！',
+    //     });
+    //   };
 
-    if (client) {
-      client.send(Initialize);
-      sendGoodsToServe(client, goodsList);
-    } else {
-      const client = new W3CWebSocket(localServerUrl);
-      // 用于指定连接失败后的回调函数
-      client.onerror = (error) => {
-        message.info({
-          icon: <></>,
-          top: 0,
-          content: '服务连接失败，请检查网路！',
-        });
-      };
+    //   // 用于指定连接成功后的回调函数y
+    //   client.onopen = () => {
+    //     client.send(Initialize);
+    //     sendGoodsToServe(client, goodsList);
+    //     window.localServerWsClient = client;
+    //   };
 
-      // 用于指定连接成功后的回调函数y
-      client.onopen = () => {
-        client.send(Initialize);
-        sendGoodsToServe(client, goodsList);
-        window.localServerWsClient = client;
-      };
-
-      // 用于指定连接关闭后的回调函数
-      client.onclose = () => {
-        handlePlay(stop());
-        window.localServerWsClient = null;
-      };
-    }
+    //   // 用于指定连接关闭后的回调函数
+    //   client.onclose = () => {
+    //     handlePlay(stop());
+    //     window.localServerWsClient = null;
+    //   };
+    // }
   };
 
   // 断开视频处理服务器
@@ -245,10 +245,11 @@ const AutoPlay = (props) => {
 
   // 连接要直播的内容和信息
   const sendGoodsToServe = (client, goodsList) => {
+    console.log(goodsList)
     let data = goodsList.map((e) => ({
       action_tag_list: e.action_tag_list,
       word_list: e.word_list || null,
-      video_url: e.image.filter(e=>{ return( !isImage(e))})[0] || null,
+      video_url: e.video_url || null,
       speed_list: e.speed_list,
       wav_url_list: e.wav_url_list,
       image: e.image.filter(e=>{ return isImage(e)}),
@@ -264,7 +265,6 @@ const AutoPlay = (props) => {
         ? getPersonPositions('person', 'winVer')
         : getPersonPositions('person', 'winHorizont'),
     }));
-    console.log(data)
     client.send('sequence->' + toString(data));
   };
 
@@ -486,7 +486,7 @@ const AutoPlay = (props) => {
                     className='flex flex-col goods_item  w_80 ml-4 mb-4'
                     key={e.id}
                   >
-                    {isImage(e.image[0]) ? (
+                    { e.image && isImage(e.image[0]) ? (
                       <div
                         className='h_80 cursor-pointer rounded overflow-hidden'
                         onClick={() => {
@@ -513,7 +513,7 @@ const AutoPlay = (props) => {
                         }}
                       >
                         <video
-                          src={e.image[0] || e.video_url}
+                          src={e.video_url}
                           alt=''
                           className='rounded w-full h-full object-fit'
                         />
