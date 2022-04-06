@@ -1,91 +1,92 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { Select, Empty, message, Upload } from 'antd';
-import { CameraTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
+import { Empty, message, Upload } from 'antd';
+import { CameraTwoTone, CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 
 import utils from '@/utils';
 import API from '@/services';
 import action from '@/actions';
 import yoyo from '@/assets/images/character_model_yoyo.png';
 import './index.less';
-import background_one_ver from '@/assets/images/background-1.png'
-import background_two_ver from '@/assets/images/background-2.png'
-import background_three_ver from '@/assets/images/background-3.png'
-import background_four_ver from '@/assets/images/background-4.png'
-import background_five_ver from '@/assets/images/background-5.png'
+import background_one_ver from '@/assets/images/background-1.png';
+import background_two_ver from '@/assets/images/background-2.png';
+import background_three_ver from '@/assets/images/background-3.png';
+import background_four_ver from '@/assets/images/background-4.png';
+import background_five_ver from '@/assets/images/background-5.png';
 
-import background_one_hor from '@/assets/images/background-1-1.jpg'
-import background_two_hor from '@/assets/images/background-2-2.png'
-import background_three_hor from '@/assets/images/background-3-3.png'
-import background_four_hor from '@/assets/images/background-4-4.png'
-import background_five_hor from '@/assets/images/background-5-5.png'
+import background_one_hor from '@/assets/images/background-1-1.jpg';
+import background_two_hor from '@/assets/images/background-2-2.png';
+import background_three_hor from '@/assets/images/background-3-3.png';
+import background_four_hor from '@/assets/images/background-4-4.png';
+import background_five_hor from '@/assets/images/background-5-5.png';
 
 const {
   type: { toString },
   validate: { validURL, isImage },
 } = utils;
-const {play: { stop, start }} = action;
+const {
+  play: { stop, start },
+} = action;
 
 // 竖向默认背景
 const verBackgroundList = [
   {
     id: 999,
-    image: background_one_ver
+    image: background_one_ver,
   },
   {
     id: 998,
-    image: background_two_ver
+    image: background_two_ver,
   },
   {
     id: 997,
-    image: background_three_ver
+    image: background_three_ver,
   },
   {
     id: 996,
-    image: background_four_ver
+    image: background_four_ver,
   },
   {
     id: 995,
-    image: background_five_ver
-  }
-]
+    image: background_five_ver,
+  },
+];
 // 横向默认背景
 const horBackgroundList = [
   {
     id: 999,
-    image: background_one_hor
+    image: background_one_hor,
   },
   {
     id: 998,
-    image: background_two_hor
+    image: background_two_hor,
   },
   {
     id: 997,
-    image: background_three_hor
+    image: background_three_hor,
   },
   {
     id: 996,
-    image: background_four_hor
+    image: background_four_hor,
   },
   {
     id: 995,
-    image: background_five_hor
-  }
-]
+    image: background_five_hor,
+  },
+];
 
 const AutoPlay = (props) => {
-  const {playState, handlePlay} = props;
-  const [options, setOptions] = useState([]);
+  const { playState, handlePlay } = props;
   const [goodsList, setGoodsList] = useState([]);
+  const [playList, setPlayList] = useState([]);
   const [reverse, setReverse] = useState(false);
-  const [value, setValue] = useState('');
-  const [loading, setLoading] = useState(false);
   const [goodsUrl, setGoodsUrl] = useState(localStorage.getItem('goodsUrl') || '');
   const [goodsWav, setGoodsWav] = useState(localStorage.getItem('goodsWav') || '');
+  const [playId, setPlayId] = useState(localStorage.getItem('playId') || '')
   const localServerUrl = process.env.REACT_APP_LOCAL_SERVER_URL;
   const [defaultBackground, setDefaultImage] = useState();
-  const [backgroundID, setBackgoundID] = useState(localStorage.getItem('id') || 996)
+  const [backgroundID, setBackgoundID] = useState(localStorage.getItem('id') || 996);
   const [bgImgList, setBackgroundList] = useState(verBackgroundList);
 
   // 获取商品列表
@@ -97,12 +98,10 @@ const AutoPlay = (props) => {
     };
 
     // 设loading加载效果
-    setLoading(true);
     try {
       response = await API.autoPlayApi.getGoodsList(data);
-      setLoading(false);
     } catch (error) {
-      setLoading(false);
+      message.error('获取商品失败！')
       return false;
     }
 
@@ -119,16 +118,15 @@ const AutoPlay = (props) => {
     } catch (error) {
       return false;
     }
-
     if (response && response.code === 200) {
-      response.data.content.forEach((option) => {
-        option.label = option.name;
-        option.value = option.id;
-      });
-      setOptions(response.data.content);
-      setValue(response.data.content[0].label);
-      // 设定初始值
-      getGoodsList(response.data.content[0].id);
+      response.data.content.forEach(e => {
+        if(playId) {
+          e.checked = (playId == e.id)
+        } else {
+          e.checked = false
+        }
+      })
+      setPlayList(response.data.content);
     }
   };
 
@@ -179,14 +177,14 @@ const AutoPlay = (props) => {
     }
 
     if (response && response.code === 200) {
-      let tempList = []
-      if(reverse) {
-        tempList = [...horBackgroundList]
+      let tempList = [];
+      if (reverse) {
+        tempList = [...horBackgroundList];
       } else {
-        tempList = [...verBackgroundList]
+        tempList = [...verBackgroundList];
       }
-      tempList.push(...response.data.content)
-      setBackgroundList(tempList)
+      tempList.push(...response.data.content);
+      setBackgroundList(tempList);
     }
   };
 
@@ -194,7 +192,9 @@ const AutoPlay = (props) => {
   const connectVideoProcess = () => {
     const { localServerWsClient: client } = window;
     // 背景图
-    let bg = validURL(defaultBackground) ? defaultBackground : `../build${defaultBackground}`;
+    let bg = validURL(defaultBackground)
+      ? defaultBackground
+      : `../build${defaultBackground}`;
 
     if (process.env.NODE_ENV !== 'development') {
       bg = validURL(defaultBackground)
@@ -244,14 +244,13 @@ const AutoPlay = (props) => {
 
   // 连接要直播的内容和信息
   const sendGoodsToServe = (client, goodsList) => {
-    console.log(goodsList)
     let data = goodsList.map((e) => ({
       action_tag_list: e.action_tag_list,
       word_list: e.word_list || null,
       video_url: e.video_url || null,
       speed_list: e.speed_list,
       wav_url_list: e.wav_url_list,
-      image:e.image || null,
+      image: e.image || null,
       is_landscape: reverse,
       resize: false,
       window: !reverse
@@ -264,15 +263,40 @@ const AutoPlay = (props) => {
         ? getPersonPositions('person', 'winVer')
         : getPersonPositions('person', 'winHorizont'),
     }));
-    console.log(data)
     client.send('sequence->' + toString(data));
   };
 
-  // 选中新的的播放商品 && 根据选中的id获取新的商品
-  const handleChange = (value) => {
-    let good = options.find((opt) => value === opt.id);
-    setValue(good.label);
-    getGoodsList(value);
+  // 选中播放列表
+  const handleSelectPlays = (p, i) => {
+    // 存选中ID
+    localStorage.setItem('playId', p.id)
+    setPlayId(p.id)
+
+    // 判断是视频还是图片
+    if (isImage(p.cover_image)) {
+      setGoodsUrl(p.cover_image);
+      setGoodsWav('');
+      localStorage.setItem('goodsUrl', p.cover_image)
+      localStorage.removeItem('goodsWav')
+    } else {
+      setGoodsWav(p.cover_image);
+      setGoodsUrl('')
+      localStorage.setItem('goodsWav', p.cover_image)
+      localStorage.removeItem('goodsUrl')
+    }
+    // 更新播放列表选中状态
+    let tempList =  playList.filter((e, idx)=> {
+      if(i === idx) {
+        e.checked = true
+      } else {
+        e.checked = false
+      }
+      return e
+    })
+    setPlayList(tempList)
+
+    // 根据ID获取商品
+    getGoodsList(p.id)
   };
 
   // 直播 || 关闭
@@ -330,7 +354,9 @@ const AutoPlay = (props) => {
   const handleScale = (dom, winDom) => {
     const o = document.getElementsByClassName(dom)[0];
     const c = document.getElementsByClassName(winDom)[0];
-    let r = !reverse? (o.offsetWidth / o.offsetHeight / 10).toFixed(6) : (o.offsetHeight / o.offsetWidth / 10).toFixed(6)
+    let r = !reverse
+      ? (o.offsetWidth / o.offsetHeight / 10).toFixed(6)
+      : (o.offsetHeight / o.offsetWidth / 10).toFixed(6);
 
     o.onmousewheel = function (e) {
       //获取图片的宽高
@@ -338,34 +364,34 @@ const AutoPlay = (props) => {
       const offsetHeight = o.offsetHeight;
       if (e.wheelDelta > 0) {
         const setWidth = offsetWidth + offsetWidth * r;
-        const setHeight = offsetHeight + offsetHeight * r
+        const setHeight = offsetHeight + offsetHeight * r;
 
-        o.style.width = setWidth + 'px'
+        o.style.width = setWidth + 'px';
         o.style.height = setHeight + 'px';
 
         // 竖屏状态下，图片的缩放宽度如果大于等于限制窗口的宽度，即不可以在放大，横屏则人物的缩放的高度如果大于等于窗口的高度，则不可在放大
-        if(!reverse) {
+        if (!reverse) {
           // 限宽
-          if(setWidth >= c.offsetWidth) {
-            o.style.width = c.offsetWidth + 'px'
-            o.style.height = (c.offsetWidth / (r * 10)) + 'px'
+          if (setWidth >= c.offsetWidth) {
+            o.style.width = c.offsetWidth + 'px';
+            o.style.height = c.offsetWidth / (r * 10) + 'px';
           }
         } else {
           // 限高
-          if(setHeight >= c.offsetHeight){
-            o.style.height = c.offsetHeight + 'px'
-            o.style.width = (c.offsetHeight / (r * 10)) + 'px'
+          if (setHeight >= c.offsetHeight) {
+            o.style.height = c.offsetHeight + 'px';
+            o.style.width = c.offsetHeight / (r * 10) + 'px';
           }
         }
 
         // 限制上下位置
-        if(c.offsetHeight <= o.offsetHeight + o.offsetTop) {
-          o.style.top = c.offsetHeight - o.offsetHeight + 'px'
+        if (c.offsetHeight <= o.offsetHeight + o.offsetTop) {
+          o.style.top = c.offsetHeight - o.offsetHeight + 'px';
         }
 
         // 限制左右位置
-        if(c.offsetWidth <= o.offsetWidth + o.offsetLeft) {
-          o.style.left = c.offsetWidth - o.offsetWidth + 'px'
+        if (c.offsetWidth <= o.offsetWidth + o.offsetLeft) {
+          o.style.left = c.offsetWidth - o.offsetWidth + 'px';
         }
       } else {
         o.style.width = offsetWidth - offsetWidth * r + 'px';
@@ -393,12 +419,12 @@ const AutoPlay = (props) => {
   };
 
   // Upload 组件方法
-  const handleUploadChange = async  ({ fileList, file }) => {
+  const handleUploadChange = async ({ fileList, file }) => {
     if (file.status === 'done') {
       await API.autoPlayApi.addBackground({
-        image: file?.response.data
-      })
-      getBackground()
+        image: file?.response.data,
+      });
+      getBackground();
     }
   };
 
@@ -419,121 +445,87 @@ const AutoPlay = (props) => {
       message.error('删除失败！');
       return false;
     }
-    getBackground()
+    getBackground();
   };
 
   // 横竖屏切换背景图
-  useEffect( () => {
-    getBackground()
+  useEffect(() => {
+    getBackground();
 
     if (!reverse) {
       handleScale('goods-img', 'winVer');
       handleScale('person', 'winVer');
-      setBackgroundList(verBackgroundList)
+      setBackgroundList(verBackgroundList);
     } else {
       handleScale('goods-img', 'winHorizont');
       handleScale('person', 'winHorizont');
-      setBackgroundList(horBackgroundList)
+      setBackgroundList(horBackgroundList);
     }
   }, [reverse]);
 
   // 请求播放列表
-  useEffect(()=>{
-    getPlaylist()
-  }, [])
+  useEffect(() => {
+    getPlaylist();
+  }, []);
 
   // 设定背景图
-  useEffect(()=>{
-    bgImgList.forEach(e => {
-      if(e.id == backgroundID) {
-        setDefaultImage(e.image)
+  useEffect(() => {
+    bgImgList.forEach((e) => {
+      if (e.id == backgroundID) {
+        setDefaultImage(e.image);
       }
-    })
-  }, [bgImgList, backgroundID])
+    });
+  }, [bgImgList, backgroundID]);
 
   // 关联直播按钮
-  useEffect(()=>{
-    if(!goodsUrl && !goodsWav) {
-      localStorage.removeItem('goodsUrl')
-      localStorage.removeItem('goodsWav')
+  useEffect(() => {
+    if (!goodsUrl && !goodsWav) {
+      localStorage.removeItem('goodsUrl');
+      localStorage.removeItem('goodsWav');
     }
-  },[goodsUrl, goodsWav])
+  }, [goodsUrl, goodsWav]);
 
   return (
     <div className='auto_play flex justify-between h-full overflow-hidden'>
-      {/* 左 */}
+      {/* 左  mb-3*/}
       <div className='flex-1 rounded bg-white h-full'>
-        <div className='border-b text-center mb-3 h_45 line_height_45'>
+        <div className='border-b text-center h_45 line_height_45'>
           直播列表
         </div>
-        <div className='mb-3 flex justify-between px-3'>
-          <Select
-            defaultActiveFirstOption
-            value={value}
-            className='rounded-full flex-1 site-select'
-            loading={loading}
-            placeholder='请选择'
-            options={options}
-            onChange={handleChange}
-          />
-        </div>
-        <div className='goods relative box-border pr-4 goods_h'>
-          {goodsList.length > 0 ? (
-            <div className='flex flex-wrap'>
-              {goodsList.map((e, i) => {
-                return (
-                  <div
-                    className='flex flex-col goods_item  w_80 ml-4 mb-4'
-                    key={e.id}
-                  >
-                    { e.image && isImage(e.image[0]) ? (
-                      <div
-                        className='h_80 cursor-pointer rounded overflow-hidden'
-                        onClick={() => {
-                          setGoodsUrl(e.image[0]);
-                          setGoodsWav('');
-                          localStorage.setItem('goodsUrl', e.image[0])
-                          localStorage.removeItem('goodsWav')
-                        }}
-                      >
-                        <img
-                          src={e.image[0]}
-                          alt=''
-                          className='rounded'
-                        />
-                      </div>
-                    ) : (
-                      <div
-                        className='h_80 cursor-pointer rounded overflow-hidden'
-                        onClick={() => {
-                          setGoodsWav(e.video_url);
-                          setGoodsUrl('');
-                          localStorage.setItem('goodsWav', e.video_url)
-                          localStorage.removeItem('goodsUrl')
-                        }}
-                      >
-                        <video
-                          src={e.video_url}
-                          alt=''
-                          className='rounded w-full h-full object-fit'
-                        />
-                      </div>
-                    )}
-                    <div className='text-overflow font_12 mt-1 px-1'>
-                      {e.name}
-                    </div>
+        <div className='flex flex-wrap goods_h'>
+          {
+            !playList.length && (<div className=' m-auto'>
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            </div>)
+          }
+          {
+            playList.map((e, i) => {
+              return(
+                <div className='h_80 ml-4 mb-4 cursor-pointer relative mt-4' key={e.id} onClick={() => handleSelectPlays(e, i)}>
+                  <div className='w_80 h_80 overflow-hidden rounded'>
+                    {
+                      isImage(e.cover_image)?(
+
+                        <img  src={e.cover_image} alt=''/>
+                      ):(
+                        <video src={e.cover_image} className='object-fit h-full w-full'/>
+                      )
+                    }
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div>
-              <div className='absolute empty_icon'>
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-              </div>
-            </div>
-          )}
+                  {
+                    e.checked && (
+                      <div className='flex justify-center items-center absolute  z-30 _top_7px _right_7px'>
+                        <CheckCircleTwoTone twoToneColor='#ff8462'/>
+                      </div>
+                    )
+                  }
+                </div>
+              )
+            })
+          }
         </div>
+
+
         <div className='bg_img_h'>
           <div className='border-b text-center mb-3 h_45 line_height_45'>
             背景图
@@ -546,12 +538,12 @@ const AutoPlay = (props) => {
                     <div
                       className='w_80 ml-4 mb-4 border h_80 rounded  cursor-pointer relative'
                       onClick={() => {
-                        setBackgoundID(u.id)
-                        localStorage.setItem('id', u.id)
+                        setBackgoundID(u.id);
+                        localStorage.setItem('id', u.id);
                       }}
                     >
                       <div className='w-full h-full rounded cursor-pointer overflow-hidden'>
-                        <img src={u.image} alt='' className='h-full w-full'/>
+                        <img src={u.image} alt='' className='h-full w-full' />
                       </div>
 
                       {i > 4 && (
@@ -559,7 +551,7 @@ const AutoPlay = (props) => {
                           className='absolute _top_7px _right_7px flex justify-center items-center z-50'
                           onClick={() => handleDeleteBackgound(u.id)}
                         >
-                          <CloseCircleTwoTone twoToneColor='#ee6843'/>
+                          <CloseCircleTwoTone twoToneColor='#ee6843' />
                         </div>
                       )}
                     </div>
@@ -597,7 +589,7 @@ const AutoPlay = (props) => {
           {!reverse ? (
             <div className='w-full relative winVer h-full'>
               <div className='play_window h-full rounded overflow-hidden'>
-                <img src={defaultBackground} alt='' className='w-full h-full'/>
+                <img src={defaultBackground} alt='' className='w-full h-full' />
               </div>
               {/* 人物 */}
               <div className='absolute bottom-0 w-full h-full'>
@@ -608,9 +600,9 @@ const AutoPlay = (props) => {
                   onDragStart={(e) => handleDragStart(e, 'person', 'winVer')}
                 />
               </div>
-              {/* 商品 */}
+              {/* 商品 w_20vh h_20vh */}
               <div
-                className='absolute w_20vh h_20vh overflow-hidden goods-img goods rounded left_405-22 top_20vh'
+                className='absolute w_20vh h-auto overflow-hidden goods-img goods rounded left_405-22 top_20vh'
                 onDragStart={(e) => handleDragStart(e, 'goods-img', 'winVer')}
               >
                 {goodsUrl && <img src={goodsUrl} alt='' />}
@@ -623,7 +615,7 @@ const AutoPlay = (props) => {
                 className='w-full h_230 relative winHorizont overflow-hidden'
                 style={{ backgroundSize: '100%, 100%' }}
               >
-                <img src={defaultBackground} alt='' className='w-full h-full'/>
+                <img src={defaultBackground} alt='' className='w-full h-full' />
                 {/* 人物 */}
                 <img
                   src={yoyo}
