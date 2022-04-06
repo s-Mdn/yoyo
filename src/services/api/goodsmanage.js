@@ -140,6 +140,13 @@ function updateGoods(data) {
   })
 }
 
+function updataVoice(data) {
+  return request({
+    url: '/api/commodity/voice_replace',
+    method: 'POST',
+    data
+  })
+}
 
 export {
   getGoodsList,
@@ -152,5 +159,6 @@ export {
   checkSensitiveWord,
   addGoods,
   restoreVioce,
-  updateGoods
+  updateGoods,
+  updataVoice
 }

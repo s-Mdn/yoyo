@@ -120,8 +120,9 @@ class GoodsInfo extends React.Component {
                   onChange={({ file }) => this.handleUpdateVioce(i, file)}
                   showUploadList={false}
                   maxCount={1}
-                  data={{ preffix: 1 }}
-                  action={`${process.env.REACT_APP_API}/api/commodity/voice_replace`}
+                  data={this.audioData}
+                  action={`${process.env.REACT_APP_API}/api/common/upload`}
+                  // action={`${process.env.REACT_APP_API}/api/commodity/voice_replace`}
                   accept='audio/ogg,audio/mp3,audio/wav,audio/m4a,audio/flac'
                 >
                   <div className='flex items-center justify-center h-7 w-20 border rounded mr-4'>
@@ -273,17 +274,30 @@ class GoodsInfo extends React.Component {
     };
   };
 
+  // 语音参数
+  audioData = (file) => {
+    const suffix = file.name.slice(file.name.lastIndexOf('.'));
+    return {
+      suffix: suffix,
+    };
+  }
   // 更新音频
-  handleUpdateVioce = (i, file) => {
+  handleUpdateVioce = async (i, file) => {
     const { dataSource } = this.state;
-    const that = this;
     if (file.status === 'done') {
+      let response = null
+      try {
+        response = await API.goodsManageApi.updataVoice({
+          simple_id: dataSource[i].sentenceId,
+          file_link: file.response.data
+        })
+      } catch (error) {
+        message.error('语音更替失败！')
+        return false
+      }
       dataSource[i].updateStatus = false;
+      dataSource[i].voice = file.response.data
       this.setState({ dataSource: this.state.dataSource });
-      let timeOut = setTimeout(() => {
-        that.props.history.goBack();
-        clearTimeout(timeOut);
-      }, 1000);
     }
   };
 
@@ -447,7 +461,7 @@ class GoodsInfo extends React.Component {
                           showUploadList={false}
                           data={this.videoData}
                           action={`${process.env.REACT_APP_API}/api/common/upload`}
-                          accept='.mp3, .wav, .asf'
+                          accept='.mp4, .avi .flv'
                           multiple={true}
                           onChange={this.handleChange}
                         >
