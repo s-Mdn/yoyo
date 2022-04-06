@@ -606,7 +606,7 @@ const AutoPlay = (props) => {
         <div className={['rounded relative flex-1 bg-white win_h flex flex-col'].join(' ')}>
           <div className="text-center h_45 line_height_45">直播列表</div>
           {!reverse ? (
-            <div className='w-full relative winVer flex-none'>
+            <div className='w-full relative winVer flex-none rounded-b overflow-hidden'>
               <div className='play_window h-full overflow-hidden'>
                 <img src={backGround} alt='' className='w-full h-full' />
               </div>
@@ -633,7 +633,7 @@ const AutoPlay = (props) => {
               </div>
             </div>
           ) : (
-            <div className='w-full flex flex-col justify-center items-center relative'>
+            <div className='w-full flex flex-col justify-center items-center relative mt-56'>
               <div
                 className='w-full h_230 relative winHorizont overflow-hidden'
                 style={{ backgroundSize: '100%, 100%' }}

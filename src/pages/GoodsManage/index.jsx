@@ -30,7 +30,8 @@ class GoodsManage extends React.Component {
       modelWidth: '400px', // Model宽度
       modelContent: '', // Model文本
       bodyStyle: {height: 'auto', textAlign: 'center', padding: '10px' },// Model的中间内容样式
-      goodsId: '',//商品ID
+      goods: {},  // 商品
+      modalItem: {},
       playId: '',// 播放ID
       reLoad: false,// 刷新
     };
@@ -56,8 +57,8 @@ class GoodsManage extends React.Component {
       return
     } else {
       this.setState({
+        modalItem: goods,
         modelVisible: true,
-        goodsId: goods.id,
         modelContent: '确定删除该商品？'
       })
     }
@@ -75,7 +76,7 @@ class GoodsManage extends React.Component {
   handlePlaysDelete = (play) => {
     this.setState({
       modelVisible: true,
-      playId: play.id,
+      modalItem: play,
       modelContent: '确定删除该播放？'
     })
   };
@@ -93,13 +94,13 @@ class GoodsManage extends React.Component {
 
   // 弹窗点击确定回调
   handleOk = async () => {
-    const { goodsId, playId, tabActive } = this.state
+    const { modalItem, playId, tabActive } = this.state
     let response = null
     try {
       if( tabActive === '1' ) {
-        response = await API.goodsManageApi.deleteGoods(goodsId)
+        response = await API.goodsManageApi.deleteGoods(modalItem.id)
       } else {
-        response = await API.goodsManageApi.deletePlay(playId)
+        response = await API.goodsManageApi.deletePlay(modalItem.id)
       }
     } catch (error) {
       message.error('删除失败！')
@@ -140,7 +141,7 @@ class GoodsManage extends React.Component {
   }
 
   render() {
-    const { bodyStyle, modelWidth, modelTitle, modelVisible, reLoad, playList, goodsList, modelContent } = this.state
+    const { bodyStyle, modelWidth, modelTitle, modelVisible, reLoad, playList, goodsList, modelContent, modalItem, tabActive } = this.state
     const { history } = this.props
 
     // 商品列表
@@ -243,6 +244,56 @@ class GoodsManage extends React.Component {
         >
 
           <div>{ modelContent }</div>
+          {
+            tabActive == 1?(
+              <div className='w_80 h_80 overflow-hidden m-auto my-2'>
+                {
+                  (modalItem && !modalItem.video_url)?(
+                    <img src={modalItem.image && modalItem.image[0]} alt=''/>
+                  ):(
+                    <video src={modalItem.video_url} className='object-fit w-full h-full' />
+                  )
+                }
+              </div>
+            ):(
+              <div className='w_80 h_80 overflow-hidden m-auto my-2'>
+                {
+                  modalItem && (
+                    <div className='w_80 h_80 overflow-hidden m-auto my-2'>
+                      {
+                        isImage(modalItem.cover_image)?(
+                          <img src={modalItem.cover_image} alt=''/>
+                        ):(
+                          <video src={modalItem.cover_image} className='object-fit w-full h-full' />
+                        )
+                      }
+                    </div>
+                  )
+                  // (modalItem)?(
+
+                  // ):(
+
+                  // )
+                  // console.log(modalItem)
+                }
+              </div>
+            )
+          }
+          {/* <div className='w_80 h_80 overflow-hidden m-auto my-2'>
+            {
+
+            }
+            {
+              (modalItem && !modalItem.video_url)?(
+                <img src={modalItem.image && modalItem.image[0]} alt=''/>
+              ):(
+                <video src={modalItem.video_url} className='object-fit w-full h-full' />
+              )
+            }
+          </div> */}
+          <div>
+            {modalItem.name}
+          </div>
         </Modal>
       </div>
     );

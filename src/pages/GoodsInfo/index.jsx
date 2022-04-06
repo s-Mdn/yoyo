@@ -1,6 +1,6 @@
 import React from 'react';
 import { Radio, Upload, Input, Table, Select, message } from 'antd';
-import { PlusOutlined, CloseCircleTwoTone } from '@ant-design/icons';
+import { PlusOutlined, CloseCircleTwoTone, ArrowLeftOutlined } from '@ant-design/icons';
 
 import utils from '@/utils';
 import API from '@/services';
@@ -384,8 +384,9 @@ class GoodsInfo extends React.Component {
       <div className='h-full overflow-hidden goodsinfo'>
         <div className='flex-1 bg-white goods_h-full p-6'>
           <div className='flex head items-center mb-4'>
-            <div className='font_20 flex items-center text-black font-semibold w_140'>
-              <span className='ml-3'>编辑商品</span>
+            <div className='font_20 flex items-center text-black font-semibold w-auto'>
+              <div className='flex items-center cursor-pointer' onClick={this.props.history.goBack}><ArrowLeftOutlined/></div>
+              <span className='ml-3'>商品管理/新增商品</span>
             </div>
           </div>
           <div className='content'>
