@@ -602,10 +602,12 @@ const AutoPlay = (props) => {
 
       {/* 中 */}
       <div className='m_l_r_24 w_405  box-border'>
-        <div className={['rounded relative flex-1 bg-white win_h '].join(' ')}>
+        {/* */}
+        <div className={['rounded relative flex-1 bg-white win_h flex flex-col'].join(' ')}>
+          <div class="text-center h_45 line_height_45">直播列表</div>
           {!reverse ? (
-            <div className='w-full relative winVer h-full'>
-              <div className='play_window h-full rounded overflow-hidden'>
+            <div className='w-full relative winVer flex-none'>
+              <div className='play_window h-full overflow-hidden'>
                 <img src={backGround} alt='' className='w-full h-full' />
               </div>
               {/* 人物 */}
