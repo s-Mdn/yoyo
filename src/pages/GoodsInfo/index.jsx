@@ -447,7 +447,7 @@ class GoodsInfo extends React.Component {
                           showUploadList={false}
                           data={this.videoData}
                           action={`${process.env.REACT_APP_API}/api/common/upload`}
-                          accept='.mp4, .avi .flv'
+                          accept='.mp3, .wav, .asf'
                           multiple={true}
                           onChange={this.handleChange}
                         >
