@@ -702,7 +702,7 @@ const AutoPlay = (props) => {
 
         {/* 按钮 */}
         <div className='h_60px rounded bg-white mt_15px flex items-center justify-center px-4 box-border'>
-          {goodsUrl ? (
+          {Object.keys(goodsUrl).length ? (
             <button
               className='bg-FF8462 px-6 py-1.5 rounded-full text-white'
               onClick={handleVideoProcess}
