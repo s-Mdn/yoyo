@@ -242,6 +242,11 @@ const AutoPlay = (props) => {
         handlePlay(stop());
         window.localServerWsClient = null;
       };
+
+      // 接受信息
+      client.onmessage = (event) => {
+        console.log(event)
+      }
     }
   };
 
