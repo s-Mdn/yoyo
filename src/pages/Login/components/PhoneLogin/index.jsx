@@ -9,7 +9,7 @@ import phoneIcon from '@/assets/icons/phone_icon.png';
 import pasIcon from '@/assets/icons/pas_icon.png';
 
 const { auth: { setLocal }, validate: { validPhone } } = utils;
-const { profile } = action;
+const { profile: { addProfile } } = action;
 const TokenKey = 'token';
 let timeOut;
 
@@ -62,13 +62,14 @@ const PhoneLogin = (props) => {
     const params = {
       phone_num: data.phone,
       code: data.code,
+      sms_use: 'login'
     };
     let response = null;
 
     try {
       response = await API.loginApi.loginByValidCode(params);
     } catch (error) {
-      setWarnings('请刷新重试')
+      setWarnings(error || '请刷新重试')
       return false;
     }
 
@@ -168,7 +169,7 @@ const mapStateToProps = ( state ) => ({
 
 const mapDispatchToProps = ( dispatch ) => ({
   handleProfile: ( data ) => {
-    dispatch(profile.addProfile( data ));
+    dispatch(addProfile( data ));
   },
 });
 

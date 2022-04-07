@@ -78,7 +78,6 @@ const Login = (props) => {
             <div className='phone_input border-b'>
               <Input
                 value={account}
-                maxLength={11}
                 placeholder='请输入账号'
                 bordered={false}
                 onChange={(e) => setAccount(() => e.target.value)}
@@ -97,7 +96,6 @@ const Login = (props) => {
                 value={password}
                 placeholder='请输入密码'
                 bordered={false}
-                maxLength={6}
                 onChange={(e) => setPassword(() => e.target.value)}
               />
             </div>

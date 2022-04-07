@@ -17,7 +17,7 @@ class Login extends React.Component {
             </div>
             {/* 登陆 form */}
             <div className='login_container_inner_right flex-1 flex justify-center'>
-              <Tabs defaultActiveKey='pas' centered tabBarStyle={{marginBottom: '25px'}}>
+              <Tabs defaultActiveKey='phone' centered tabBarStyle={{marginBottom: '25px'}}>
                 <TabPane tab='手机登陆' key='phone'>
                   <PhoneLogin />
                 </TabPane>
