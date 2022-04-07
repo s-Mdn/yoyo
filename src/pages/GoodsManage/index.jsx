@@ -6,17 +6,18 @@ import {
   RedoOutlined,
   AudioTwoTone,
   CheckCircleTwoTone,
-  SyncOutlined
+  SyncOutlined,
 } from '@ant-design/icons';
-import Modal from '@/components/Modal'
+import Modal from '@/components/Modal';
 import Content from './component/Content';
 import API from '@/services';
 import utils from '@/utils';
 import './index.less';
 
 const { TabPane } = Tabs;
-const {validate: { isImage }} = utils;
-
+const {
+  validate: { isImage },
+} = utils;
 
 class GoodsManage extends React.Component {
   constructor(props) {
@@ -25,23 +26,25 @@ class GoodsManage extends React.Component {
       goodsList: [], // 商品列表
       playList: [], // 播放列表
       tabActive: '1', // 激活的卡片
-      modelTitle: '',// Model标题
-      modelVisible: false,// Model显示状态
+      modelTitle: '', // Model标题
+      modelVisible: false, // Model显示状态
       modelWidth: '400px', // Model宽度
       modelContent: '', // Model文本
-      bodyStyle: {height: 'auto', textAlign: 'center', padding: '10px' },// Model的中间内容样式
-      goods: {},  // 商品
+      bodyStyle: { height: 'auto', textAlign: 'center', padding: '10px' }, // Model的中间内容样式
+      goods: {}, // 商品
       modalItem: {},
-      playId: '',// 播放ID
-      reLoad: false,// 刷新
+      playId: '', // 播放ID
+      reLoad: false, // 刷新
+      isViewGoods: false, // 查看商品
+      imgList: [],
     };
   }
 
   // 编辑商品
   handleGoodsEdit = (goods) => {
-    if(goods.status === 'f') {
+    if (goods.status === 'f') {
       message.info('语音合成中，无法进行操作！');
-      return
+      return;
     }
 
     this.props.history.push({
@@ -52,24 +55,24 @@ class GoodsManage extends React.Component {
 
   // 删除商品
   handleGoodsDelete = (goods) => {
-    if(goods.status === 'f') {
+    if (goods.status === 'f') {
       message.info('语音合成中，无法进行操作！');
-      return
+      return;
     } else {
       this.setState({
         modalItem: goods,
         modelVisible: true,
-        modelContent: '确定删除该商品？'
-      })
+        modelContent: '确定删除该商品？',
+      });
     }
   };
 
   // 编辑播放列表
-  handlePlaysEdit =  (play) => {
+  handlePlaysEdit = (play) => {
     this.props.history.push({
       pathname: `/plays/${play.id}`,
-      query: { id: play.id, goodsName: play.name }
-    })
+      query: { id: play.id, goodsName: play.name },
+    });
   };
 
   // 播放列表删除
@@ -77,22 +80,36 @@ class GoodsManage extends React.Component {
     this.setState({
       modelVisible: true,
       modalItem: play,
-      modelContent: '确定删除该播放？'
-    })
+      modelContent: '确定删除该播放？',
+    });
   };
 
   // 查看播放item的商品
   handlePlayView = async (play) => {
-    console.log(play)
-    let response = null
+    console.log(play);
+    let response = null;
     try {
-      response = await API.goodsManageApi.viewGoods({id: play.id})
+      response = await API.goodsManageApi.viewGoods({ id: play.id });
     } catch (error) {
-      message.error('查看失败！')
-      return false
+      message.error('查看失败！');
+      return false;
     }
-    console.log(response)
-  }
+    if (response && response.code === 200) {
+      let imgList = [];
+      response.data.forEach((e) => {
+        if (e.video_url) {
+          imgList.push(e.video_url);
+        } else {
+          imgList.push(...e.image);
+        }
+      });
+      // console.log(imgList)
+      this.setState({
+        modelVisible: true,
+        imgList,
+      });
+    }
+  };
 
   // Tabs切换
   handleTabChange = (activeKey) => {
@@ -101,28 +118,28 @@ class GoodsManage extends React.Component {
 
   // 刷新
   handleReLoad = () => {
-    this.setState({reLoad: true})
+    this.setState({ reLoad: true });
     this.getGoodsAndPlaylist();
   };
 
   // 弹窗点击确定回调
   handleOk = async () => {
-    const { modalItem, playId, tabActive } = this.state
-    let response = null
+    const { modalItem, playId, tabActive } = this.state;
+    let response = null;
     try {
-      if( tabActive === '1' ) {
-        response = await API.goodsManageApi.deleteGoods(modalItem.id)
+      if (tabActive === '1') {
+        response = await API.goodsManageApi.deleteGoods(modalItem.id);
       } else {
-        response = await API.goodsManageApi.deletePlay(modalItem.id)
+        response = await API.goodsManageApi.deletePlay(modalItem.id);
       }
     } catch (error) {
-      message.error('删除失败！')
-      return false
+      message.error('删除失败！');
+      return false;
     }
 
-    if(response && response.code === 200) {
+    if (response && response.code === 200) {
       this.getGoodsAndPlaylist();
-      this.setState({modelVisible: false})
+      this.setState({ modelVisible: false });
     }
   };
 
@@ -135,7 +152,7 @@ class GoodsManage extends React.Component {
         API.goodsManageApi.getPlaylist(),
       ]);
     } catch (error) {
-      message.error('获取失败，请刷新重试！')
+      message.error('获取失败，请刷新重试！');
       return false;
     }
 
@@ -154,48 +171,59 @@ class GoodsManage extends React.Component {
   }
 
   render() {
-    const { bodyStyle, modelWidth, modelTitle, modelVisible, reLoad, playList, goodsList, modelContent, modalItem, tabActive } = this.state
-    const { history } = this.props
+    const {
+      bodyStyle,
+      modelWidth,
+      modelTitle,
+      modelVisible,
+      reLoad,
+      playList,
+      goodsList,
+      modelContent,
+      modalItem,
+      tabActive,
+      isViewGoods,
+      imgList,
+    } = this.state;
+    const { history } = this.props;
 
     // 商品列表
-    const Goods = ( g ) => {
-      return(
+    const Goods = (g) => {
+      return (
         <>
-          {
-            g.image && isImage(g.image[0])? (
-              <img src={g.image[0]} alt=''/>
-            ):(
-              <video className='w-full h-full object-fit'  src={g.video_url}/>
-            )
-          }
+          {g.image && isImage(g.image[0]) ? (
+            <img src={g.image[0]} alt='' />
+          ) : (
+            <video className='w-full h-full object-fit' src={g.video_url} />
+          )}
           <div className='absolute left-0 top-0 z-10'>
-            {
-              (g.status === 'f')? (
-                <div className=' flex items-center ml_3 mt-1'>
-                  <AudioTwoTone twoToneColor='#ff8462' />
-                  <span className='font_12 color-ee6843'>语音合成中....</span>
-                </div>
-              ):(
-                <div className=' flex items-center ml_3 mt-1'>
-                  <CheckCircleTwoTone twoToneColor='#ff8462' />
-                </div>
-              )
-            }
+            {g.status === 'f' ? (
+              <div className=' flex items-center ml_3 mt-1'>
+                <AudioTwoTone twoToneColor='#ff8462' />
+                <span className='font_12 color-ee6843'>语音合成中....</span>
+              </div>
+            ) : (
+              <div className=' flex items-center ml_3 mt-1'>
+                <CheckCircleTwoTone twoToneColor='#ff8462' />
+              </div>
+            )}
           </div>
         </>
-      )
-    }
+      );
+    };
 
     // 播放列表
-    const Plays = ( p ) => {
-      return(
+    const Plays = (p) => {
+      return (
         <>
-          {
-            isImage(p.cover_image)?(<img src={p.cover_image} alt=''/>) : (<video className='object-fit h-full' src={p.cover_image}/>)
-          }
+          {isImage(p.cover_image) ? (
+            <img src={p.cover_image} alt='' />
+          ) : (
+            <video className='object-fit h-full' src={p.cover_image} />
+          )}
         </>
-      )
-    }
+      );
+    };
 
     return (
       <div className='box-border goodsmanage overflow-hidden'>
@@ -228,21 +256,21 @@ class GoodsManage extends React.Component {
               className='border flex items-center py-0.5 px-4 rounded cursor-pointer reload'
               onClick={this.handleReLoad}
             >
-              {
-                !reLoad? (<RedoOutlined />) : (<SyncOutlined spin />)
-              }
+              {!reLoad ? <RedoOutlined /> : <SyncOutlined spin />}
             </div>
             {this.state.tabActive === '1' ? (
               <div
                 className='border flex items-center py-0.5 px-4 rounded cursor-pointer ml-3'
-                onClick={()=>history.push({ pathname: '/goods', query: { isAdd: true } })}
+                onClick={() =>
+                  history.push({ pathname: '/goods', query: { isAdd: true } })
+                }
               >
                 新增
               </div>
             ) : (
               <div
                 className='border flex items-center py-0.5 px-4 rounded cursor-pointer ml-3'
-                onClick={()=>history.push({pathname: '/plays'})}
+                onClick={() => history.push({ pathname: '/plays' })}
               >
                 新增
               </div>
@@ -255,43 +283,57 @@ class GoodsManage extends React.Component {
           visible={modelVisible}
           width={modelWidth}
           bodyStyle={bodyStyle}
-          onCancel={()=>this.setState({modelVisible: false})}
+          onCancel={() => this.setState({ modelVisible: false })}
           onOk={this.handleOk}
         >
-
-          <div>{ modelContent }</div>
-          {
-            tabActive == 1?(
-              <div className='w_80 h_80 overflow-hidden m-auto my-2'>
-                {
-                  (modalItem && !modalItem.video_url)?(
-                    <img src={modalItem.image && modalItem.image[0]} alt=''/>
-                  ):(
-                    <video src={modalItem.video_url} className='object-fit w-full h-full' />
-                  )
-                }
-              </div>
-            ):(
-              <div className='w_80 h_80 overflow-hidden m-auto my-2'>
-                {
-                  modalItem && (
+          <div>{modelContent}</div>
+          {!isViewGoods ? (
+            <div className='flex flex-wrap _ml_5px'>
+              {imgList.map((e, i) => {
+                return (
+                  <div key={e} className='w_80 h_80 overflow-hidden ml_20px mb_20px rounded'>
+                    {isImage(e) ? (
+                      <img src={e} alt='' />
+                    ) : (
+                      <video src={e}  className='w-full h-full object-fit' />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <>
+              {tabActive == 1 ? (
+                <div className='w_80 h_80 overflow-hidden m-auto my-2'>
+                  {modalItem && !modalItem.video_url ? (
+                    <img src={modalItem.image && modalItem.image[0]} alt='' />
+                  ) : (
+                    <video
+                      src={modalItem.video_url}
+                      className='object-fit w-full h-full'
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className='w_80 h_80 overflow-hidden m-auto my-2'>
+                  {modalItem && (
                     <div className='w_80 h_80 overflow-hidden m-auto my-2'>
-                      {
-                        isImage(modalItem.cover_image)?(
-                          <img src={modalItem.cover_image} alt=''/>
-                        ):(
-                          <video src={modalItem.cover_image} className='object-fit w-full h-full' />
-                        )
-                      }
+                      {isImage(modalItem.cover_image) ? (
+                        <img src={modalItem.cover_image} alt='' />
+                      ) : (
+                        <video
+                          src={modalItem.cover_image}
+                          className='object-fit w-full h-full'
+                        />
+                      )}
                     </div>
-                  )
-                }
-              </div>
-            )
-          }
-          <div>
-            {modalItem.name}
-          </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          <div>{modalItem.name}</div>
         </Modal>
       </div>
     );

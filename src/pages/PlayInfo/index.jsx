@@ -131,9 +131,10 @@ class PlayInfo extends React.Component {
       const {
         data: { pagination, content },
       } = response;
+
       this.setState({
         total: pagination.total,
-        goodsList: content,
+        goodsList: content.filter(e => {return e.status !== 'f'}),
       });
     }
   };
