@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Upload, Input, message, Radio } from 'antd';
-import { EditOutlined, CameraTwoTone } from '@ant-design/icons';
+import { CameraTwoTone, EditFilled } from '@ant-design/icons';
 import utils from '@/utils'
 import API from '@/services';
 import action from '@/actions'
@@ -169,12 +169,16 @@ class Profile extends React.Component {
                 <div className='p_t_b_30 form border-b'>
                   {!resetName ? (
                     <div className='font_26  font-semibold flex items-center'>
-                      <span className='mr-4 text-black'>{nickName}</span>
+                      <span className='mr-4 text-black'>
+                        {
+                          nickName?(nickName): 'YoYo'
+                        }
+                      </span>
                       <div
-                        className='cursor-pointer'
+                        className='cursor-pointer text-black'
                         onClick={() => this.handleResetName(true)}
                       >
-                        <EditOutlined />
+                        <EditFilled />
                       </div>
                     </div>
                   ) : (
@@ -210,17 +214,23 @@ class Profile extends React.Component {
                   )}
                 </div>
 
-                <div className='p_t_b_30 form border-b'>
-                  <div className='font_15 color-444 font-semibold flex items-center'>
+                <div className='p_t_b_30 form border-b flex'>
+                  <div className='font_15 color-444 font-semibold flex items-center  w-4/6'>
                     <span className='mr-4 w_120'>手机号码</span>
                     <div className='cursor-pointer'>{ hidePhoneNum }</div>
                   </div>
+                  <div className='flex items-center text-black cursor-default'>
+                    <EditFilled/><span className='ml-2'>修改</span>
+                  </div>
                 </div>
 
-                <div className='p_t_b_30 form border-b'>
-                  <div className='font_15 color-444 font-semibold flex items-center'>
+                <div className='p_t_b_30 form border-b flex'>
+                  <div className='font_15 color-444 font-semibold flex items-center w-4/6'>
                     <span className='mr-4 w_120'>账户密码</span>
                     <div className='cursor-pointer'>******</div>
+                  </div>
+                  <div className='flex items-center text-black cursor-default'>
+                    <EditFilled/><span className='ml-2'>修改</span>
                   </div>
                 </div>
 
