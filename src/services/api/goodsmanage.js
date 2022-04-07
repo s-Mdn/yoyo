@@ -140,11 +140,28 @@ function updateGoods(data) {
   })
 }
 
+/**
+ *
+ * @param {object} data
+ * @returns
+ */
 function updataVoice(data) {
   return request({
     url: '/api/commodity/voice_replace',
     method: 'POST',
     data
+  })
+}
+
+/**
+ *
+ * @param {object} data
+ * @returns
+ */
+function viewGoods(data) {
+  return request({
+    url: '/api/play_list/get_commodity?play_list_id=' + data.id,
+    method: 'GET'
   })
 }
 
@@ -160,5 +177,6 @@ export {
   addGoods,
   restoreVioce,
   updateGoods,
-  updataVoice
+  updataVoice,
+  viewGoods
 }

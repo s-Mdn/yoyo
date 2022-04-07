@@ -81,6 +81,19 @@ class GoodsManage extends React.Component {
     })
   };
 
+  // 查看播放item的商品
+  handlePlayView = async (play) => {
+    console.log(play)
+    let response = null
+    try {
+      response = await API.goodsManageApi.viewGoods({id: play.id})
+    } catch (error) {
+      message.error('查看失败！')
+      return false
+    }
+    console.log(response)
+  }
+
   // Tabs切换
   handleTabChange = (activeKey) => {
     this.setState({ tabActive: activeKey });
@@ -190,6 +203,7 @@ class GoodsManage extends React.Component {
           <Tabs onChange={this.handleTabChange} defaultActiveKey='1'>
             <TabPane tab='所有商品' key='1'>
               <Content
+                isView={false}
                 content={goodsList}
                 childrenNode={Goods}
                 handleDelete={this.handleGoodsDelete}
@@ -198,8 +212,10 @@ class GoodsManage extends React.Component {
             </TabPane>
             <TabPane tab='播放列表' key='2'>
               <Content
+                isView={true}
                 content={playList}
                 childrenNode={Plays}
+                handleView={this.handlePlayView}
                 handleDelete={this.handlePlaysDelete}
                 handleEdit={this.handlePlaysEdit}
               />
@@ -269,28 +285,10 @@ class GoodsManage extends React.Component {
                       }
                     </div>
                   )
-                  // (modalItem)?(
-
-                  // ):(
-
-                  // )
-                  // console.log(modalItem)
                 }
               </div>
             )
           }
-          {/* <div className='w_80 h_80 overflow-hidden m-auto my-2'>
-            {
-
-            }
-            {
-              (modalItem && !modalItem.video_url)?(
-                <img src={modalItem.image && modalItem.image[0]} alt=''/>
-              ):(
-                <video src={modalItem.video_url} className='object-fit w-full h-full' />
-              )
-            }
-          </div> */}
           <div>
             {modalItem.name}
           </div>

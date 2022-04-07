@@ -385,13 +385,13 @@ class GoodsInfo extends React.Component {
         <div className='flex-1 bg-white goods_h-full p-6'>
           <div className='flex head items-center mb-4'>
             <div className='font_20 flex items-center text-black font-semibold w-auto'>
-              <div className='flex items-center cursor-pointer' onClick={this.props.history.goBack}><ArrowLeftOutlined/></div>
+              <div className='flex items-center cursor-pointer w_30px' onClick={this.props.history.goBack}><ArrowLeftOutlined/></div>
               <span className='ml-3'>商品管理/新增商品</span>
             </div>
           </div>
           <div className='content'>
-            <div className='content_upload flex'>
-              <span className='w_140 text-right mr-4'>商品展示</span>
+            <div className='content_upload flex ml_30px'>
+              <span className='mr-4'>商品展示</span>
               <div className='upload-area'>
                 <div className='upload_type mb-2'>
                   <Radio.Group
@@ -482,9 +482,9 @@ class GoodsInfo extends React.Component {
                 </div>
               </div>
             </div>
-            <div className='content_info mt-4'>
-              <div className='goods_name flex items-center'>
-                <span className='w_140 text-right mr-4'>商品名称</span>
+            <div className='content_info mt-4 '>
+              <div className='goods_name flex items-center ml_30px'>
+                <span className='mr-4'>商品名称</span>
                 <Input
                   style={{ width: '50%' }}
                   placeholder='请输入商品名称'
@@ -492,8 +492,8 @@ class GoodsInfo extends React.Component {
                   onChange={(e) => this.setState({ goodsName: e.target.value })}
                 />
               </div>
-              <div className='goods_price flex mb-6 mt-6'>
-                <span className='w_140 text-right mr-4'>商品价格</span>
+              <div className='goods_price flex mb-6 mt-6 ml_30px'>
+                <span className='mr-4'>商品价格</span>
                 <Input
                   style={{ width: '50%' }}
                   placeholder='请输入商品价格'
@@ -503,8 +503,8 @@ class GoodsInfo extends React.Component {
                   }
                 />
               </div>
-              <div className='goods_introduce flex'>
-                <span className='w_140 text-right mr-4'>商品介绍</span>
+              <div className='goods_introduce flex ml_30px'>
+                <span className='mr-4'>商品介绍</span>
                 <div className='w-2/4 h_200 relative'>
                   <Input.TextArea
                     style={{ height: '100%', resize: 'none' }}
@@ -514,9 +514,10 @@ class GoodsInfo extends React.Component {
                       this.setState({ introduce: e.target.value })
                     }
                   />
+                  <div className='font_12'>介绍文案以句号为段落结束</div>
                 </div>
+
               </div>
-              <div className='ml_156 font_12'>介绍文案以句号为段落结束</div>
             </div>
           </div>
           {dataSource.length > 0 && (
