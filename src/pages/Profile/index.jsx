@@ -11,7 +11,11 @@ const ModelTempLate = React.lazy(() => import('@/components/ModelTempLate'));
 
 const { validate, type, auth } = utils;
 const { profile, quality } = action;
+const changePhoneTag = 'check_phone_num';
+const changePasTag = 'reset_password';
+const checkNewPhoneTag = 'reset_phone_num';
 let timer = null;
+
 class Profile extends React.Component {
   constructor(props) {
     super(props);
@@ -22,12 +26,15 @@ class Profile extends React.Component {
       avatar: '', // 头像
       hidePhoneNum: '', // 处理后的电话号码
       passWord: {},
-      timeStamp: '获取验证码',
+      timeStampPas: '获取验证码',
+      timeStampOldPhone: '获取验证码',
+      timeStampNewphone: '获取验证码',
       visible: false, // 弹窗visible
       modelTitle: '', // 弹窗标题
       modelVndom: null, //控制弹窗footer和content
       isGetValidata: false, // 是否已经获取验证码
-      oldPhone: '', // 旧手机号码
+      newPhone: '', // 旧手机号码
+      code: {}, // 修改手机号验证码
     };
   }
 
@@ -115,12 +122,15 @@ class Profile extends React.Component {
   changePasFooter = () => (
     <div>
       <button
-        className='border border_r_3 font_12 py_2 px_10 mr_8px'
+        className='border font_12 py-1 w_65px mr_8px rounded-full'
         onClick={this.handleCancel}
       >
         取 消
       </button>
-      <button className='border border_r_3 font_12 py_2 px_10 bg-FF8462 text-white'>
+      <button
+        className='border font_12 py-1 w_65px rounded-full bg-FF8462 text-white'
+        onClick={this.handleComfirmChangePas}
+      >
         确 认
       </button>
     </div>
@@ -142,22 +152,24 @@ class Profile extends React.Component {
         />
         <button
           className='absolute right-3 px-2 py-1 border rounded-full'
-          onClick={() => this.countDown(60000)}
+          onClick={() =>
+            this.getValidateCode(changePasTag, this.props.userInfo.phone_num)
+          }
         >
-          {validate.isNumber(this.state.timeStamp) ? (
+          {validate.isNumber(this.state.timeStampPas) ? (
             <>
-              {this.state.timeStamp}
+              {this.state.timeStampPas}
               秒后重发
             </>
           ) : (
-            <>{this.state.timeStamp}</>
+            <>{this.state.timeStampPas}</>
           )}
         </button>
       </p>
       <p className='new_pasword flex items-center'>
         <label className='flex-none mr-2 ml_10px'>输入验证码：</label>
         <Input
-          autoComplete='off'
+          autoComplete='new-password'
           onChange={(e) => {
             this.state.passWord.code = e.target.value;
             this.setState({
@@ -176,7 +188,7 @@ class Profile extends React.Component {
       <p className='new_pasword flex items-center'>
         <label className='flex-none mr-2 ml_10px'>输入新密码：</label>
         <Input.Password
-          autoComplete='off'
+          autoComplete='new-password'
           onChange={(e) => {
             this.state.passWord.newPas = e.target.value;
             this.setState({
@@ -195,7 +207,7 @@ class Profile extends React.Component {
       <p className='comfire_pasword flex items-center' style={{ margin: 0 }}>
         <label className='flex-none mr-2 ml_10px'>确认新密码：</label>
         <Input.Password
-          autoComplete='off'
+          autoComplete='new-password'
           onChange={(e) => {
             this.state.passWord.comfirmPas = e.target.value;
             this.setState({
@@ -216,9 +228,15 @@ class Profile extends React.Component {
 
   // 修改手机号码弹窗footer
   changePhoneFooter = () => (
-    <div className='flex justify-center'>
+    <div className='flex justify-center font_12'>
       <button
-        className='mx-auto border rounded-full py-1 px-3 bg-FF8462 font_12 text-white'
+        className='border rounded-full px-4 w_65px mr-3'
+        onClick={this.handleCancel}
+      >
+        取消
+      </button>
+      <button
+        className='border rounded-full py-1 w_65px bg-FF8462 font_12 text-white'
         onClick={this.handleNext}
       >
         下一步
@@ -237,19 +255,23 @@ class Profile extends React.Component {
             padding: '4px 10px',
             color: '#000',
           }}
+          disabled
+          value={this.state.hidePhoneNum}
           maxLength={11}
         />
         <button
           className='absolute right-0 px-2 py-1 border-l h-full'
-          onClick={()=>this.getValidateCode()}
+          onClick={() => {
+            this.getValidateCode(changePhoneTag, this.props.userInfo.phone_num);
+          }}
         >
-          {validate.isNumber(this.state.timeStamp) ? (
+          {validate.isNumber(this.state.timeStampOldPhone) ? (
             <>
-              {this.state.timeStamp}
+              {this.state.timeStampOldPhone}
               秒后重发
             </>
           ) : (
-            <>{this.state.timeStamp}</>
+            <>{this.state.timeStampOldPhone}</>
           )}
         </button>
       </p>
@@ -259,6 +281,11 @@ class Profile extends React.Component {
           bordered={false}
           placeholder='请输入验证码'
           maxLength={11}
+          value={this.state.code.oldPhoneCode}
+          onChange={e =>{
+            this.state.code.oldPhoneCode = e.target.value
+            this.setState({code: this.state.code})
+          }}
         />
       </p>
     </div>
@@ -267,75 +294,296 @@ class Profile extends React.Component {
   // 确认修改手机号弹窗footer
   comfirmPhoneFooter = () => (
     <div className='flex justify-center font_12'>
-      <button className='border rounded-full px-4 py-1 mr-3' onClick={this.handleCancel}>取消</button>
-      <button className='border rounded-full px-4 py-1 bg-FF8462 text-white'>确定</button>
+      <button
+        className='border rounded-full px-4 py-1 mr-3'
+        onClick={this.handleCancel}
+      >
+        取消
+      </button>
+      <button
+        className='border rounded-full px-4 py-1 bg-FF8462 text-white'
+        onClick={this.handleComfirm}
+      >
+        确定
+      </button>
     </div>
   );
 
   // 确认修改手机号弹窗中心内容
-  comfirmPhoneContent = () => {
-    return this.changePhoneContent()
-  };
+  comfirmPhoneContent = () => (
+    <div>
+      <p className='origin_pasword flex items-center border rounded relative'>
+        <Input
+          style={{
+            height: '32px',
+            border: 'none',
+            padding: '4px 10px',
+            color: '#000',
+          }}
+          value={this.state.newPhone}
+          onChange={e => {this.setState({newPhone: e.target.value})}}
+          maxLength={11}
+        />
+        <button
+          className='absolute right-0 px-2 py-1 border-l h-full'
+          onClick={() => {
+            this.getValidateCode(checkNewPhoneTag, this.state.newPhone);
+          }}
+        >
+          {validate.isNumber(this.state.timeStampNewphone) ? (
+            <>
+              {this.state.timeStampNewphone}
+              秒后重发
+            </>
+          ) : (
+            <>{this.state.timeStampNewphone}</>
+          )}
+        </button>
+      </p>
+      <p className='flex items-center border-b'>
+        <Input
+          autoComplete='off'
+          bordered={false}
+          placeholder='请输入验证码'
+          maxLength={11}
+          value={this.state.code.newPhoneCode}
+          onChange={e =>{
+            this.state.code.newPhoneCode = e.target.value
+            this.setState({code: this.state.code})
+          }}
+        />
+      </p>
+    </div>
+  );
 
   // 下一步
   handleNext = async () => {
-    if(!this.state.isGetValidata) {
-      message.warning('请先获取验证码!')
-      return false
+    const { isGetValidata, hidePhoneNum, code: { oldPhoneCode } } = this.state
+    const {userInfo: { phone_num }} = this.props
+    if (!isGetValidata) {
+      message.warning('请先获取验证码!');
+      return false;
     }
-    if(!this.state.oldPhone) {
-      message.warning('手机号码不能为空！')
+    if (!hidePhoneNum) {
+      message.warning('手机号码不能为空！');
+      return false;
+    }
+    if (!validate.validPhone(phone_num)) {
+      message.warning('手机号码格式不对！');
+      return false;
+    }
+    if(!oldPhoneCode) {
+      message.warning('请输入验证码!');
+      return false;
+    }
+    if(!validate.isChinese(oldPhoneCode)) {
+      message.warning('请输入正确的验证码!');
+      return false;
+    }
+
+    let res = null;
+    try {
+      res = await API.profileApi.checkOldPhone({
+        phone_num: phone_num,
+        code: oldPhoneCode,
+        sms_use: changePhoneTag
+      })
+    } catch (error) {
+      message.error('修改失败！')
       return false
     }
 
-    if(validate.validPhone(this.state.oldPhone)) {
-      message.warning('手机号码格式不对！')
+    if(res && res.code === 200) {
+      this.setState({
+        modelVndom: 1,
+        isGetValidata: false
+      });
+      clearTimeout(timer);
+    }
+  };
+
+  // 确认修改密码
+  handleComfirmChangePas = async () => {
+    console.log(this.state.passWord);
+    const { comfirmPas, newPas, code } = this.state.passWord;
+
+    // 校验
+    if (!code || !newPas || !comfirmPas) {
+      message.warning('信息内容不能为空!');
+      return false;
+    }
+
+    // 检验密码是否相同
+    if (newPas != comfirmPas) {
+      message.warning('密码不一致!');
+      return false;
+    }
+
+    // 检验不能有中文字符
+    if (
+      !validate.isChinese(code) ||
+      !validate.isChinese(comfirmPas) ||
+      !validate.isChinese(newPas)
+    ) {
+      message.error('内容不能含有中文字符！');
+      return false;
+    }
+
+    const data = {
+      phone_num: this.props.userInfo.phone_num,
+      new_password: newPas,
+      code,
+      sms_use: changePasTag,
+    };
+
+    let res = null;
+    try {
+      res = await API.profileApi.resetPassword(data);
+    } catch (error) {
+      message.error(error || '密码修改失败！');
+      return false;
+    }
+
+    if (res ** res.code === 200) {
+      message.success('密码修改成功！');
+      this.setState({
+        visible: false,
+        title: '',
+        timeStamp: '获取验证码',
+      });
+      clearTimeout(timer);
+    }
+  };
+
+  // 新手机号修改确认
+  handleComfirm = async () => {
+    const { newPhone, isGetValidata, code } = this.state
+    if(newPhone) {
+      message.warning('手机号码不能为空！')
       return false
     }
-    this.setState({
-      modelVndom: 1,
-    })
-    clearTimeout(timer)
+    if(!validate.validPhone(newPhone)) {
+      message.warning('手机格式不对！')
+      return false
+    }
+    if(!isGetValidata) {
+      message.warning('请先获取验证码！')
+      return false
+    }
+    if(!code.newPhoneCode) {
+      message.warning('验证码不能为空！')
+      return false
+    }
+
+    let res = null
+    try {
+      res = await API.profileApi.changePhone({
+        phone_num: this.props.userInfo.phone_num,
+        new_phone_num: this.state.newPhone,
+        code: this.state.code.newPhoneCode,
+        sms_use: checkNewPhoneTag
+      })
+    } catch (error) {
+      message.error('修改失败！')
+      return false
+    }
+
+    if(res && res.code === 200) {
+      this.setState({
+        newPhone: '',
+        code: {},
+        isGetValidata: false,
+        passWord: {},
+        timeStampNewPhone: '获取验证码',
+        timeStampOldPhone: '获取验证码'
+      })
+    }
   }
 
   // 取消
   handleCancel = () => {
-    this.setState({visible: false})
-    clearTimeout(timer)
-    timer = null
-  }
+    this.setState({
+      visible: false,
+      isGetValidata: false,
+      passWord: {},
+      code: {},
+      timeStampPas: '获取验证码',
+      timeStampOldPhone: '获取验证码',
+      timeStampNewphone: '获取验证码',
+    });
+    clearTimeout(timer);
+    timer = null;
+  };
 
   // 修改手机号码获取验证码
-  getValidateCode = () => {
-    if(!validate.validPhone(this.state.oldPhone)) {
-      message.error('手机号码格式不正确！')
-      return false
+  getValidateCode = async (tag, phone) => {
+    if (!phone) {
+      message.warning('请输入手机号码！');
+      return false;
     }
-    if(this.state.oldPhone) {
-      this.countDown(60000)
+    if (!validate.validPhone(phone)) {
+      message.error('手机号码格式不正确！');
+      return false;
     }
+
+    let res;
     try {
-      console.log('获取验证码')
+      res = await API.loginApi.getValidCode({
+        phone_num: phone,
+        sms_use: tag,
+      });
     } catch (error) {
-      message.error(error || '获取验证码失败！')
-      return false
+      message.error(error || '获取验证码失败！');
+      clearTimeout(timer);
+      this.setState({
+        timeStamp: '获取验证码',
+      });
+      return false;
     }
-  }
+    this.countDown(60000);
+    if (res && res.code === 200 && tag === changePhoneTag) {
+      this.setState({ isGetValidata: true });
+    }
+  };
 
   // 倒数计时
   countDown = (ms) => {
     let maxTime = ms / 1000;
     let that = this;
-    setTimeout(function f() {
+    const { modelVndom } = this.state
+    timer = setTimeout(function f() {
       if (maxTime > 1) {
         --maxTime;
-        that.setState({ timeStamp: maxTime });
+        if(modelVndom === 1) {
+          that.setState({ timeStampNewPhone: maxTime });
+        }
+        if(modelVndom === 2) {
+          that.setState({ timeStampOldPhone: maxTime });
+        }
+        if(modelVndom === 3) {
+          that.setState({ timeStampPas: maxTime });
+        }
+
       } else {
-        that.setState({ timeStamp: '重新发送' });
+        if(modelVndom === 1) {
+          that.setState({
+            timeStampNewphone: '重新发送',
+          })
+        }
+        if(modelVndom === 2) {
+          that.setState({
+            timeStampOldPhone: '重新发送'
+          })
+        }
+        if(modelVndom === 3) {
+          that.setState({
+            timeStampPas: '重新发送'
+          })
+        }
         clearTimeout(timer);
         return;
       }
-      timer = setTimeout(f, 1000);
+      setTimeout(f, 1000);
     }, 1000);
   };
 
@@ -529,11 +777,6 @@ class Profile extends React.Component {
           </div>
         </div>
         <ModelTempLate
-          // visible={true}
-          // title='修改手机号码'
-          // footer={this.comfirmPhoneFooter()}
-          // content={this.comfirmPhoneContent()}
-
           visible={visible}
           title={modelTitle}
           footer={
