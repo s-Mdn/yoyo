@@ -1,4 +1,4 @@
-import { Popover, Avatar, Image } from 'antd';
+import { Popover, Avatar } from 'antd';
 import content from './content.jsx';
 const _Popover = (props) => {
   const { userInfo, loginOut } = props;
@@ -16,7 +16,7 @@ const _Popover = (props) => {
             alt=''
           />
         ) : (
-          <Avatar src={<img src='https://joeschmoe.io/api/v1/random' style={{ width: '32px', height: '32px', borderRadius: '100%' }} />} />
+          <Avatar src={<img src='https://joeschmoe.io/api/v1/random' alt='' style={{ width: '32px', height: '32px', borderRadius: '100%' }} />} />
         )}
       </Popover>
     </>

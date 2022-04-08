@@ -2,24 +2,26 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Upload, Input, message, Radio } from 'antd';
 import { CameraTwoTone, EditFilled } from '@ant-design/icons';
-import utils from '@/utils'
+import utils from '@/utils';
 import API from '@/services';
-import action from '@/actions'
+import action from '@/actions';
 import './index.less';
 import defaultAvatar from '@/assets/images/character_model_yoyo.png';
+const ModelTempLate = React.lazy(() => import('@/components/ModelTempLate'));
 
-const { validate, type, auth } = utils
-const { profile, quality } = action
+const { validate, type, auth } = utils;
+const { profile, quality } = action;
 
 class Profile extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      nickName: '',     // 昵称
-      nickNamer: '',    // 昵称输入框占位符
+      nickName: '', // 昵称
+      nickNamer: '', // 昵称输入框占位符
       resetName: false, // 重制网名窗口
-      avatar: '',       // 头像
+      avatar: '', // 头像
       hidePhoneNum: '', // 处理后的电话号码
+      passWord: {},
     };
   }
 
@@ -30,26 +32,26 @@ class Profile extends React.Component {
 
   // 确认修改网名
   handleComfimrResetName = async () => {
-    if(!this.state.nickNamer) {
-      message.warn('昵称不能为空字符')
-      return false
+    if (!this.state.nickNamer) {
+      message.warn('昵称不能为空字符');
+      return false;
     }
     let response = null;
     let data = {
       avatar: this.state.avatar,
       nickname: this.state.nickNamer,
-    }
+    };
     try {
       response = await API.profileApi.updataProfile(data);
-      console.log( response )
+      console.log(response);
     } catch (error) {
       return false;
     }
 
-    if(response && response.code === 200 && response.data) {
-      auth.setLocal('userInfo', type.toString(response.data))
-      this.setState({resetName: false})
-      this.props.handleProfile(response.data)
+    if (response && response.code === 200 && response.data) {
+      auth.setLocal('userInfo', type.toString(response.data));
+      this.setState({ resetName: false });
+      this.props.handleProfile(response.data);
     }
   };
 
@@ -74,24 +76,25 @@ class Profile extends React.Component {
   // Upload 组件方法
   handleChange = ({ fileList, file }) => {
     this.setState({
-      avatar: file.response?.data
-    })
-    let userInfo = auth.getLocal('userInfo') && JSON.parse(auth.getLocal('userInfo'))
-    userInfo.avatar = file.response?.data
-    auth.setLocal('userInfo', type.toString(userInfo))
-    this.props.handleProfile(userInfo)
+      avatar: file.response?.data,
+    });
+    let userInfo =
+      auth.getLocal('userInfo') && JSON.parse(auth.getLocal('userInfo'));
+    userInfo.avatar = file.response?.data;
+    auth.setLocal('userInfo', type.toString(userInfo));
+    this.props.handleProfile(userInfo);
   };
 
   // Radio事件
   handleRadioChange = (e) => {
-    console.log(e.target.value)
-  }
+    console.log(e.target.value);
+  };
 
   // 退出
   handleLogOut = () => {
-    localStorage.clear()
+    localStorage.clear();
     window.location.reload();
-  }
+  };
 
   // 上传图片参数
   data = (file) => {
@@ -102,17 +105,52 @@ class Profile extends React.Component {
     };
   };
 
+  // 修改密码弹窗footer
+  changePasFooter = () => (
+    <div>
+      <button className='border border_r_3 font_12 py_2 px_10 mr_8px'>
+        取 消
+      </button>
+      <button className='border border_r_3 font_12 py_2 px_10 bg-FF8462 text-white'>
+        确 认
+      </button>
+    </div>
+  );
+
+  // 修改密码弹窗中心内容
+  changePasContent = () => (
+    <div>
+      <p className='origin_pasword flex items-center border-b'>
+        <Input style={{height: '28px', border: 'none', padding: '4px 10px', color: '#000'}} disabled value='123'/>
+      </p>
+      <p className='new_pasword flex items-center'>
+        <label className='flex-none mr-2 ml_10px'>输入验证码：</label>
+        <Input style={{ height: '28px', border: 'none', borderBottom: '1px solid #ccc'}} placeholder='请输入新密码' value={this.state.passWord.newPas}/>
+      </p>
+      <p className='new_pasword flex items-center'>
+        <label className='flex-none mr-2 ml_10px'>输入新密码：</label>
+        <Input.Password style={{ height: '28px', border: 'none', borderBottom: '1px solid #ccc'}} placeholder='请输入新密码' value={this.state.passWord.newPas}/>
+      </p>
+      <p className='comfire_pasword flex items-center' style={{margin: 0}}>
+        <label className='flex-none mr-2 ml_10px'>确认新密码：</label>
+        <Input.Password style={{height: '28px', border: 'none', borderBottom: '1px solid #ccc'}} placeholder='请确认新密码' value={this.state.passWord.comfirmPas}/>
+      </p>
+    </div>
+  );
+
   componentDidMount() {
     this.setState({
       avatar: this.props.userInfo.avatar,
       nickName: this.props.userInfo.nickname,
-      hidePhoneNum: validate.hidePhoneNum(type.toString(this.props.userInfo.phone_num))
+      hidePhoneNum: validate.hidePhoneNum(
+        type.toString(this.props.userInfo.phone_num)
+      ),
     });
-  }
+  };
 
   render() {
-    const { avatar, nickName, resetName, hidePhoneNum } = this.state
-    const { radioValue, handleRadioChange } = this.props
+    const { avatar, nickName, resetName, hidePhoneNum } = this.state;
+    const { radioValue, handleRadioChange } = this.props;
     return (
       <div className='profile overflow-hidden box-border'>
         <div className='bg-white rounder relative profile_h_full'>
@@ -127,13 +165,9 @@ class Profile extends React.Component {
                     action={`${process.env.REACT_APP_API}/api/common/upload`}
                     accept='.jpg, .png, .gif, .webp'
                   >
-                    {avatar? (
+                    {avatar ? (
                       <div className='relative avatar h-full'>
-                        <img
-                          className='h-full'
-                          src={avatar}
-                          alt=''
-                        />
+                        <img className='h-full' src={avatar} alt='' />
                         <div className='absolute top-0 left-0 z-10 h_w_100 rounded text-center hidden flex-col justify-center avatar_model'>
                           <CameraTwoTone twoToneColor='#fff' />
                           <p
@@ -170,9 +204,7 @@ class Profile extends React.Component {
                   {!resetName ? (
                     <div className='font_26  font-semibold flex items-center'>
                       <span className='mr-4 text-black'>
-                        {
-                          nickName?(nickName): 'YoYo'
-                        }
+                        {nickName ? nickName : 'YoYo'}
                       </span>
                       <div
                         className='cursor-pointer text-black'
@@ -188,12 +220,11 @@ class Profile extends React.Component {
                       </label>
                       <div>
                         <Input
-                          style={{  width: '420px', border: '1px solid #ccc',  }}
+                          style={{ width: '420px', border: '1px solid #ccc' }}
                           value={this.state.nickNamer}
-                          onChange={e =>{
-                            this.setState({nickNamer: e.target.value})
-                          }
-                          }
+                          onChange={(e) => {
+                            this.setState({ nickNamer: e.target.value });
+                          }}
                         />
                         <p className='mt-6'>
                           <button
@@ -217,10 +248,11 @@ class Profile extends React.Component {
                 <div className='p_t_b_30 form border-b flex'>
                   <div className='font_15 color-444 font-semibold flex items-center  w-4/6'>
                     <span className='mr-4 w_120'>手机号码</span>
-                    <div className='cursor-pointer'>{ hidePhoneNum }</div>
+                    <div className='cursor-pointer'>{hidePhoneNum}</div>
                   </div>
                   <div className='flex items-center text-black cursor-default'>
-                    <EditFilled/><span className='ml-2'>修改</span>
+                    <EditFilled />
+                    <span className='ml-2'>修改</span>
                   </div>
                 </div>
 
@@ -230,7 +262,8 @@ class Profile extends React.Component {
                     <div className='cursor-pointer'>******</div>
                   </div>
                   <div className='flex items-center text-black cursor-default'>
-                    <EditFilled/><span className='ml-2'>修改</span>
+                    <EditFilled />
+                    <span className='ml-2'>修改</span>
                   </div>
                 </div>
 
@@ -245,7 +278,10 @@ class Profile extends React.Component {
                   <div className='font_15 color-444 font-semibold flex items-center'>
                     <span className='mr-4 w_120'>动画质量</span>
                     <div className='cursor-pointer flex'>
-                      <Radio.Group onChange={e => handleRadioChange(e.target.value)} value={radioValue}>
+                      <Radio.Group
+                        onChange={(e) => handleRadioChange(e.target.value)}
+                        value={radioValue}
+                      >
                         <Radio value={'FLUENCY'}>流畅</Radio>
                         <Radio value={'MEDIUM'}>平衡</Radio>
                         <Radio value={'HEIGHT'}>高清</Radio>
@@ -257,26 +293,37 @@ class Profile extends React.Component {
             </div>
           </div>
           <div className='w-full text-center'>
-            <div className='rounded-full py-2 bg-FF8462 w_150px m-auto mt-10 text-white' onClick={this.handleLogOut}>退 出</div>
+            <div
+              className='rounded-full py-2 bg-FF8462 w_150px m-auto mt-10 text-white'
+              onClick={this.handleLogOut}
+            >
+              退 出
+            </div>
           </div>
         </div>
+        <ModelTempLate
+          visible={true}
+          title='删 除'
+          footer={this.changePasFooter()}
+          content={this.changePasContent()}
+        ></ModelTempLate>
       </div>
     );
-  }
+  };
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  handleProfile: (data) =>{
-    dispatch(profile.addProfile(data))
+  handleProfile: (data) => {
+    dispatch(profile.addProfile(data));
   },
   handleRadioChange: (value) => {
-    dispatch(quality.handleChange(value))
-  }
+    dispatch(quality.handleChange(value));
+  },
 });
 
 const mapStateToProps = (state) => ({
   userInfo: state.profile,
-  radioValue: state.quality
+  radioValue: state.quality,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);

@@ -447,15 +447,15 @@ const AutoPlay = (props) => {
 
   // 删除背景图
   const handleDeleteBackgound = async (id) => {
-    let res = null
     try {
-      res = await API.autoPlayApi.deleteBackground(id);
+      // res = await API.autoPlayApi.deleteBackground(id);
+      await API.autoPlayApi.deleteBackground(id)
     } catch (error) {
       message.error('删除失败！');
       return false;
     }
 
-    let r = backGroundList.filter(e => e.id == id)
+    // let r = backGroundList.filter(e => e.id == id)
     localStorage.removeItem('background')
     setBackGround(backGroundList[3])
     getBackground()

@@ -124,7 +124,7 @@ class GoodsManage extends React.Component {
 
   // 弹窗点击确定回调
   handleOk = async () => {
-    const { modalItem, playId, tabActive } = this.state;
+    const { modalItem, tabActive } = this.state;
     let response = null;
     try {
       if (tabActive === '1') {
