@@ -626,7 +626,7 @@ const AutoPlay = (props) => {
       </div>
 
       {/* 中 */}
-      <div className='m_l_r_24 w_405  box-border'>
+      <div className='m_l_r_24 flex-1 box-border'>
         {/* 中心内容 */}
         <div className={['rounded relative flex-1 bg-white flex flex-col  win_h'].join(' ')}>
           {!reverse ? (
@@ -645,7 +645,7 @@ const AutoPlay = (props) => {
               </div>
               {/* 商品 */}
               <div
-                className='absolute w_20vh h_20vh overflow-hidden goods-img goods rounded left_405-22 top_20vh'
+                className='absolute w_20vh h_20vh overflow-hidden goods-img goods rounded right-8 top_20vh'
                 // onDragStart={(e) => handleDragStart(e, 'goods-img', 'winVer')}
               >
                 {goodsUrl &&
@@ -659,7 +659,7 @@ const AutoPlay = (props) => {
           ) : (
             <div className='w-full flex flex-col justify-center items-center relative mt-56'>
               <div
-                className='w-full h_230 relative winHorizont overflow-hidden'
+                className='w-full h_400px relative winHorizont overflow-hidden'
                 style={{ backgroundSize: '100%, 100%' }}
               >
                 <img src={backGround?.image} alt='' className='w-full h-full' />
@@ -667,7 +667,7 @@ const AutoPlay = (props) => {
                 <img
                   src={yoyo}
                   alt=''
-                  className='absolute bottom-0 left-10 w_100 person'
+                  className='absolute bottom-0 left-10 h-full person'
                   // onDragStart={(e) =>
                   //   handleDragStart(e, 'person', 'winHorizont')
                   // }
@@ -675,7 +675,7 @@ const AutoPlay = (props) => {
 
                 {/* 商品 */}
                 <div
-                  className='absolute h_13vh w_13vh overflow-hidden goods-img rounded left-0 top-4'
+                  className='absolute h_20vh w_20vh overflow-hidden goods-img rounded right-20 top-8'
                   // onDragStart={(e) =>
                   //   handleDragStart(e, 'goods-img', 'winHorizont')
                   // }
