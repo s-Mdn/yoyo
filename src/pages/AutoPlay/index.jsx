@@ -459,6 +459,12 @@ const AutoPlay = (props) => {
     getBackground();
   };
 
+  // 横竖屏切换
+  const handleReverse = (bol) => {
+    setReverse(!bol)
+    localStorage.setItem('reverse', !bol)
+  };
+
   // 横竖屏切换背景图
   // useEffect(() => {
   //   if (!reverse) {
@@ -513,7 +519,6 @@ const AutoPlay = (props) => {
   useEffect(() => {
     let temp = localStorage.getItem('zoom');
     if (temp) {
-      console.log(temp);
       let zoom = temp === 'false' ? false : true;
 
       setZoom(zoom);
@@ -521,25 +526,32 @@ const AutoPlay = (props) => {
   }, []);
 
   // 设定背景图
-  useEffect(() => {
-    if (backGroundList) {
-      let tempObj =
-        localStorage.getItem('background') &&
-        toObject(localStorage.getItem('background'));
-      if (tempObj) {
-        backGroundList.filter((e) => {
-          e.checked = e.id === tempObj.id;
-          if (e.id === tempObj.id) {
-            setBackGround(e);
-            localStorage.setItem('background', toString(e));
-          }
-          return e;
-        });
-      } else {
-        setBackGround(backGroundList[3]);
-      }
+  // useEffect(() => {
+  //   if (backGroundList) {
+  //     let tempObj =
+  //       localStorage.getItem('background') &&
+  //       toObject(localStorage.getItem('background'));
+  //     if (tempObj) {
+  //       backGroundList.filter((e) => {
+  //         e.checked = e.id === tempObj.id;
+  //         if (e.id === tempObj.id) {
+  //           setBackGround(e);
+  //           localStorage.setItem('background', toString(e));
+  //         }
+  //         return e;
+  //       });
+  //     } else {
+  //       setBackGround(backGroundList[3]);
+  //     }
+  //   }
+  // }, [reverse, backGroundList]);
+
+  useEffect(()=>{
+    let temp = localStorage.getItem('reverse')
+    if(temp) {
+      setReverse(temp == 'false'? false : true)
     }
-  }, [reverse, backGroundList]);
+  }, [reverse])
 
   return (
     <div className='auto_play flex justify-between h-full overflow-hidden'>
@@ -754,9 +766,11 @@ const AutoPlay = (props) => {
           )}
           <div
             className='font_12 color_FF8462 px-1 bg-001529 absolute right-0 top-2 rounded-l cursor-pointer'
-            onClick={() => {
-              setReverse((reverse) => !reverse);
-            }}
+            // onClick={() => {
+            //   setReverse((reverse) => !reverse);
+            //   localStorage.setItem()
+            // }}
+            onClick={()=>handleReverse(reverse)}
           >
             {reverse ? '横屏' : '竖屏'}
           </div>
