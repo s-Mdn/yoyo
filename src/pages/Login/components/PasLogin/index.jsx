@@ -110,7 +110,7 @@ const Login = (props) => {
               记住密码
             </Checkbox>
           </div>
-          <div className='font_14 color-FF8462 cursor-pointer'>忘记密码？</div>
+          {/* <div className='font_14 color-FF8462 cursor-pointer'>忘记密码？</div> */}
         </div>
 
         <Form.Item>

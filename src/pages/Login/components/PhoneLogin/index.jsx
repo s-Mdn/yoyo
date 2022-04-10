@@ -41,20 +41,25 @@ const PhoneLogin = (props) => {
       return false;
     }
 
-    // 指定倒计时间
-    setTime(60);
-    // 首次获取验证码状态
-    if(!initTime) { setIntTime(true) }
 
+
+    let res = null
     const data = {
       phone_num: phone,
       sms_use: 'login',
     };
     try {
-      await API.loginApi.getValidCode(data);
+      res = await API.loginApi.getValidCode(data);
     } catch (error) {
+      console.log(error)
+      setWarnings(error || '获取验证码当天次数已上限！')
       return false;
     }
+
+    // 指定倒计时间
+    setTime(60);
+    // 首次获取验证码状态
+    if(!initTime) { setIntTime(true) }
   };
 
   // 登录事件

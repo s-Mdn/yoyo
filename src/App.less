@@ -60,9 +60,32 @@ code {
   width: 80px;
 }
 
+.font_12 {
+  font-size: 12px;
+}
+
 img[src=""],
 img:not([src]) {
   opacity:0;
+}
+
+.ant-input[disabled] {
+  background-color: #fff;
+}
+
+input::-webkit-input-placeholder {
+  /* placeholder颜色  */
+  color: #aab2bd;
+  /* placeholder字体大小  */
+  font-size: 12px;
+}
+
+// 去除input组件点击蓝色颜色边框
+.ant-input-affix-wrapper {
+  border: none ;
+  outline: none;
+  width: 95%;
+  box-shadow: none;
 }
 
 /*去除默认的边框线*/

@@ -447,15 +447,15 @@ const AutoPlay = (props) => {
 
   // 删除背景图
   const handleDeleteBackgound = async (id) => {
-    let res = null
     try {
-      res = await API.autoPlayApi.deleteBackground(id);
+      // res = await API.autoPlayApi.deleteBackground(id);
+      await API.autoPlayApi.deleteBackground(id)
     } catch (error) {
       message.error('删除失败！');
       return false;
     }
 
-    let r = backGroundList.filter(e => e.id == id)
+    // let r = backGroundList.filter(e => e.id == id)
     localStorage.removeItem('background')
     setBackGround(backGroundList[3])
     getBackground()
@@ -707,7 +707,7 @@ const AutoPlay = (props) => {
 
         {/* 按钮 */}
         <div className='h_60px rounded bg-white mt_15px flex items-center justify-center px-4 box-border'>
-          {goodsUrl ? (
+          {Object.keys(goodsUrl).length ? (
             <button
               className='bg-FF8462 px-6 py-1.5 rounded-full text-white'
               onClick={handleVideoProcess}
