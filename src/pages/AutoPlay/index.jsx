@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { Empty, message, Upload } from 'antd';
+import { Empty, message } from 'antd';
 import {
-  CameraTwoTone,
-  CloseCircleTwoTone,
   CheckCircleTwoTone,
 } from '@ant-design/icons';
 
@@ -462,24 +460,24 @@ const AutoPlay = (props) => {
   };
 
   // 横竖屏切换背景图
-  useEffect(() => {
-    if (!reverse) {
-      // 商品缩放
-      handleScale('goods-img', 'winVer');
-      // 人物缩放
-      handleScale('person', 'winVer');
-      // 背景图
-      setBackgroundList(verBackgroundList)
-    } else {
-      // 商品缩放
-      handleScale('goods-img', 'winHorizont');
-      // 人物缩放
-      handleScale('person', 'winHorizont');
-      // 背景图
-      setBackgroundList(horBackgroundList)
-    }
+  // useEffect(() => {
+  //   if (!reverse) {
+  //     // 商品缩放
+  //     handleScale('goods-img', 'winVer');
+  //     // 人物缩放
+  //     handleScale('person', 'winVer');
+  //     // 背景图
+  //     setBackgroundList(verBackgroundList)
+  //   } else {
+  //     // 商品缩放
+  //     handleScale('goods-img', 'winHorizont');
+  //     // 人物缩放
+  //     handleScale('person', 'winHorizont');
+  //     // 背景图
+  //     setBackgroundList(horBackgroundList)
+  //   }
 
-  }, [reverse]);
+  // }, [reverse]);
 
   // 请求播放列表
   useEffect(() => {
@@ -567,7 +565,7 @@ const AutoPlay = (props) => {
           })}
         </div>
 
-        <div className='bg_img_h'>
+        {/* <div className='bg_img_h'>
           <div className='border-b text-center mb-3 h_45 line_height_45'>
             背景图
           </div>
@@ -624,7 +622,7 @@ const AutoPlay = (props) => {
               </div>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* 中 */}
@@ -642,13 +640,13 @@ const AutoPlay = (props) => {
                   src={yoyo}
                   alt=''
                   className='absolute top_calc w_35vh h_60vh person'
-                  onDragStart={(e) => handleDragStart(e, 'person', 'winVer')}
+                  // onDragStart={(e) => handleDragStart(e, 'person', 'winVer')}
                 />
               </div>
               {/* 商品 */}
               <div
                 className='absolute w_20vh h_20vh overflow-hidden goods-img goods rounded left_405-22 top_20vh'
-                onDragStart={(e) => handleDragStart(e, 'goods-img', 'winVer')}
+                // onDragStart={(e) => handleDragStart(e, 'goods-img', 'winVer')}
               >
                 {goodsUrl &&
                   (isImage(goodsUrl.cover_image) ? (
@@ -670,17 +668,17 @@ const AutoPlay = (props) => {
                   src={yoyo}
                   alt=''
                   className='absolute bottom-0 left-10 w_100 person'
-                  onDragStart={(e) =>
-                    handleDragStart(e, 'person', 'winHorizont')
-                  }
+                  // onDragStart={(e) =>
+                  //   handleDragStart(e, 'person', 'winHorizont')
+                  // }
                 />
 
                 {/* 商品 */}
                 <div
                   className='absolute h_13vh w_13vh overflow-hidden goods-img rounded left-0 top-4'
-                  onDragStart={(e) =>
-                    handleDragStart(e, 'goods-img', 'winHorizont')
-                  }
+                  // onDragStart={(e) =>
+                  //   handleDragStart(e, 'goods-img', 'winHorizont')
+                  // }
                 >
                   {goodsUrl &&
                     (isImage(goodsUrl.cover_image) ? (
