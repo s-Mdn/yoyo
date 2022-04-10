@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { Empty, message } from 'antd';
-import {
-  CheckCircleTwoTone,
-} from '@ant-design/icons';
+import { CheckCircleTwoTone } from '@ant-design/icons';
 
 import utils from '@/utils';
 import API from '@/services';
@@ -101,9 +99,11 @@ const AutoPlay = (props) => {
   // ws
   const localServerUrl = process.env.REACT_APP_LOCAL_SERVER_URL;
   // 背景图
-  const [backGround, setBackGround] = useState({})
+  const [backGround, setBackGround] = useState({});
   // 背景图列表
   const [backGroundList, setBackgroundList] = useState([]);
+  // 放大缩小(false为小，true为大)
+  const [zoom, setZoom] = useState(true);
 
   // 获取商品列表
   const getGoodsList = async (id) => {
@@ -137,7 +137,7 @@ const AutoPlay = (props) => {
 
     if (response && response.code === 200) {
       response.data.content.forEach((e) => {
-        e.checked =false
+        e.checked = false;
       });
       setPlayList(response.data.content);
     }
@@ -190,9 +190,11 @@ const AutoPlay = (props) => {
     }
 
     if (response && response.code === 200) {
-      let tempList = !reverse? toString(verBackgroundList) : toString(horBackgroundList)
-      let r =  toObject(tempList)
-      r.push(...response.data.content)
+      let tempList = !reverse
+        ? toString(verBackgroundList)
+        : toString(horBackgroundList);
+      let r = toObject(tempList);
+      r.push(...response.data.content);
       setBackgroundList(r);
     }
   };
@@ -201,9 +203,7 @@ const AutoPlay = (props) => {
   const connectVideoProcess = () => {
     const { localServerWsClient: client } = window;
     // 背景图
-    let bg = validURL(backGround)
-      ? backGround
-      : `../build${backGround}`;
+    let bg = validURL(backGround) ? backGround : `../build${backGround}`;
 
     if (process.env.NODE_ENV !== 'development') {
       bg = validURL(backGround)
@@ -243,8 +243,8 @@ const AutoPlay = (props) => {
 
       // 接受信息
       client.onmessage = (event) => {
-        console.log(event)
-      }
+        console.log(event);
+      };
     }
   };
 
@@ -296,13 +296,13 @@ const AutoPlay = (props) => {
 
   // 选中背景图
   const handleSelectBackGround = (u, i) => {
-    setBackGround(u)
-    localStorage.setItem('background', toString(u))
+    setBackGround(u);
+    localStorage.setItem('background', toString(u));
 
     backGroundList.filter((e, v) => {
-      e.checked = (i === v)
-      return e
-    })
+      e.checked = i === v;
+      return e;
+    });
   };
 
   // 直播 || 关闭
@@ -447,16 +447,16 @@ const AutoPlay = (props) => {
   const handleDeleteBackgound = async (id) => {
     try {
       // res = await API.autoPlayApi.deleteBackground(id);
-      await API.autoPlayApi.deleteBackground(id)
+      await API.autoPlayApi.deleteBackground(id);
     } catch (error) {
       message.error('删除失败！');
       return false;
     }
 
     // let r = backGroundList.filter(e => e.id == id)
-    localStorage.removeItem('background')
-    setBackGround(backGroundList[3])
-    getBackground()
+    localStorage.removeItem('background');
+    setBackGround(backGroundList[3]);
+    getBackground();
   };
 
   // 横竖屏切换背景图
@@ -482,50 +482,64 @@ const AutoPlay = (props) => {
   // 请求播放列表
   useEffect(() => {
     getPlaylist();
-    getBackground()
+    getBackground();
   }, []);
 
-  useEffect(()=>{
-    if(playList.length) {
-      let tempObj = localStorage.getItem('plays') && toObject(localStorage.getItem('plays'))
-      if( tempObj ) {
-        playList.filter(e => {
-          if(e.id === tempObj.id) {
-            e.checked = true
-            setGoodsUrl(e)
-            localStorage.setItem('plays', toString(e))
+  useEffect(() => {
+    if (playList.length) {
+      let tempObj =
+        localStorage.getItem('plays') &&
+        toObject(localStorage.getItem('plays'));
+      if (tempObj) {
+        playList.filter((e) => {
+          if (e.id === tempObj.id) {
+            e.checked = true;
+            setGoodsUrl(e);
+            localStorage.setItem('plays', toString(e));
           }
-          return e
-        })
+          return e;
+        });
 
         // 如果缓存的内容和数据没有对应上的则清除缓存
-        if(!playList.some(e => e.id === tempObj.id)) {
-          localStorage.removeItem('plays')
+        if (!playList.some((e) => e.id === tempObj.id)) {
+          localStorage.removeItem('zoom');
+          localStorage.removeItem('plays');
         }
       }
     }
-  }, [playList])
+  }, [playList]);
+
+  // 放大缩小
+  useEffect(() => {
+    let temp = localStorage.getItem('zoom');
+    if (temp) {
+      console.log(temp);
+      let zoom = temp === 'false' ? false : true;
+
+      setZoom(zoom);
+    }
+  }, []);
 
   // 设定背景图
-  useEffect(()=>{
-    if(backGroundList) {
-      let tempObj = localStorage.getItem('background') && toObject(localStorage.getItem('background'))
-      if( tempObj ) {
-        backGroundList.filter(e => {
-          e.checked =( e.id === tempObj.id)
-          if(e.id === tempObj.id) {
-            setBackGround(e)
-            localStorage.setItem('background', toString(e))
+  useEffect(() => {
+    if (backGroundList) {
+      let tempObj =
+        localStorage.getItem('background') &&
+        toObject(localStorage.getItem('background'));
+      if (tempObj) {
+        backGroundList.filter((e) => {
+          e.checked = e.id === tempObj.id;
+          if (e.id === tempObj.id) {
+            setBackGround(e);
+            localStorage.setItem('background', toString(e));
           }
-          return e
-        })
+          return e;
+        });
       } else {
-        setBackGround(backGroundList[3])
+        setBackGround(backGroundList[3]);
       }
     }
-  }, [reverse, backGroundList])
-
-
+  }, [reverse, backGroundList]);
 
   return (
     <div className='auto_play flex justify-between h-full overflow-hidden'>
@@ -628,7 +642,11 @@ const AutoPlay = (props) => {
       {/* 中 */}
       <div className='m_l_r_24 flex-1 box-border'>
         {/* 中心内容 */}
-        <div className={['rounded relative flex-1 bg-white flex flex-col  win_h'].join(' ')}>
+        <div
+          className={[
+            'rounded relative flex-1 bg-white flex flex-col  win_h',
+          ].join(' ')}
+        >
           {!reverse ? (
             <div className='w-full relative winVer flex-none rounded overflow-hidden h-full'>
               <div className='play_window h-full overflow-hidden'>
@@ -644,17 +662,38 @@ const AutoPlay = (props) => {
                 />
               </div>
               {/* 商品 */}
-              <div
-                className='absolute w_20vh h_20vh overflow-hidden goods-img goods rounded right-8 top_20vh'
-                // onDragStart={(e) => handleDragStart(e, 'goods-img', 'winVer')}
-              >
-                {goodsUrl &&
-                  (isImage(goodsUrl.cover_image) ? (
-                    <img src={goodsUrl.cover_image} alt='' />
-                  ) : (
-                    <video src={goodsUrl.cover_image} className='object-fill' />
-                  ))}
-              </div>
+
+              {zoom ? (
+                <div
+                  className='absolute w_20vh h_20vh overflow-hidden goods-img goods rounded right-8 top_20vh'
+                  // onDragStart={(e) => handleDragStart(e, 'goods-img', 'winVer')}
+                >
+                  {goodsUrl &&
+                    (isImage(goodsUrl.cover_image) ? (
+                      <img src={goodsUrl.cover_image} alt='' />
+                    ) : (
+                      <video
+                        src={goodsUrl.cover_image}
+                        className='object-fill'
+                      />
+                    ))}
+                </div>
+              ) : (
+                <div
+                  className='absolute w-full h_200px top-0 left-0'
+                  // onDragStart={(e) => handleDragStart(e, 'goods-img', 'winVer')}
+                >
+                  {goodsUrl &&
+                    (isImage(goodsUrl.cover_image) ? (
+                      <img src={goodsUrl.cover_image} alt='' />
+                    ) : (
+                      <video
+                        src={goodsUrl.cover_image}
+                        className='object-fill'
+                      />
+                    ))}
+                </div>
+              )}
             </div>
           ) : (
             <div className='w-full flex flex-col justify-center items-center relative mt-56'>
@@ -674,22 +713,42 @@ const AutoPlay = (props) => {
                 />
 
                 {/* 商品 */}
-                <div
-                  className='absolute h_20vh w_20vh overflow-hidden goods-img rounded right-20 top-8'
-                  // onDragStart={(e) =>
-                  //   handleDragStart(e, 'goods-img', 'winHorizont')
-                  // }
-                >
-                  {goodsUrl &&
-                    (isImage(goodsUrl.cover_image) ? (
-                      <img src={goodsUrl.cover_image} alt='' />
-                    ) : (
-                      <video
-                        src={goodsUrl.cover_image}
-                        className='object-fill'
-                      />
-                    ))}
-                </div>
+
+                {zoom ? (
+                  <div
+                    className='absolute h_20vh w_20vh overflow-hidden goods-img rounded right-20 top-8'
+                    // onDragStart={(e) =>
+                    //   handleDragStart(e, 'goods-img', 'winHorizont')
+                    // }
+                  >
+                    {goodsUrl &&
+                      (isImage(goodsUrl.cover_image) ? (
+                        <img src={goodsUrl.cover_image} alt='' />
+                      ) : (
+                        <video
+                          src={goodsUrl.cover_image}
+                          className='object-fill'
+                        />
+                      ))}
+                  </div>
+                ) : (
+                  <div
+                    className='absolute h_35vh w_35vh overflow-hidden goods-img rounded right-4 top-6'
+                    // onDragStart={(e) =>
+                    //   handleDragStart(e, 'goods-img', 'winHorizont')
+                    // }
+                  >
+                    {goodsUrl &&
+                      (isImage(goodsUrl.cover_image) ? (
+                        <img src={goodsUrl.cover_image} alt='' />
+                      ) : (
+                        <video
+                          src={goodsUrl.cover_image}
+                          className='object-fill'
+                        />
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -704,7 +763,25 @@ const AutoPlay = (props) => {
         </div>
 
         {/* 按钮 */}
-        <div className='h_60px rounded bg-white mt_15px flex items-center justify-center px-4 box-border'>
+        <div className='h_60px rounded bg-white mt_15px flex items-center px-6 box-border justify-between'>
+          {!Object.keys(goodsUrl).length ? (
+            <button className='color_333'>缩小-</button>
+          ) : (
+            <>
+              {zoom ? (
+                <button className='color_333'>缩小-</button>
+              ) : (
+                <button
+                  onClick={() => {
+                    localStorage.setItem('zoom', true);
+                    setZoom(true);
+                  }}
+                >
+                  缩小-
+                </button>
+              )}
+            </>
+          )}
           {Object.keys(goodsUrl).length ? (
             <button
               className='bg-FF8462 px-6 py-1.5 rounded-full text-white'
@@ -716,6 +793,24 @@ const AutoPlay = (props) => {
             <button className='bg_CCC px-6 py-1.5 rounded-full text-white'>
               开始直播
             </button>
+          )}
+          {!Object.keys(goodsUrl).length ? (
+            <button className='color_333'>+放大</button>
+          ) : (
+            <>
+              {!zoom ? (
+                <button className='color_333'>+放大</button>
+              ) : (
+                <button
+                  onClick={() => {
+                    localStorage.setItem('zoom', false);
+                    setZoom(false);
+                  }}
+                >
+                  +放大
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
