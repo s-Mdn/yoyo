@@ -203,14 +203,14 @@ const AutoPlay = (props) => {
   const connectVideoProcess = () => {
     const { localServerWsClient: client } = window;
     // 背景图
-    let bg = validURL(backGround)
-      ? backGround
-      : `../build${backGround}`;
+    let bg = validURL(backGround.image)
+      ? backGround.image
+      : `../build${backGround.image}`;
 
     if (process.env.NODE_ENV !== 'development') {
-      bg = validURL(backGround)
-        ? backGround
-        : `../app.asar.unpacked${backGround}`;
+      bg = validURL(backGround.image)
+        ? backGround.image
+        : `../app.asar.unpacked${backGround.image}`;
     }
 
     // 背景图 和 清晰度
