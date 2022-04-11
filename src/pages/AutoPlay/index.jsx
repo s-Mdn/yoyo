@@ -269,15 +269,15 @@ const AutoPlay = (props) => {
       image: e.image || null,
       is_landscape: reverse,
       resize: zoom,
-      window: !reverse
-        ? getGoodsPositions('goods-img', 'winVer').window
-        : getGoodsPositions('goods-img', 'winHorizont').window,
-      product_resize: !reverse
-        ? getGoodsPositions('goods-img', 'winVer').product_resize
-        : getGoodsPositions('goods-img', 'winHorizont').product_resize,
-      avatar_resize: !reverse
-        ? getPersonPositions('person', 'winVer')
-        : getPersonPositions('person', 'winHorizont'),
+      // window: !reverse
+      //   ? getGoodsPositions('goods-img', 'winVer').window
+      //   : getGoodsPositions('goods-img', 'winHorizont').window,
+      // product_resize: !reverse
+      //   ? getGoodsPositions('goods-img', 'winVer').product_resize
+      //   : getGoodsPositions('goods-img', 'winHorizont').product_resize,
+      // avatar_resize: !reverse
+      //   ? getPersonPositions('person', 'winVer')
+      //   : getPersonPositions('person', 'winHorizont'),
     }));
     client.send('sequence->' + toString(data));
   };
