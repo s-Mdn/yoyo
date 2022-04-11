@@ -210,12 +210,12 @@ const AutoPlay = (props) => {
       // bg = validURL(backGround)
       //   ? backGround
       //   : `../app.asar.unpacked${backGround}`;
-      bg = `../app.asar.unpacked${backGround}`;
+      bg = `../app.asar.unpacked${default_back_ground}`;
     }
 
     // 背景图 和 清晰度
     const Initialize = 'start->' + toString({ bg, clarity: ' MEDIUM' });
-
+    console.log(Initialize)
     if (client) {
       client.send(Initialize);
       sendGoodsToServe(client, goodsList);
@@ -230,7 +230,7 @@ const AutoPlay = (props) => {
         });
       };
 
-      // 用于指定连接成功后的回调函数y
+      // 用于指定连接成功后的回调函数
       client.onopen = () => {
         client.send(Initialize);
         sendGoodsToServe(client, goodsList);
@@ -269,7 +269,7 @@ const AutoPlay = (props) => {
       image: e.image || null,
       is_landscape: reverse,
       resize: zoom,
-      // window: !reverse
+
       //   ? getGoodsPositions('goods-img', 'winVer').window
       //   : getGoodsPositions('goods-img', 'winHorizont').window,
       // product_resize: !reverse
@@ -279,6 +279,7 @@ const AutoPlay = (props) => {
       //   ? getPersonPositions('person', 'winVer')
       //   : getPersonPositions('person', 'winHorizont'),
     }));
+    // console.log(data)
     client.send('sequence->' + toString(data));
   };
 
