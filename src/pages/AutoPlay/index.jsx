@@ -268,7 +268,7 @@ const AutoPlay = (props) => {
       wav_url_list: e.wav_url_list,
       image: e.image || null,
       is_landscape: reverse,
-      resize: zoom,
+      resize: !zoom,
 
       //   ? getGoodsPositions('goods-img', 'winVer').window
       //   : getGoodsPositions('goods-img', 'winHorizont').window,
