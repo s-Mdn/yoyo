@@ -96,7 +96,7 @@ class PlayInfo extends React.Component {
         response = await API.goodsManageApi.increasePlays(data);
       }
     } catch (error) {
-      message.error('保存失败！');
+      message.error(error || '保存失败！');
       return false;
     }
 
