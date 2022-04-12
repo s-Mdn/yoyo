@@ -105,6 +105,10 @@ class Profile extends React.Component {
 
   // 退出
   handleLogOut = () => {
+    if(this.props.playState) {
+      message.warning('正在播放，无法退出！')
+      return false
+    }
     localStorage.clear();
     window.location.reload();
   };
@@ -811,6 +815,7 @@ const mapDispatchToProps = (dispatch) => ({
 const mapStateToProps = (state) => ({
   userInfo: state.profile,
   radioValue: state.quality,
+  playState: state.play,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);

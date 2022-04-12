@@ -6,6 +6,7 @@ import Popover from '@/components/Popover';
 import utils from '@/utils';
 import action from '@/actions';
 import logo from '@/assets/images/logo.png';
+import { message } from 'antd';
 
 
 const { auth, main } = utils;
@@ -29,7 +30,7 @@ const getCurrentWindow = () => {
 const currentWindow = getCurrentWindow();
 
 function Titlebar(props) {
-  const { userInfo, handleLoginOut, handlePlay, token } = props
+  const { userInfo, handleLoginOut, handlePlay, token, playState } = props
 
   // 管理窗口状态
   const [maximized, setMaximized] = useState(currentWindow?.isMaximized());
@@ -41,6 +42,10 @@ function Titlebar(props) {
 
   // 退出
   const loginOut = () => {
+    if( playState ) {
+      message.warning('正在播放，无法退出！')
+      return false
+    }
     auth.removeLocal('token');
     auth.removeLocal('userInfo');
     handleLoginOut(login.clearAll({}));
@@ -98,7 +103,8 @@ const mapDispatchToProps = (dispatch) => ({
 });
 const mapStateToProps = (state) => ({
   userInfo: state.profile,
-  token: state.profile.token
+  token: state.profile.token,
+  playState: state.play,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Titlebar))
