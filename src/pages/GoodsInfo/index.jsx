@@ -1,6 +1,10 @@
 import React from 'react';
 import { Radio, Upload, Input, Table, Select, message } from 'antd';
-import { PlusOutlined, CloseCircleTwoTone, ArrowLeftOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  CloseCircleTwoTone,
+  ArrowLeftOutlined,
+} from '@ant-design/icons';
 
 import utils from '@/utils';
 import API from '@/services';
@@ -177,7 +181,8 @@ class GoodsInfo extends React.Component {
 
   // 添加商品
   handleAddGoods = async () => {
-    const { goodsList, introduce, goodsName, goodsPrice, selectRadio } = this.state;
+    const { goodsList, introduce, goodsName, goodsPrice, selectRadio } =
+      this.state;
     if (goodsList.length === 0 || !introduce || !goodsName || !goodsPrice) {
       message.warning('请添加完整的商品信息！');
       return false;
@@ -192,14 +197,14 @@ class GoodsInfo extends React.Component {
       name: goodsName,
       price: goodsPrice,
     };
-    if(selectRadio == 2) {
-      delete data.image
-      data.video_url = goodsList[0]
+    if (selectRadio == 2) {
+      delete data.image;
+      data.video_url = goodsList[0];
     }
     try {
       response = await API.goodsManageApi.addGoods(data);
     } catch (error) {
-      message.error('语音生成失败！');
+      message.error(error || '语音生成失败！');
       return false;
     }
     if (response && response.code === 200 && response.data) {
@@ -213,7 +218,7 @@ class GoodsInfo extends React.Component {
 
   // 更新商品
   handleUpdataGoods = async () => {
-    const { goodsName, goodsPrice, introduce, goodsList, dataSource } =
+    const { goodsName, goodsPrice, introduce, goodsList, dataSource, selectRadio } =
       this.state;
 
     if (goodsList.length === 0 || !goodsName || !goodsName || !introduce) {
@@ -232,6 +237,11 @@ class GoodsInfo extends React.Component {
       id: this.props.location.query.goods.id,
     };
 
+    if (selectRadio == 2) {
+      delete data.image;
+      data.video_url = goodsList[0];
+    }
+
     dataSource.forEach((e, i) => {
       data.tag_list.push(dataSource[i].label);
       data.speed_list.push(dataSource[i].speedNum);
@@ -243,7 +253,7 @@ class GoodsInfo extends React.Component {
       response = await API.goodsManageApi.updateGoods(data);
     } catch (error) {
       message.warning(
-        (error && error.message) || '语音正则合成中，请稍后在做修改！'
+        error || '语音正则合成中，请稍后在做修改！'
       );
       return false;
     }
@@ -280,23 +290,23 @@ class GoodsInfo extends React.Component {
     return {
       suffix: suffix,
     };
-  }
+  };
   // 更新音频
   handleUpdateVioce = async (i, file) => {
     const { dataSource } = this.state;
     if (file.status === 'done') {
-      let response = null
+      let response = null;
       try {
         response = await API.goodsManageApi.updataVoice({
           simple_id: dataSource[i].sentenceId,
-          file_link: file.response.data
-        })
+          file_link: file.response.data,
+        });
       } catch (error) {
-        message.error('语音更替失败！')
-        return false
+        message.error('语音更替失败！');
+        return false;
       }
       dataSource[i].updateStatus = false;
-      dataSource[i].voice = file.response.data
+      dataSource[i].voice = file.response.data;
       this.setState({ dataSource: this.state.dataSource });
     }
   };
@@ -337,7 +347,7 @@ class GoodsInfo extends React.Component {
         image,
         name,
         price,
-        introduce: introduceTxt
+        introduce: introduceTxt,
       } = this.props.location?.query?.goods;
       // tabel数据源
       const dataSource = [];
@@ -359,14 +369,14 @@ class GoodsInfo extends React.Component {
         goodsName: name,
         goodsList: image || [video],
         goodsPrice: price,
-        selectRadio: video? 2 : 1,
+        selectRadio: video ? 2 : 1,
         introduce: introduceTxt,
-        isAdd: this.props.location.query.isAdd
+        isAdd: this.props.location.query.isAdd,
       });
     } else {
       this.setState({
-        isAdd: this.props.location.query.isAdd
-      })
+        isAdd: this.props.location.query.isAdd,
+      });
     }
   }
 
@@ -387,7 +397,12 @@ class GoodsInfo extends React.Component {
         <div className='flex-1 bg-white goods_h-full p-6'>
           <div className='flex head items-center mb-4'>
             <div className='font_20 flex items-center text-black font-semibold w-auto'>
-              <div className='flex items-center cursor-pointer w_30px' onClick={this.props.history.goBack}><ArrowLeftOutlined/></div>
+              <div
+                className='flex items-center cursor-pointer w_30px'
+                onClick={this.props.history.goBack}
+              >
+                <ArrowLeftOutlined />
+              </div>
               <span className='ml-3'>商品管理/新增商品</span>
             </div>
           </div>
@@ -401,7 +416,7 @@ class GoodsInfo extends React.Component {
                     onChange={(e) => {
                       this.setState({
                         selectRadio: e.target.value,
-                        goodsList: []
+                        goodsList: [],
                       });
                     }}
                   >
@@ -460,24 +475,28 @@ class GoodsInfo extends React.Component {
                   ) : (
                     <>
                       {selectRadio == 2 && (
-                        <Upload
-                          showUploadList={false}
-                          data={this.videoData}
-                          action={`${process.env.REACT_APP_API}/api/common/upload`}
-                          accept='.mp4, .avi .flv'
-                          multiple={true}
-                          onChange={this.handleChange}
-                        >
-                          <div
-                            className={[
-                              'w_100px h_100px border_radius_5px border flex justify-center items-center flex-col',
-                              goodsList.length && 'ml_15px',
-                            ].join(' ')}
-                          >
-                            <PlusOutlined />
-                            <div style={{ marginTop: 8 }}>video</div>
-                          </div>
-                        </Upload>
+                        <>
+                          {!(goodsList.length >= 1) && (
+                            <Upload
+                              showUploadList={false}
+                              data={this.videoData}
+                              action={`${process.env.REACT_APP_API}/api/common/upload`}
+                              accept='.mp4, .avi .flv'
+                              multiple={true}
+                              onChange={this.handleChange}
+                            >
+                              <div
+                                className={[
+                                  'w_100px h_100px border_radius_5px border flex justify-center items-center flex-col',
+                                  goodsList.length && 'ml_15px',
+                                ].join(' ')}
+                              >
+                                <PlusOutlined />
+                                <div style={{ marginTop: 8 }}>video</div>
+                              </div>
+                            </Upload>
+                          )}
+                        </>
                       )}
                     </>
                   )}
@@ -518,7 +537,6 @@ class GoodsInfo extends React.Component {
                   />
                   <div className='font_12'>介绍文案以句号为段落结束</div>
                 </div>
-
               </div>
             </div>
           </div>
