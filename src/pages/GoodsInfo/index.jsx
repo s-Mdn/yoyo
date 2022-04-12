@@ -333,6 +333,7 @@ class GoodsInfo extends React.Component {
         action_tag_list: label,
         wav_url_list: wavs,
         speed_list: speeds,
+        video_url: video,
         simple_sentence_id_list: sentenceId,
         image,
         name,
@@ -354,11 +355,13 @@ class GoodsInfo extends React.Component {
           updateStatus: false,
         });
       });
+
       this.setState({
         dataSource,
         goodsName: name,
-        goodsList: image,
+        goodsList: image || [video],
         goodsPrice: price,
+        selectRadio: video? 2 : 1,
         introduce: introduceTxt,
         isAdd: this.props.location.query.isAdd
       });
@@ -396,7 +399,7 @@ class GoodsInfo extends React.Component {
               <div className='upload-area'>
                 <div className='upload_type mb-2'>
                   <Radio.Group
-                    defaultValue={selectRadio}
+                    value={selectRadio}
                     onChange={(e) => {
                       this.setState({
                         selectRadio: e.target.value,
@@ -453,12 +456,12 @@ class GoodsInfo extends React.Component {
                         ].join(' ')}
                       >
                         <PlusOutlined />
-                        <div style={{ marginTop: 8 }}>Upload</div>
+                        <div style={{ marginTop: 8 }}>image</div>
                       </div>
                     </Upload>
                   ) : (
                     <>
-                      {!goodsList.length && selectRadio == 2 && (
+                      { selectRadio == 2 && (
                         <Upload
                           showUploadList={false}
                           data={this.videoData}
@@ -474,7 +477,7 @@ class GoodsInfo extends React.Component {
                             ].join(' ')}
                           >
                             <PlusOutlined />
-                            <div style={{ marginTop: 8 }}>Upload</div>
+                            <div style={{ marginTop: 8 }}>video</div>
                           </div>
                         </Upload>
                       )}

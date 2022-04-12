@@ -133,7 +133,7 @@ class GoodsManage extends React.Component {
         response = await API.goodsManageApi.deletePlay(modalItem.id);
       }
     } catch (error) {
-      message.error('删除失败！');
+      message.error(error || '删除失败！');
       return false;
     }
 

@@ -121,7 +121,7 @@ function addGoods(data) {
  */
 function restoreVioce(data) {
   return request({
-    url: '/api/commodity/vioce_restore',
+    url: '/api/commodity/voice_restore',
     method: 'POST',
     data
   })
