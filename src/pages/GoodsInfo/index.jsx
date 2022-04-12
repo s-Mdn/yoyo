@@ -331,6 +331,7 @@ class GoodsInfo extends React.Component {
         word_list: introduce,
         action_tag_list: label,
         wav_url_list: wavs,
+        video_url: video,
         speed_list: speeds,
         simple_sentence_id_list: sentenceId,
         image,
@@ -356,7 +357,7 @@ class GoodsInfo extends React.Component {
       this.setState({
         dataSource,
         goodsName: name,
-        goodsList: image,
+        goodsList: image || [video],
         goodsPrice: price,
         introduce: introduceTxt,
         isAdd: this.props.location.query.isAdd
@@ -395,7 +396,8 @@ class GoodsInfo extends React.Component {
               <div className='upload-area'>
                 <div className='upload_type mb-2'>
                   <Radio.Group
-                    defaultValue={selectRadio}
+                    // defaultValue={selectRadio}
+                    value={selectRadio}
                     onChange={(e) => {
                       this.setState({
                         selectRadio: e.target.value,
@@ -457,7 +459,7 @@ class GoodsInfo extends React.Component {
                     </Upload>
                   ) : (
                     <>
-                      {!goodsList.length && selectRadio == 2 && (
+                      {selectRadio == 2 && (
                         <Upload
                           showUploadList={false}
                           data={this.videoData}
