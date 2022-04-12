@@ -199,7 +199,8 @@ class GoodsInfo extends React.Component {
     try {
       response = await API.goodsManageApi.addGoods(data);
     } catch (error) {
-      message.error('语音生成失败！');
+      console.log(error)
+      message.error(error || '语音生成失败！');
       return false;
     }
     if (response && response.code === 200 && response.data) {
@@ -243,7 +244,7 @@ class GoodsInfo extends React.Component {
       response = await API.goodsManageApi.updateGoods(data);
     } catch (error) {
       message.warning(
-        (error && error.message) || '语音正则合成中，请稍后在做修改！'
+        error || '语音正则合成中，请稍后在做修改！'
       );
       return false;
     }
