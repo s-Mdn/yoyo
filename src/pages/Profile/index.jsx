@@ -28,7 +28,7 @@ class Profile extends React.Component {
       passWord: {},
       timeStampPas: '获取验证码',
       timeStampOldPhone: '获取验证码',
-      timeStampNewphone: '获取验证码',
+      timeStampNewPhone: '获取验证码',
       visible: false, // 弹窗visible
       modelTitle: '', // 弹窗标题
       modelVndom: null, //控制弹窗footer和content
@@ -105,9 +105,9 @@ class Profile extends React.Component {
 
   // 退出
   handleLogOut = () => {
-    if(this.props.playState) {
-      message.warning('正在播放，无法退出！')
-      return false
+    if (this.props.playState) {
+      message.warning('正在播放，无法退出！');
+      return false;
     }
     localStorage.clear();
     window.location.reload();
@@ -286,9 +286,9 @@ class Profile extends React.Component {
           placeholder='请输入验证码'
           maxLength={11}
           value={this.state.code.oldPhoneCode}
-          onChange={e =>{
-            this.state.code.oldPhoneCode = e.target.value
-            this.setState({code: this.state.code})
+          onChange={(e) => {
+            this.state.code.oldPhoneCode = e.target.value;
+            this.setState({ code: this.state.code });
           }}
         />
       </p>
@@ -325,7 +325,9 @@ class Profile extends React.Component {
             color: '#000',
           }}
           value={this.state.newPhone}
-          onChange={e => {this.setState({newPhone: e.target.value})}}
+          onChange={(e) => {
+            this.setState({ newPhone: e.target.value });
+          }}
           maxLength={11}
         />
         <button
@@ -334,13 +336,13 @@ class Profile extends React.Component {
             this.getValidateCode(checkNewPhoneTag, this.state.newPhone);
           }}
         >
-          {validate.isNumber(this.state.timeStampNewphone) ? (
+          {validate.isNumber(this.state.timeStampNewPhone) ? (
             <>
-              {this.state.timeStampNewphone}
+              {this.state.timeStampNewPhone}
               秒后重发
             </>
           ) : (
-            <>{this.state.timeStampNewphone}</>
+            <>{this.state.timeStampNewPhone}</>
           )}
         </button>
       </p>
@@ -351,9 +353,9 @@ class Profile extends React.Component {
           placeholder='请输入验证码'
           maxLength={11}
           value={this.state.code.newPhoneCode}
-          onChange={e =>{
-            this.state.code.newPhoneCode = e.target.value
-            this.setState({code: this.state.code})
+          onChange={(e) => {
+            this.state.code.newPhoneCode = e.target.value;
+            this.setState({ code: this.state.code });
           }}
         />
       </p>
@@ -362,8 +364,14 @@ class Profile extends React.Component {
 
   // 下一步
   handleNext = async () => {
-    const { isGetValidata, hidePhoneNum, code: { oldPhoneCode } } = this.state
-    const {userInfo: { phone_num }} = this.props
+    const {
+      isGetValidata,
+      hidePhoneNum,
+      code: { oldPhoneCode },
+    } = this.state;
+    const {
+      userInfo: { phone_num },
+    } = this.props;
     if (!isGetValidata) {
       message.warning('请先获取验证码!');
       return false;
@@ -376,11 +384,11 @@ class Profile extends React.Component {
       message.warning('手机号码格式不对！');
       return false;
     }
-    if(!oldPhoneCode) {
+    if (!oldPhoneCode) {
       message.warning('请输入验证码!');
       return false;
     }
-    if(!validate.isChinese(oldPhoneCode)) {
+    if (!validate.isChinese(oldPhoneCode)) {
       message.warning('请输入正确的验证码!');
       return false;
     }
@@ -390,17 +398,17 @@ class Profile extends React.Component {
       res = await API.profileApi.checkOldPhone({
         phone_num: phone_num,
         code: oldPhoneCode,
-        sms_use: changePhoneTag
-      })
+        sms_use: changePhoneTag,
+      });
     } catch (error) {
-      message.error('修改失败！')
-      return false
+      message.error('修改失败！');
+      return false;
     }
 
-    if(res && res.code === 200) {
+    if (res && res.code === 200) {
       this.setState({
         modelVndom: 1,
-        isGetValidata: false
+        isGetValidata: false,
       });
       clearTimeout(timer);
     }
@@ -448,61 +456,73 @@ class Profile extends React.Component {
       return false;
     }
 
-    if (res ** res.code === 200) {
-      message.success('密码修改成功！');
+    if (res && res.code === 200) {
+      message.success('修改成功，即将退出重新登录！');
       this.setState({
         visible: false,
         title: '',
         timeStamp: '获取验证码',
       });
       clearTimeout(timer);
+      let timeOut = setTimeout(() => {
+        localStorage.clear();
+        window.location.reload();
+        clearTimeout(timeOut);
+      }, 1500)
     }
   };
 
   // 新手机号修改确认
   handleComfirm = async () => {
-    const { newPhone, isGetValidata, code } = this.state
-    if(newPhone) {
-      message.warning('手机号码不能为空！')
-      return false
+    const { newPhone, isGetValidata, code } = this.state;
+    if (!newPhone) {
+      message.warning('手机号码不能为空！');
+      return false;
     }
-    if(!validate.validPhone(newPhone)) {
-      message.warning('手机格式不对！')
-      return false
+    if (!validate.validPhone(newPhone)) {
+      message.warning('手机格式不对！');
+      return false;
     }
-    if(!isGetValidata) {
-      message.warning('请先获取验证码！')
-      return false
+    if (!isGetValidata) {
+      message.warning('请先获取验证码！');
+      return false;
     }
-    if(!code.newPhoneCode) {
-      message.warning('验证码不能为空！')
-      return false
+    if (!code.newPhoneCode) {
+      message.warning('验证码不能为空！');
+      return false;
     }
 
-    let res = null
+    let res = null;
     try {
       res = await API.profileApi.changePhone({
         phone_num: this.props.userInfo.phone_num,
         new_phone_num: this.state.newPhone,
         code: this.state.code.newPhoneCode,
-        sms_use: checkNewPhoneTag
-      })
+        sms_use: checkNewPhoneTag,
+      });
     } catch (error) {
-      message.error('修改失败！')
-      return false
+      message.error(error || '修改失败！');
+      return false;
     }
 
-    if(res && res.code === 200) {
+    if (res && res.code === 200) {
+      message.success('修改成功，即将退出重新登录！');
       this.setState({
         newPhone: '',
         code: {},
         isGetValidata: false,
         passWord: {},
+        visible: false,
         timeStampNewPhone: '获取验证码',
-        timeStampOldPhone: '获取验证码'
-      })
+        timeStampOldPhone: '获取验证码',
+      });
+      let timeOut = setTimeout(() => {
+        localStorage.clear();
+        window.location.reload();
+        clearTimeout(timeOut);
+      }, 1500)
     }
-  }
+  };
 
   // 取消
   handleCancel = () => {
@@ -513,14 +533,41 @@ class Profile extends React.Component {
       code: {},
       timeStampPas: '获取验证码',
       timeStampOldPhone: '获取验证码',
-      timeStampNewphone: '获取验证码',
+      timeStampNewPhone: '获取验证码',
     });
     clearTimeout(timer);
     timer = null;
   };
 
+  // 修改手机号
+  handleChangePhone = () => {
+    if(this.props.playState) {
+      message.warning('正在播放，无法修改手机号码！')
+      return false
+    }
+    this.setState({
+      visible: true,
+      modelVndom: 2,
+      modelTitle: '修改手机号',
+    });
+  };
+
+  // 修改密码
+  handleChangePas = () => {
+    if(this.props.playState) {
+      message.warning('正在播放，无法修改密码！')
+      return false
+    }
+    this.setState({
+      visible: true,
+      modelVndom: 3,
+      modelTitle: '修改密码',
+    });
+  }
+
   // 修改手机号码获取验证码
   getValidateCode = async (tag, phone) => {
+    this.countDown(60000);
     if (!phone) {
       message.warning('请输入手机号码！');
       return false;
@@ -545,7 +592,11 @@ class Profile extends React.Component {
       return false;
     }
     this.countDown(60000);
-    if (res && res.code === 200 && tag === changePhoneTag) {
+    if (
+      res &&
+      res.code === 200 &&
+      (tag === changePhoneTag || tag === checkNewPhoneTag)
+    ) {
       this.setState({ isGetValidata: true });
     }
   };
@@ -554,35 +605,35 @@ class Profile extends React.Component {
   countDown = (ms) => {
     let maxTime = ms / 1000;
     let that = this;
-    const { modelVndom } = this.state
+    const { modelVndom } = this.state;
+    clearTimeout(timer);
     timer = setTimeout(function f() {
       if (maxTime > 1) {
         --maxTime;
-        if(modelVndom === 1) {
+        if (modelVndom === 1) {
           that.setState({ timeStampNewPhone: maxTime });
         }
-        if(modelVndom === 2) {
+        if (modelVndom === 2) {
           that.setState({ timeStampOldPhone: maxTime });
         }
-        if(modelVndom === 3) {
+        if (modelVndom === 3) {
           that.setState({ timeStampPas: maxTime });
         }
-
       } else {
-        if(modelVndom === 1) {
+        if (modelVndom === 1) {
           that.setState({
-            timeStampNewphone: '重新发送',
-          })
+            timeStampNewPhone: '重新发送',
+          });
         }
-        if(modelVndom === 2) {
+        if (modelVndom === 2) {
           that.setState({
-            timeStampOldPhone: '重新发送'
-          })
+            timeStampOldPhone: '重新发送',
+          });
         }
-        if(modelVndom === 3) {
+        if (modelVndom === 3) {
           that.setState({
-            timeStampPas: '重新发送'
-          })
+            timeStampPas: '重新发送',
+          });
         }
         clearTimeout(timer);
         return;
@@ -713,13 +764,7 @@ class Profile extends React.Component {
                   </div>
                   <div
                     className='flex items-center text-black cursor-default'
-                    onClick={() => {
-                      this.setState({
-                        visible: true,
-                        modelVndom: 2,
-                        modelTitle: '修改手机号',
-                      });
-                    }}
+                    onClick={this.handleChangePhone}
                   >
                     <EditFilled />
                     <span className='ml-2'>修改</span>
@@ -733,13 +778,7 @@ class Profile extends React.Component {
                   </div>
                   <div
                     className='flex items-center text-black cursor-default'
-                    onClick={() => {
-                      this.setState({
-                        visible: true,
-                        modelVndom: 3,
-                        modelTitle: '修改密码',
-                      });
-                    }}
+                    onClick={this.handleChangePas}
                   >
                     <EditFilled />
                     <span className='ml-2'>修改</span>
