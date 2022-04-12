@@ -359,6 +359,7 @@ class GoodsInfo extends React.Component {
         goodsName: name,
         goodsList: image || [video],
         goodsPrice: price,
+        selectRadio: video? 2 : 1,
         introduce: introduceTxt,
         isAdd: this.props.location.query.isAdd
       });
@@ -396,7 +397,6 @@ class GoodsInfo extends React.Component {
               <div className='upload-area'>
                 <div className='upload_type mb-2'>
                   <Radio.Group
-                    // defaultValue={selectRadio}
                     value={selectRadio}
                     onChange={(e) => {
                       this.setState({
@@ -454,7 +454,7 @@ class GoodsInfo extends React.Component {
                         ].join(' ')}
                       >
                         <PlusOutlined />
-                        <div style={{ marginTop: 8 }}>Upload</div>
+                        <div style={{ marginTop: 8 }}>image</div>
                       </div>
                     </Upload>
                   ) : (
@@ -475,7 +475,7 @@ class GoodsInfo extends React.Component {
                             ].join(' ')}
                           >
                             <PlusOutlined />
-                            <div style={{ marginTop: 8 }}>Upload</div>
+                            <div style={{ marginTop: 8 }}>video</div>
                           </div>
                         </Upload>
                       )}
