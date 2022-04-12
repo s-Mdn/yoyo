@@ -56,6 +56,10 @@ function Titlebar(props) {
 
   // 关闭
   const handleClose = () => {
+    if( playState ) {
+      message.warning('正在播放，无法退出！')
+      return false
+    }
     currentWindow?.close()
     handlePlay(play.stop(false))
     localStorage.removeItem('goodsWav')
