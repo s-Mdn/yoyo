@@ -59,6 +59,7 @@ class GoodsManage extends React.Component {
       return;
     } else {
       this.setState({
+        isViewGoods: true,
         modalItem: goods,
         modelVisible: true,
         modelContent: '确定删除该商品？',
@@ -79,13 +80,13 @@ class GoodsManage extends React.Component {
     this.setState({
       modelVisible: true,
       modalItem: play,
+      isViewGoods: true,
       modelContent: '确定删除该播放？',
     });
   };
 
   // 查看播放item的商品
   handlePlayView = async (play) => {
-    console.log(play);
     let response = null;
     try {
       response = await API.goodsManageApi.viewGoods({ id: play.id });
@@ -102,9 +103,9 @@ class GoodsManage extends React.Component {
           imgList.push(...e.image);
         }
       });
-      // console.log(imgList)
       this.setState({
         modelVisible: true,
+        isViewGoods: false,
         imgList,
       });
     }
@@ -303,16 +304,27 @@ class GoodsManage extends React.Component {
           ) : (
             <>
               {tabActive == 1 ? (
-                <div className='w_80 h_80 overflow-hidden m-auto my-2'>
-                  {modalItem && !modalItem.video_url ? (
-                    <img src={modalItem.image && modalItem.image[0]} alt='' />
-                  ) : (
-                    <video
-                      src={modalItem.video_url}
-                      className='object-fit w-full h-full'
-                    />
-                  )}
-                </div>
+                <>
+                  {
+                    (modalItem && modalItem.video_url)?(
+                      <div className='w_80 h_80 overflow-hidden m-auto my-2'>
+                        <video src={modalItem.video_url} className='object-fit w-full h-full'/>
+                      </div>
+                    ):(
+                      <div className='flex flex-wrap _ml_5px'>
+                        {
+                          modalItem.image.map((e, i) => {
+                            return (
+                              <div key={e} className='w_80 h_80 overflow-hidden ml_20px mb_20px rounded'>
+                                <img src={e} alt='' />
+                              </div>
+                            )
+                          })
+                        }
+                      </div>
+                    )
+                  }
+                </>
               ) : (
                 <div className='w_80 h_80 overflow-hidden m-auto my-2'>
                   {modalItem && (
