@@ -28,13 +28,14 @@ import background_five_hor from '@/assets/images/background-5-5.png';
 const {
   type: { toString, toObject },
   validate: { validURL, isImage },
+  auth: { getLocal, setLocal }
 } = utils;
 const {
   play: { stop, start },
 } = action;
 
 // 竖向默认背景
-const verBackgroundList = [
+const backGroundListVerticalConstant = [
   {
     id: 999,
     checked: false,
@@ -62,7 +63,7 @@ const verBackgroundList = [
   },
 ];
 // 横向默认背景
-const horBackgroundList = [
+const backgroundListHorizontalConstant = [
   {
     id: 999,
     checked: false,
@@ -104,8 +105,8 @@ const AutoPlay = (props) => {
   const localServerUrl = process.env.REACT_APP_LOCAL_SERVER_URL;
   // 背景图
   const [backGround, setBackGround] = useState({})
-  // 背景图列表
-  const [backGroundList, setBackgroundList] = useState([]);
+  // 背景图列表(竖向)
+  const [backGroundListVertical, setBackgroundListVertical] = useState([]);
 
   // 获取商品列表
   const getGoodsList = async (id) => {
@@ -183,20 +184,34 @@ const AutoPlay = (props) => {
   };
 
   // 获取背景图
-  const getBackground = async () => {
-    let response = null;
-    try {
-      response = await API.autoPlayApi.getBackground();
-    } catch (error) {
-      return false;
-    }
+  const getBackground =  () => {
+    const backGround = toObject(getLocal('background'))
 
-    if (response && response.code === 200) {
-      let tempList = !reverse? toString(verBackgroundList) : toString(horBackgroundList)
-      let r =  toObject(tempList)
-      r.push(...response.data.content)
-      setBackgroundList(r);
-    }
+    API.autoPlayApi.getBackground()
+      .then(r => {
+        backGroundListVerticalConstant.push(...r.data.content)
+        backgroundListHorizontalConstant.push(...r.data.content)
+
+        // 筛选上一次选中的背景图(竖向)
+        backgroundListHorizontalConstant.filter((e, i) => {
+          e.checked = e.id === backGround.id
+          return e
+        })
+
+        // 筛选上一次选中的背景图(横向)
+        backgroundListHorizontalConstant.filter(e => {
+          e.checked = e.id === backGround.id
+          return e
+        })
+
+        // 横竖向背景图
+        setBackgroundListVertical(backGroundListVerticalConstant)
+        setBackgroundListVertical(backgroundListHorizontalConstant)
+      })
+      .catch(e => {
+        message.error(e || '获取背景图失败！')
+        return false
+      })
   };
 
   // 通过 ws 连接视频处理服务器
@@ -301,7 +316,7 @@ const AutoPlay = (props) => {
     setBackGround(u)
     localStorage.setItem('background', toString(u))
 
-    backGroundList.filter((e, v) => {
+    backGroundListVertical.filter((e, v) => {
       e.checked = (i === v)
       return e
     })
@@ -429,10 +444,11 @@ const AutoPlay = (props) => {
   // Upload 组件方法
   const handleUploadChange = async ({ fileList, file }) => {
     if (file.status === 'done') {
-      await API.autoPlayApi.addBackground({
-        image: file?.response.data,
-      });
-      getBackground();
+
+      // await API.autoPlayApi.addBackground({
+      //   image: file?.response.data,
+      // });
+      // getBackground();
     }
   };
 
@@ -446,18 +462,18 @@ const AutoPlay = (props) => {
   };
 
   // 删除背景图
-  const handleDeleteBackgound = async (id) => {
-    try {
-      await API.autoPlayApi.deleteBackground(id)
-    } catch (error) {
-      message.error('删除失败！');
-      return false;
-    }
+  const handleDeleteBackgound = async (u) => {
+    console.log( u )
+    // try {
+    //   await API.autoPlayApi.deleteBackground(id)
+    // } catch (error) {
+    //   message.error('删除失败！');
+    //   return false;
+    // }
 
-    // let r = backGroundList.filter(e => e.id == id)
-    localStorage.removeItem('background')
-    setBackGround(backGroundList[3])
-    getBackground()
+    // localStorage.removeItem('background')
+    // setBackGround(backGroundListVertical[3])
+    // getBackground()
   };
 
   // 横竖屏切换背景图
@@ -467,15 +483,11 @@ const AutoPlay = (props) => {
       handleScale('goods-img', 'winVer');
       // 人物缩放
       handleScale('person', 'winVer');
-      // 背景图
-      setBackgroundList(verBackgroundList)
     } else {
       // 商品缩放
       handleScale('goods-img', 'winHorizont');
       // 人物缩放
       handleScale('person', 'winHorizont');
-      // 背景图
-      setBackgroundList(horBackgroundList)
     }
 
   }, [reverse]);
@@ -509,10 +521,10 @@ const AutoPlay = (props) => {
 
   // 设定背景图
   useEffect(()=>{
-    if(backGroundList) {
+    if(backGroundListVertical) {
       let tempObj = localStorage.getItem('background') && toObject(localStorage.getItem('background'))
       if( tempObj ) {
-        backGroundList.filter(e => {
+        backGroundListVertical.filter(e => {
           e.checked =( e.id === tempObj.id)
           if(e.id === tempObj.id) {
             setBackGround(e)
@@ -521,10 +533,10 @@ const AutoPlay = (props) => {
           return e
         })
       } else {
-        setBackGround(backGroundList[3])
+        setBackGround(backGroundListVertical[3])
       }
     }
-  }, [reverse, backGroundList])
+  }, [reverse, backGroundListVertical])
 
 
 
@@ -572,15 +584,15 @@ const AutoPlay = (props) => {
             背景图
           </div>
           <div className='flex flex-wrap'>
-            {backGroundList.map((u, i) => {
+            {backGroundListVertical.map((u, i) => {
               return (
                 <div key={u.id}>
                   {i <= 8 && (
-                    <div
-                      className='w_80 ml-4 mb-4 border h_80 rounded  cursor-pointer relative'
-                      onClick={() => handleSelectBackGround(u, i)}
-                    >
-                      <div className='w-full h-full rounded cursor-pointer overflow-hidden'>
+                    <div className='w_80 ml-4 mb-4 border h_80 rounded  cursor-pointer relative'>
+                      <div
+                        className='w-full h-full rounded cursor-pointer overflow-hidden'
+                        onClick={() => handleSelectBackGround(u, i)}
+                      >
                         <img src={u.image} alt='' className='h-full w-full' />
                       </div>
 
@@ -593,7 +605,7 @@ const AutoPlay = (props) => {
                       {i > 4 && (
                         <div
                           className='absolute _top_7px _right_7px flex justify-center items-center z-50'
-                          onClick={() => handleDeleteBackgound(u.id)}
+                          onClick={() => handleDeleteBackgound(u)}
                         >
                           <CloseCircleTwoTone twoToneColor='#ee6843' />
                         </div>
@@ -603,7 +615,7 @@ const AutoPlay = (props) => {
                 </div>
               );
             })}
-            {!(backGroundList.length >= 9) && (
+            {!(backGroundListVertical.length >= 9) && (
               <div className='w_80 ml-4 mb-4 border h_80 rounded overflow-hidden cursor-pointer self_bg_img'>
                 <Upload
                   data={data}
