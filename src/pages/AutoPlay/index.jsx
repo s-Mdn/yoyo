@@ -448,7 +448,6 @@ const AutoPlay = (props) => {
   // 删除背景图
   const handleDeleteBackgound = async (id) => {
     try {
-      // res = await API.autoPlayApi.deleteBackground(id);
       await API.autoPlayApi.deleteBackground(id)
     } catch (error) {
       message.error('删除失败！');
@@ -543,7 +542,7 @@ const AutoPlay = (props) => {
           {playList.map((e, i) => {
             return (
               <div
-                className='h_80 ml-4 mb-4 cursor-pointer relative mt-4'
+                className='w_80 ml-4 mb-4 cursor-pointer relative mt-4 overflow-hidden'
                 key={e.id}
                 onClick={() => handleSelectPlays(e, i)}
               >
@@ -562,6 +561,7 @@ const AutoPlay = (props) => {
                     <CheckCircleTwoTone twoToneColor='#ff8462' />
                   </div>
                 )}
+                <div className='text-center font_12 px-1 text-overflow'>{e.name}</div>
               </div>
             );
           })}
