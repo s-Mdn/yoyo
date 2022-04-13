@@ -21,7 +21,9 @@ import background_three_hor from '@/assets/images/background-3-3.png';
 import background_four_hor from '@/assets/images/background-4-4.png';
 import background_five_hor from '@/assets/images/background-5-5.png';
 
-import default_back_ground from '@/assets/bg-preview.jpg'
+// 竖向背景图
+import default_back_ground_ver from '@/assets/bg-preview.jpg'
+
 const {
   type: { toString, toObject },
   validate: { validURL, isImage },
@@ -206,12 +208,12 @@ const AutoPlay = (props) => {
     const { localServerWsClient: client } = window;
     // 背景图
     // let bg = validURL(backGround) ? backGround : `../build${backGround}`;
-    let bg = `../build${default_back_ground}`
+    let bg = `../build${default_back_ground_ver}`
     if (process.env.NODE_ENV !== 'development') {
       // bg = validURL(backGround)
       //   ? backGround
       //   : `../app.asar.unpacked${backGround}`;
-      bg = `../app.asar.unpacked${default_back_ground}`;
+      bg = `../app.asar.unpacked${default_back_ground_ver}`;
     }
 
     // 背景图 和 清晰度
@@ -590,7 +592,7 @@ const AutoPlay = (props) => {
                     <CheckCircleTwoTone twoToneColor='#ff8462' />
                   </div>
                 )}
-                <div className='px-1 text-overflow text-center'>{e.name}</div>
+                <div className='px-1 text-overflow text-center font_12 mt-2'>{e.name}</div>
               </div>
             );
           })}
@@ -657,7 +659,7 @@ const AutoPlay = (props) => {
       </div>
 
       {/* 中 */}
-      <div className='m_l_r_24 flex-1 box-border'>
+      <div className='m_l_r_24 flex-1 box-border relative'>
         {/* 中心内容 */}
         <div
           className={[
@@ -667,7 +669,7 @@ const AutoPlay = (props) => {
           {!reverse ? (
             <div className='w-full relative winVer flex-none rounded overflow-hidden h-full'>
               <div className='play_window h-full overflow-hidden'>
-                <img src={default_back_ground} alt='' className='w-full h-full' />
+                <img src={default_back_ground_ver} alt='' className='w-full h-full' />
               </div>
               {/* 人物 */}
               <div className='absolute bottom-0 w-full h-full'>
@@ -713,12 +715,12 @@ const AutoPlay = (props) => {
               )}
             </div>
           ) : (
-            <div className='w-full flex flex-col justify-center items-center relative mt-56'>
+            <div className='w-full flex flex-col justify-center items-center absolute top-1/2 translate_y_50'>
               <div
                 className='w-full h_400px relative winHorizont overflow-hidden'
                 style={{ backgroundSize: '100%, 100%' }}
               >
-                <img src={default_back_ground} alt='' />
+                <img src={default_back_ground_ver} alt='' />
                 {/* 人物 */}
                 <img
                   src={yoyo}
