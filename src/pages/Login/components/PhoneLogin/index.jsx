@@ -77,6 +77,7 @@ const PhoneLogin = (props) => {
       setWarnings(error || '请刷新重试')
       return false;
     }
+    console.log( response )
 
     if( response && response.code === 200 ) {
       setLocal(TokenKey, response.data.token);

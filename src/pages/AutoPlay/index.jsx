@@ -103,6 +103,7 @@ const AutoPlay = (props) => {
   const [backGround, setBackGround] = useState({});
   // 背景图列表
   const [backGroundList, setBackgroundList] = useState([]);
+
   // 放大缩小(false为小，true为大)
   const [zoom, setZoom] = useState(true);
 
@@ -570,13 +571,13 @@ const AutoPlay = (props) => {
           {playList.map((e, i) => {
             return (
               <div
-                className='h_80 ml-4 mb-4 cursor-pointer relative mt-4'
+                className='ml-4 mb-4 cursor-pointer relative mt-4 w_80 overflow-hidden'
                 key={e.id}
                 onClick={() => handleSelectPlays(e, i)}
               >
                 <div className='w_80 h_80 overflow-hidden rounded'>
                   {isImage(e.cover_image) ? (
-                    <img src={e.cover_image} alt='' />
+                    <img src={e.cover_image} alt='' className='h-full'/>
                   ) : (
                     <video
                       src={e.cover_image}
@@ -585,10 +586,11 @@ const AutoPlay = (props) => {
                   )}
                 </div>
                 {e.checked && (
-                  <div className='flex justify-center items-center absolute  z-30 _top_7px _right_7px'>
+                  <div className='flex justify-center items-center absolute  z-30 top-0 right-0'>
                     <CheckCircleTwoTone twoToneColor='#ff8462' />
                   </div>
                 )}
+                <div className='px-1 text-overflow text-center'>{e.name}</div>
               </div>
             );
           })}

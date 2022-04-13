@@ -38,6 +38,11 @@ function checkOldPhone(data) {
   })
 }
 
+/**
+ *
+ * @param {object} data
+ * @returns
+ */
 function changePhone(data) {
   return request({
     url: '/api/auth/reset_phone_num',
@@ -45,6 +50,7 @@ function changePhone(data) {
     data
   })
 }
+
 
 export {
   updataProfile,
