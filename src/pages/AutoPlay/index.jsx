@@ -22,8 +22,8 @@ import background_four_hor from '@/assets/images/background-4-4.png';
 import background_five_hor from '@/assets/images/background-5-5.png';
 
 // 竖向背景图
-import default_back_ground_ver from '@/assets/bg-preview.jpg'
-
+import tax_hor from '@/assets/tax_hor.png'
+import tax_ver from '@/assets/tax_ver.png'
 const {
   type: { toString, toObject },
   validate: { validURL, isImage },
@@ -207,13 +207,10 @@ const AutoPlay = (props) => {
   const connectVideoProcess = () => {
     const { localServerWsClient: client } = window;
     // 背景图
-    // let bg = validURL(backGround) ? backGround : `../build${backGround}`;
-    let bg = `../build${default_back_ground_ver}`
+    let background = !reverse? tax_ver : tax_hor
+    let bg = `../build${background}`
     if (process.env.NODE_ENV !== 'development') {
-      // bg = validURL(backGround)
-      //   ? backGround
-      //   : `../app.asar.unpacked${backGround}`;
-      bg = `../app.asar.unpacked${default_back_ground_ver}`;
+      bg = `../app.asar.unpacked${background}`;
     }
 
     // 背景图 和 清晰度
@@ -669,7 +666,7 @@ const AutoPlay = (props) => {
           {!reverse ? (
             <div className='w-full relative winVer flex-none rounded overflow-hidden h-full'>
               <div className='play_window h-full overflow-hidden'>
-                <img src={default_back_ground_ver} alt='' className='w-full h-full' />
+                <img src={tax_ver} alt='' className='w-full h-full' />
               </div>
               {/* 人物 */}
               <div className='absolute bottom-0 w-full h-full'>
@@ -720,7 +717,7 @@ const AutoPlay = (props) => {
                 className='w-full h_400px relative winHorizont overflow-hidden'
                 style={{ backgroundSize: '100%, 100%' }}
               >
-                <img src={default_back_ground_ver} alt='' />
+                <img src={tax_ver} alt='' />
                 {/* 人物 */}
                 <img
                   src={yoyo}
