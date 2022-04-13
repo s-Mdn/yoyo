@@ -88,15 +88,39 @@ class Profile extends React.Component {
 
   // Upload 组件方法
   handleChange = ({ fileList, file }) => {
-    this.setState({
-      avatar: file.response?.data,
-    });
-    let userInfo =
-      auth.getLocal('userInfo') && JSON.parse(auth.getLocal('userInfo'));
-    userInfo.avatar = file.response?.data;
-    auth.setLocal('userInfo', type.toString(userInfo));
-    this.props.handleProfile(userInfo);
+    if(file.status === 'done') {
+      this.setState({
+        avatar: file.response?.data,
+      })
+      this.updataUserInfo()
+    }
   };
+
+
+  updataUserInfo = async () => {
+    let res = null
+    let data = {
+      avatar: this.state.avatar,
+      nickname: this.state.nickNamer || this.state.nickName
+    }
+    try {
+      res = await API.profileApi.updataProfile(data)
+    } catch (error) {
+      message.error(error || '修改失败！')
+    }
+    if(res && res.code === 200) {
+      let user_info = res.data
+      user_info.token = auth.getLocal('token')
+      this.props.handleProfile(user_info);
+      auth.setLocal('userInfo', type.toString(user_info))
+      message.success('修改成功')
+      this.setState({
+        resetName: false,
+        nickName: user_info.nickname
+      })
+    }
+
+  }
 
   // Radio事件
   handleRadioChange = (e) => {
@@ -401,7 +425,7 @@ class Profile extends React.Component {
         sms_use: changePhoneTag,
       });
     } catch (error) {
-      message.error(error || '修改失败！');
+      message.error('修改失败！');
       return false;
     }
 
@@ -741,7 +765,7 @@ class Profile extends React.Component {
                         <p className='mt-6'>
                           <button
                             className='btn-confime px-4 py-1 text-center rounded bg-001529 color-666'
-                            onClick={this.handleComfimrResetName}
+                            onClick={()=>this.updataUserInfo()}
                           >
                             确认
                           </button>
