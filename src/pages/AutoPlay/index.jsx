@@ -207,8 +207,8 @@ const AutoPlay = (props) => {
         });
 
         // 横竖向背景图
-        // setBackgroundListVertical(backGroundListVerticalConstant)
-        // setBackgroundListHorizontal(backgroundListHorizontalConstant)
+        setBackgroundListVertical(backGroundListVerticalConstant)
+        setBackgroundListHorizontal(backgroundListHorizontalConstant)
       })
       .catch((e) => {
         message.error(e || '获取背景图失败！');
@@ -646,6 +646,28 @@ const AutoPlay = (props) => {
       </div>
 
       <div className='m_l_r_15px w_405  box-border center'>
+        <div className='flex relative rounded play_window_h'>
+          {
+            !reverse?(
+              <div className='h-full w-full window_level'>
+                <img className='h-full w-full object-fit-fill' alt='背景图'/>
+                <div className='goods absolute top-0 right-0 w_20vh h_20vh top_20vh rounded border overflow-hidden'>
+                  <img src={goodsUrl.cover_image} className='w-full h-full object-fit-fill'/>
+                </div>
+                <div className='person absolute top-0 right-0'>2</div>
+              </div>
+            ):(
+              <div className='h-full bg-black w-full flex items-center'>横window_straight</div>
+            )
+          }
+          <div
+            className='absolute right-0 top-2 font_12 color_FF8462 px-1 bg-001529 rounded-l cursor-pointer'
+            onClick={() => setReverse((reverse) => !reverse)}
+          >
+            {reverse ? '横屏' : '竖屏'}
+          </div>
+        </div>
+
 
         {/* <div
           className={[
