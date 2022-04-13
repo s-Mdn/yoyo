@@ -92,6 +92,7 @@ class GoodsInfo extends React.Component {
                     value={defaultSpeed}
                     onChange={(e) => {
                       this.state.dataSource[i].speed = e;
+                      this.state.dataSource[i].speedNum = e
                       this.setState({
                         dataSource: this.state.dataSource,
                       });
