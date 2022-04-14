@@ -55,7 +55,7 @@ class GoodsInfo extends React.Component {
                       });
                     }}
                     options={[
-                      { label: '点赞', value: '点赞' },
+                      { label: '赞美', value: '赞美' },
                       { label: '查资料', value: '查资料' },
                       { label: '讲解', value: '讲解' },
                       { label: '划重点', value: '划重点' },
