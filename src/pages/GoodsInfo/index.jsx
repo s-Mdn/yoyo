@@ -55,11 +55,18 @@ class GoodsInfo extends React.Component {
                       });
                     }}
                     options={[
-                      { label: '开场', value: '开场' },
-                      { label: '自然', value: '自然' },
-                      { label: '赞美', value: '赞美' },
-                      { label: '欢迎', value: '欢迎' },
-                      { label: '感谢', value: '感谢' },
+                      { label: '点赞', value: '点赞' },
+                      { label: '查资料', value: '查资料' },
+                      { label: '讲解', value: '讲解' },
+                      { label: '划重点', value: '划重点' },
+                      { label: '温馨提示', value: '温馨提示' },
+                      { label: '正确', value: '正确' },
+                      { label: '错误', value: '错误' },
+                      { label: '出场', value: '出场' },
+                      { label: '再见', value: '再见' },
+                      { label: '保证', value: '保证' },
+                      { label: '比心', value: '比心' },
+                      { label: '标准动作', value: '标准动作' },
                     ]}
                   />
                 </div>

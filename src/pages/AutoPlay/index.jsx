@@ -279,7 +279,7 @@ const AutoPlay = (props) => {
       //   ? getPersonPositions('person', 'winVer')
       //   : getPersonPositions('person', 'winHorizont'),
     }));
-    // console.log(data)
+    console.log(data)
     client.send('sequence->' + toString(data));
   };
 
@@ -561,7 +561,7 @@ const AutoPlay = (props) => {
       {/* 左  mb-3*/}
       <div className='flex-1 rounded bg-white h-full'>
         <div className='border-b text-center h_45 line_height_45'>直播列表</div>
-        <div className='flex flex-wrap goods_h'>
+        <div className='flex flex-wrap goods_h content-start'>
           {!playList.length && (
             <div className=' m-auto'>
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
