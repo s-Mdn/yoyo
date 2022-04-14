@@ -8,18 +8,22 @@ import API from '@/services';
 import phoneIcon from '@/assets/icons/phone_icon.png';
 import pasIcon from '@/assets/icons/pas_icon.png';
 
+import { LoginActions } from '@/store/actions'
+
+
 const { auth: { setLocal }, validate: { validPhone } } = utils;
 const { profile: { addProfile } } = action;
 const TokenKey = 'token';
 let timeOut;
 
 const PhoneLogin = (props) => {
-  const { token, handleProfile } = props;
+  const { token, handleProfile, handleUpdateUserInfo } = props;
   const [phone, setPhone] = useState();
   const [code, setCode] = useState();
   const [warnings, setWarnings] = useState();
   const [time, setTime] = useState(0);
   const [initTime, setIntTime] = useState(false)
+  const [submitTag, setSubmitTag] = useState(true);
 
   // hook 根据依赖自动计算倒计时
   useEffect(() => {
@@ -33,72 +37,71 @@ const PhoneLogin = (props) => {
 
   // 获取验证码
   const handleValidCode = async () => {
-    if (!phone) {
-      setWarnings('请输入手机号码')
-      return false;
-    } else if(!validPhone(phone)) {
-      setWarnings('手机号码格式不正确')
-      return false;
-    }
+    setTime(60)
+    // if (!phone) {
+    //   setWarnings('请输入手机号码')
+    //   return false;
+    // } else if(!validPhone(phone)) {
+    //   setWarnings('手机号码格式不正确')
+    //   return false;
+    // }
 
+    // let res = null
+    // const data = {
+    //   phone_num: phone,
+    //   sms_use: 'login',
+    // };
+    // try {
+    //   res = await API.loginApi.getValidCode(data);
+    // } catch (error) {
+    //   console.log(error)
+    //   setWarnings(error || '获取验证码当天次数已上限！')
+    //   return false;
+    // }
 
-
-    let res = null
-    const data = {
-      phone_num: phone,
-      sms_use: 'login',
-    };
-    try {
-      res = await API.loginApi.getValidCode(data);
-    } catch (error) {
-      console.log(error)
-      setWarnings(error || '获取验证码当天次数已上限！')
-      return false;
-    }
-
-    // 指定倒计时间
-    setTime(60);
-    // 首次获取验证码状态
-    if(!initTime) { setIntTime(true) }
-  };
-
-  // 登录事件
-  const handleLogin = async (data) => {
-    const params = {
-      phone_num: data.phone,
-      code: data.code,
-      sms_use: 'login'
-    };
-    let response = null;
-
-    try {
-      response = await API.loginApi.loginByValidCode(params);
-    } catch (error) {
-      setWarnings(error || '请刷新重试')
-      return false;
-    }
-
-    if( response && response.code === 200 ) {
-      setLocal(TokenKey, response.data.token);
-      setLocal('userInfo', JSON.stringify(response.data));
-      handleProfile(response.data);
-    }
+    // // 指定倒计时间
+    // setTime(60);
+    // // 首次获取验证码状态
+    // if(!initTime) { setIntTime(true) }
   };
 
   // 表单提交事件
   const handleSubmit = () => {
     if ( !phone ) {
-      setWarnings('请填写手机号');
+      setWarnings('手机号不能为空');
       return false;
-    } else if ( !validPhone(phone) ) {
+    }
+    if (!validPhone( phone )) {
       setWarnings('手机号码格式不正确');
       return false;
-    } else if (!code ) {
+    }
+    if ( !code ) {
       setWarnings('请填写验证码');
       return false;
     }
 
+    // 请求还没有结果，限制第二次触发
+    if( !submitTag ) { return false }
     handleLogin({ phone, code });
+  };
+
+  // 登录事件
+  const handleLogin = ({ phone, code }) => {
+    const data = {
+      phone_num: phone,
+      code: code,
+      sms_use: 'login'
+    };
+
+    API.loginApi.loginByValidCode(data)
+      .then(r => {
+        setSubmitTag(false)
+        handleUpdateUserInfo(r.data)
+      }).catch(e => {
+        setSubmitTag(false)
+        setWarnings(e || '验证码或手机号正确！')
+        return false
+      })
   };
 
   if ( token ) {
@@ -169,16 +172,10 @@ const PhoneLogin = (props) => {
 };
 
 const mapStateToProps = ( state ) => ({
-  token: state.profile.token,
+  token: state.userInfo.token,
 });
 
-const mapDispatchToProps = ( dispatch ) => ({
-  handleProfile: ( data ) => {
-    dispatch(addProfile( data ));
-  },
-});
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
 )(PhoneLogin);

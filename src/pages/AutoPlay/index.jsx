@@ -510,48 +510,6 @@ const AutoPlay = (props) => {
     getBackground();
   }, []);
 
-  // useEffect(() => {
-  //   if (playList.length) {
-  //     let tempObj =
-  //       localStorage.getItem('plays') &&
-  //       toObject(localStorage.getItem('plays'));
-  //     if (tempObj) {
-  //       playList.filter((e) => {
-  //         if (e.id === tempObj.id) {
-  //           e.checked = true;
-  //           setGoodsUrl(e);
-  //           localStorage.setItem('plays', toString(e));
-  //         }
-  //         return e;
-  //       });
-
-  //       // 如果缓存的内容和数据没有对应上的则清除缓存
-  //       if (!playList.some((e) => e.id === tempObj.id)) {
-  //         localStorage.removeItem('plays');
-  //       }
-  //     }
-  //   }
-  // }, [playList]);
-
-  // 设定背景图
-  // useEffect(()=>{
-  //   if(backGroundListVertical) {
-  //     let tempObj = localStorage.getItem('background') && toObject(localStorage.getItem('background'))
-  //     if( tempObj ) {
-  //       backGroundListVertical.filter(e => {
-  //         e.checked =( e.id === tempObj.id)
-  //         if(e.id === tempObj.id) {
-  //           setBackGround(e)
-  //           localStorage.setItem('background', toString(e))
-  //         }
-  //         return e
-  //       })
-  //     } else {
-  //       setBackGround(backGroundListVertical[3])
-  //     }
-  //   }
-  // }, [reverse, backGroundListVertical])
-
   return (
     <div className='auto_play flex justify-between h-full overflow-hidden'>
       <div className='left flex-1 rounded bg-white h-full p_b_15px'>
@@ -676,6 +634,7 @@ const AutoPlay = (props) => {
                 <img
                   src={playItem.cover_image}
                   className='w-full h-full object-fit-fill'
+                  alt=''
                 />
               </div>
               <div className='person_h_level absolute bottom-0 left-0'>
@@ -691,6 +650,7 @@ const AutoPlay = (props) => {
                   <img
                     src={playItem.cover_image}
                     className='w-full h-full object-fit-fill'
+                    alt=''
                   />
                 </div>
                 <div className='person_h_straight absolute bottom-0 left-5'>
@@ -707,89 +667,6 @@ const AutoPlay = (props) => {
           </div>
         </div>
 
-        {/* <div
-          className={[
-            'rounded relative flex-1 bg-white flex flex-col  win_h',
-          ].join(' ')}
-        >
-          {!reverse ? (
-            <div className='w-full relative winVer flex-none rounded overflow-hidden h-full'>
-              <div className='play_window h-full overflow-hidden'>
-                <img
-                  src={backGround?.image}
-                  alt=''
-                  className='object-fit-fill w-full h-full'
-                />
-              </div>
-              <div className='absolute bottom-0 w-full h-full'>
-                <img
-                  src={yoyo}
-                  alt=''
-                  className='absolute top_calc w_35vh h_60vh person '
-                  onDragStart={(e) => handleDragStart(e, 'person', 'winVer')}
-                />
-              </div>
-
-              <div
-                className='absolute w_20vh h_20vh overflow-hidden goods-img goods rounded left_405-22 top_20vh'
-                onDragStart={(e) => handleDragStart(e, 'goods-img', 'winVer')}
-              >
-                {goodsUrl &&
-                  (isImage(goodsUrl.cover_image) ? (
-                    <img src={goodsUrl.cover_image} alt='' />
-                  ) : (
-                    <video src={goodsUrl.cover_image} className='object-fill' />
-                  ))}
-              </div>
-            </div>
-          ) : (
-            <div className='w-full flex flex-col justify-center items-center relative mt-56'>
-              <div
-                className='w-full h_230 relative winHorizont overflow-hidden'
-                style={{ backgroundSize: '100%, 100%' }}
-              >
-                <img src={backGround?.image} alt='' className='w-full h-full' />
-
-                <img
-                  src={yoyo}
-                  alt=''
-                  className='absolute bottom-0 left-10 w_100 person'
-                  onDragStart={(e) =>
-                    handleDragStart(e, 'person', 'winHorizont')
-                  }
-                />
-
-
-                <div
-                  className='absolute h_13vh w_13vh overflow-hidden goods-img rounded left-0 top-4'
-                  onDragStart={(e) =>
-                    handleDragStart(e, 'goods-img', 'winHorizont')
-                  }
-                >
-                  {goodsUrl &&
-                    (isImage(goodsUrl.cover_image) ? (
-                      <img src={goodsUrl.cover_image} alt='' />
-                    ) : (
-                      <video
-                        src={goodsUrl.cover_image}
-                        className='object-fill'
-                      />
-                    ))}
-                </div>
-              </div>
-            </div>
-          )}
-          <div
-            className='font_12 color_FF8462 px-1 bg-001529 absolute right-0 top-2 rounded-l cursor-pointer'
-            onClick={() => {
-              setReverse((reverse) => !reverse);
-            }}
-          >
-            {reverse ? '横屏' : '竖屏'}
-          </div>
-        </div> */}
-
-        {/* 按钮 */}
         <div className='h_60px rounded bg-white mt_15px flex items-center justify-center px-4 box-border'>
           {Object.keys(playItem).length ? (
             <button
@@ -806,7 +683,6 @@ const AutoPlay = (props) => {
         </div>
       </div>
 
-      {/* 右 */}
       <div className='flex-1 rounded bg-white'>
         <div className='border-b text-center mb-3 h_45 line_h_44'>
           直播间互动

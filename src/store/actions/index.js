@@ -10,3 +10,10 @@ export const PlayAutoActions = {
   // 播放状态
   UpdatePlayState: 'UPDATE_PLAY_STATE'
 }
+
+export const LoginActions = {
+  // 更新个人信息
+  UpdateUserInfo: 'UPDATE_USER_INFO',
+  // 清空个人信息
+  ClearUserInfo: 'CLEAR_USER_INFO'
+}

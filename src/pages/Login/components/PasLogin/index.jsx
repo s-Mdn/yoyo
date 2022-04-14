@@ -8,6 +8,7 @@ import action from '@/actions';
 import userIcon from '@/assets/icons/user_icon.png';
 import eyeIcon from '@/assets/icons/eye_icon.png';
 
+
 const { auth: { getLocal, setLocal }, validate: { validPhone } } = utils;
 const { profile: { addProfile } } = action;
 const accountCache =
@@ -15,40 +16,41 @@ const accountCache =
 const TokenKey = 'token';
 
 const Login = (props) => {
-  const { token } = props;
+  const { token, handleUpdateUserInfo } = props;
   const [account, setAccount] = useState(accountCache?.account);
   const [password, setPassword] = useState(accountCache?.password);
   const [checked, setChecked] = useState(true);
   const [warnings, setWarnings] = useState();
+  const [submitTag, setSubmitTag] = useState(true);
 
   // 提交
   const handleSubmit = async () => {
-    if (!validPhone(account)) {
-      setWarnings('账号格式不正确，请重新输入')
-      return false;
-    } else if (!password) {
-      setWarnings('输入密码')
+    if( !account ) {
+      setWarnings('请重新输入帐号！')
       return false;
     }
-
-    let response = null;
-    let data = {
-      phone_num: account,
-      password,
-    };
-    try {
-      response = await API.loginApi.loginByPassword(data);
-    } catch (error) {
-      setWarnings('账号或密码不对')
+    if( !validPhone(account) ) {
+      setWarnings('账号格式不正确！')
+      return false;
+    }
+    if ( !password ) {
+      setWarnings('输入密码！')
       return false;
     }
 
-    if(response && response.code === 200) {
-      setLocal(TokenKey, response.data.token);
-      setLocal('userInfo', JSON.stringify(response.data));
-      props.handleProfile(response.data);
-    }
+    // 请求还没有结果，限制第二次触发
+    if( !submitTag ) { return false }
 
+    const data = { phone_num: account, password }
+    API.loginApi.loginByPassword(data)
+      .then(r => {
+        setSubmitTag(false)
+        handleUpdateUserInfo(r.data)
+      }).catch(e => {
+        setSubmitTag(false)
+        setWarnings(e || '账号或密码不对')
+        return false
+      })
   };
 
   // 是否保存账号密码
@@ -58,7 +60,7 @@ const Login = (props) => {
     }
   }, [checked, account, password]);
 
-  if (token) {
+  if ( token ) {
     return <Redirect to='/' />;
   }
 
@@ -123,13 +125,8 @@ const Login = (props) => {
 };
 
 const mapStateToProps = (state) => ({
-  token: state.profile.token,
+  token: state.userInfo.token,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  handleProfile: (data) => {
-    dispatch(addProfile(data));
-  },
-});
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(mapStateToProps)(Login);

@@ -4,15 +4,17 @@ import profile from '@/reducers/profile';
 import play from '@/reducers/play';
 import quality from '@/reducers/quality';
 
+import PlayAutoReducer from './reducers/play-auto'
+import LoginReducer from './reducers/login'
 
-import AddPlayItemReducer from './reducers/AddPlayItemReducer'
-import UpdatePlayList from './reducers/UpdatePlayList'
+
 const rootReducer = combineReducers({
   profile,
+  userInfo: LoginReducer.UpdateUserInfo,
   play,
   quality,
-  playItem: AddPlayItemReducer,
-  playList: UpdatePlayList,
+  playItem: PlayAutoReducer.AddPlayItem,
+  playList: PlayAutoReducer.UpdatePlayList,
 })
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
