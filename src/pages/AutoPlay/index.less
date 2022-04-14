@@ -32,7 +32,12 @@
   .object-fit-fill {
     object-fit: fill;
   }
-
+  .object-fit-contain {
+    object-fit: contain;
+  }
+  .object-fit-cover {
+    object-fit: cover;
+  }
   .left {
     .play_list {
       height: calc(100vh - 80px - 285px - 1rem);
@@ -46,7 +51,7 @@
       height: calc(45px + 1rem + 200px + 40px);
       overflow: hidden;
       .background_list_h {
-        height: calc(45px + 1rem + 200px + 40px - 40px - 20px);
+        height: calc(45px + 1rem + 200px + 40px - 45px);
         overflow: auto;
       }
     }
@@ -56,6 +61,17 @@
       height: calc(100% - 75px);
       background: white;
       overflow: hidden;
+    }
+    .person_h_level {
+      height: auto;
+      width: 75%;
+    }
+    .window_straight {
+      height: 230px;
+    }
+    .person_h_straight {
+      height: auto;
+      width: 30%;
     }
   }
   .right {
