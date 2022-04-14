@@ -7,7 +7,7 @@ import {
   CloseCircleTwoTone,
   CheckCircleTwoTone,
 } from '@ant-design/icons';
-
+import { PlayAutoActions } from '@/store/actions'
 import utils from '@/utils';
 import API from '@/services';
 import action from '@/actions';
@@ -92,15 +92,11 @@ const backgroundListHorizontalConstant = [
 ];
 
 const AutoPlay = (props) => {
-  const { playState, handlePlay } = props;
+  const { playState, handlePlay, playItem, handleUpdatePlayItem, playList, handleUpdatePlayList } = props;
   // 商品列表
   const [goodsList, setGoodsList] = useState([]);
-  // 播放列表
-  const [playList, setPlayList] = useState([]);
   // 横竖屏
   const [reverse, setReverse] = useState(true);
-  // 选中要播放的
-  const [plays, setPlays] = useState({});
   // ws
   const localServerUrl = process.env.REACT_APP_LOCAL_SERVER_URL;
   // 背景图(竖向)
@@ -114,9 +110,10 @@ const AutoPlay = (props) => {
 
   // 选中播放
   const handleSelectPlays = (p) => {
-    setPlayList(playList.filter((e) => {e.checked = p.id === e.id;return e}))
-    setPlays(p);
+    let tempList = playList.filter((e) => {e.checked = p.id === e.id;return e})
 
+    handleUpdatePlayItem(p)
+    handleUpdatePlayList(tempList)
     // 根据ID获取商品
     getGoodsList(p.id);
   };
@@ -157,8 +154,8 @@ const AutoPlay = (props) => {
       .then(r =>{
         let tempRes = r.data.content
         tempRes.forEach(p =>p.checked = false)
-
-        setPlayList(tempRes)
+        // 缓存到redux
+        handleUpdatePlayList(tempRes)
       }).catch(e =>{
         message.error(e || '获取数据失败！');
         return false
@@ -172,24 +169,24 @@ const AutoPlay = (props) => {
     API.autoPlayApi
       .getBackground()
       .then((r) => {
-        backGroundListVerticalConstant.push(...r.data.content);
-        backgroundListHorizontalConstant.push(...r.data.content);
+        let l = [...backGroundListVerticalConstant, ...r.data.content]
+        let h = [...backgroundListHorizontalConstant, ...r.data.content]
         // 筛选上一次选中的背景图(竖向)
 
-        backGroundListVerticalConstant.filter((e, i) => {
+        l.filter((e, i) => {
           e.checked = e.id === backGround?.id;
           return e;
         });
 
         // 筛选上一次选中的背景图(横向)
-        backgroundListHorizontalConstant.filter((e) => {
+        h.filter((e) => {
           e.checked = e.id === backGround?.id;
           return e;
         });
 
         // 横竖向背景图
-        setBackgroundListVertical(backGroundListVerticalConstant);
-        setBackgroundListHorizontal(backgroundListHorizontalConstant);
+        setBackgroundListVertical(l);
+        setBackgroundListHorizontal(h);
       })
       .catch((e) => {
         message.error(e || '获取背景图失败！');
@@ -337,11 +334,6 @@ const AutoPlay = (props) => {
     }));
     client.send('sequence->' + toString(data));
   };
-
-
-
-
-
 
   // 直播 || 关闭
   const handleVideoProcess = async () => {
@@ -682,7 +674,7 @@ const AutoPlay = (props) => {
               <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundVertica.image}/>
               <div className='goods absolute top_20vh right-0 w_20vh h_20vh rounded border overflow-hidden'>
                 <img
-                  src={plays.cover_image}
+                  src={playItem.cover_image}
                   className='w-full h-full object-fit-fill'
                 />
               </div>
@@ -697,7 +689,7 @@ const AutoPlay = (props) => {
                 <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundHorizontal.image}/>
                 <div className='goods absolute top-8 right-6 w_20vh h_20vh rounded border overflow-hidden'>
                   <img
-                    src={plays.cover_image}
+                    src={playItem.cover_image}
                     className='w-full h-full object-fit-fill'
                   />
                 </div>
@@ -799,7 +791,7 @@ const AutoPlay = (props) => {
 
         {/* 按钮 */}
         <div className='h_60px rounded bg-white mt_15px flex items-center justify-center px-4 box-border'>
-          {Object.keys(plays).length ? (
+          {Object.keys(playItem).length ? (
             <button
               className='bg-FF8462 px-6 py-1.5 rounded-full text-white'
               onClick={handleVideoProcess}
@@ -816,7 +808,7 @@ const AutoPlay = (props) => {
 
       {/* 右 */}
       <div className='flex-1 rounded bg-white'>
-        <div className='border-b text-center mb-3 h_45 line_height_45'>
+        <div className='border-b text-center mb-3 h_45 line_h_44'>
           直播间互动
         </div>
         <div className='interactive_area_h relative'>
@@ -829,13 +821,34 @@ const AutoPlay = (props) => {
   );
 };
 
+
+
 const mapStateToProps = (state) => ({
+  playList: state.playList,
+  playItem: state.playItem,
   playState: state.play,
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  // 开始播放 || 停止播放
   handlePlay: (actions) => {
     dispatch(actions);
+  },
+
+  // 添加播放列表
+  handleUpdatePlayList: (data) => {
+    dispatch({
+      type: PlayAutoActions.UpdatePlayList,
+      data
+    })
+  },
+
+  // 添加播放
+  handleUpdatePlayItem: (data) => {
+    dispatch({
+      type: PlayAutoActions.AddPlayItem,
+      data
+    })
   },
 });
 export default connect(mapStateToProps, mapDispatchToProps)(AutoPlay);
