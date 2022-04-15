@@ -2,7 +2,6 @@ import utils from '@/utils'
 const { auth }  = utils
 
 const profile = (state = {}, action) => {
-  console.log( action.type )
   switch (action.type) {
     case 'ADD_PROFILE':
       return {

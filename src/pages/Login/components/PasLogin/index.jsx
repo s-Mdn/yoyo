@@ -11,11 +11,9 @@ import eyeIcon from '@/assets/icons/eye_icon.png';
 const { auth: { getLocal, setLocal }, validate: { validPhone } } = utils;
 const accountCache =
   getLocal('accountCache') && JSON.parse(getLocal('accountCache'));
-const TokenKey = 'token';
 
 const Login = (props) => {
   const { token, handleUpdateUserInfo } = props;
-  console.log( handleUpdateUserInfo )
   const [account, setAccount] = useState(accountCache?.account);
   const [password, setPassword] = useState(accountCache?.password);
   const [checked, setChecked] = useState(true);
@@ -127,8 +125,5 @@ const Login = (props) => {
 const mapStateToProps = (state) => ({
   token: state.userInfo.token,
 });
-const mapDispatchToProps = (dispatch) => ({
-
-})
 
 export default connect(mapStateToProps, )(Login);

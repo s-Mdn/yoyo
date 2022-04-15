@@ -2,7 +2,6 @@ import { LoginActions } from '../actions'
 
 const LoginReducer = {
   UpdateUserInfo: (state = {}, action) => {
-    console.log( action.type, 'UpdateUserInfo' )
     switch (action.type) {
       case LoginActions.UpdateUserInfo:
         return {

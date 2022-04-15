@@ -10,11 +10,15 @@ import LoginReducer from './reducers/login'
 
 const rootReducer = combineReducers({
   profile,
-  userInfo: LoginReducer.UpdateUserInfo,
   play,
   quality,
-  playItem: PlayAutoReducer.AddPlayItem,
+  userInfo: LoginReducer.UpdateUserInfo,
+  playItem: PlayAutoReducer.UpdatePlayItem,
   playList: PlayAutoReducer.UpdatePlayList,
+  playState: PlayAutoReducer.UpdatePlayState,
+  goodsList: PlayAutoReducer.UpdateGoodsList,
+  backGroungL: PlayAutoReducer.UpdateBackGroundListVertical,
+  backGroungH: PlayAutoReducer.UpdateBackGroundListHorizontal,
 })
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose

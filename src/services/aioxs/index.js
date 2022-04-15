@@ -2,11 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Spin, message } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import store from '@/store'
 import Axios from 'axios';
-import utils from '@/utils'
-const { auth: { getLocal } } = utils
-console.log( store.getState().userInfo.token  )
+import store from '@/store'
+
+
 // 加载动效，效缓解用户的焦虑。
 let needLoading = false
 let requestCount = 0;
@@ -58,9 +57,6 @@ service.interceptors.request.use(
     needLoading = config.needLoading
     store.getState().userInfo.token &&
     (config.headers.Authorization = 'JWT ' + store.getState().userInfo.token);
-
-    // getLocal('token') &&
-    //   (config.headers.Authorization = 'JWT ' + store.getState().userInfo.token);
 
     if (
       config.method.toLocaleLowerCase() === 'post' ||
