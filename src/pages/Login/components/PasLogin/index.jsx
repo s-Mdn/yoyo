@@ -4,13 +4,11 @@ import { Redirect } from 'react-router-dom';
 import { Form, Input, Checkbox } from 'antd';
 import utils from '@/utils';
 import API from '@/services';
-import action from '@/actions';
 import userIcon from '@/assets/icons/user_icon.png';
 import eyeIcon from '@/assets/icons/eye_icon.png';
 
 
 const { auth: { getLocal, setLocal }, validate: { validPhone } } = utils;
-const { profile: { addProfile } } = action;
 const accountCache =
   getLocal('accountCache') && JSON.parse(getLocal('accountCache'));
 const TokenKey = 'token';
@@ -40,14 +38,15 @@ const Login = (props) => {
 
     // 请求还没有结果，限制第二次触发
     if( !submitTag ) { return false }
-
+    setSubmitTag(false)
+    
     const data = { phone_num: account, password }
     API.loginApi.loginByPassword(data)
       .then(r => {
-        setSubmitTag(false)
+        setSubmitTag(true)
         handleUpdateUserInfo(r.data)
       }).catch(e => {
-        setSubmitTag(false)
+        setSubmitTag(true)
         setWarnings(e || '账号或密码不对')
         return false
       })

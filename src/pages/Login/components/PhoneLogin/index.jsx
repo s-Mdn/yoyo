@@ -82,6 +82,7 @@ const PhoneLogin = (props) => {
 
     // 请求还没有结果，限制第二次触发
     if( !submitTag ) { return false }
+    setSubmitTag(false)
     handleLogin({ phone, code });
   };
 
@@ -95,10 +96,13 @@ const PhoneLogin = (props) => {
 
     API.loginApi.loginByValidCode(data)
       .then(r => {
-        setSubmitTag(false)
+        clearTimeout(timeOut)
+        setTime(0)
+        setIntTime(false)
+        setSubmitTag(true)
         handleUpdateUserInfo(r.data)
       }).catch(e => {
-        setSubmitTag(false)
+        setSubmitTag(true)
         setWarnings(e || '验证码或手机号正确！')
         return false
       })
