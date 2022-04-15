@@ -17,8 +17,10 @@ const rootReducer = combineReducers({
   playList: PlayAutoReducer.UpdatePlayList,
   playState: PlayAutoReducer.UpdatePlayState,
   goodsList: PlayAutoReducer.UpdateGoodsList,
-  backGroungL: PlayAutoReducer.UpdateBackGroundListVertical,
-  backGroungH: PlayAutoReducer.UpdateBackGroundListHorizontal,
+  backGroungListL: PlayAutoReducer.UpdateBackGroundListVertical,
+  backGroungListH: PlayAutoReducer.UpdateBackGroundListHorizontal,
+  backGroundL: PlayAutoReducer.UpdateBackGroundL,
+  backGroundH: PlayAutoReducer.UpdateBackGroundH,
 })
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose

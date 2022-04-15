@@ -2,22 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { Input } from 'antd';
-import action from '@/actions';
 import utils from '@/utils';
 import API from '@/services';
 import phoneIcon from '@/assets/icons/phone_icon.png';
 import pasIcon from '@/assets/icons/pas_icon.png';
 
-import { LoginActions } from '@/store/actions'
 
-
-const { auth: { setLocal }, validate: { validPhone } } = utils;
-const { profile: { addProfile } } = action;
-const TokenKey = 'token';
+const {  validate: { validPhone } } = utils;
 let timeOut;
 
 const PhoneLogin = (props) => {
-  const { token, handleProfile, handleUpdateUserInfo } = props;
+  const { token, handleUpdateUserInfo } = props;
   const [phone, setPhone] = useState();
   const [code, setCode] = useState();
   const [warnings, setWarnings] = useState();
@@ -36,7 +31,7 @@ const PhoneLogin = (props) => {
   }, [time]);
 
   // 获取验证码
-  const handleValidCode = async () => {
+  const handleValidCode = () => {
     if (!phone) {
       setWarnings('请输入手机号码')
       return false;
@@ -45,23 +40,18 @@ const PhoneLogin = (props) => {
       return false;
     }
 
-    let res = null
     const data = {
       phone_num: phone,
       sms_use: 'login',
-    };
-    try {
-      res = await API.loginApi.getValidCode(data);
-    } catch (error) {
-      console.log(error)
-      setWarnings(error || '获取验证码当天次数已上限！')
-      return false;
     }
-
-    // 指定倒计时间
-    setTime(60);
-    // 首次获取验证码状态
-    if(!initTime) { setIntTime(true) }
+    API.loginApi.getValidCode(data)
+      .then(r => {
+        setTime(60);
+        if(!initTime) { setIntTime(true) }
+      }).catch(e => {
+        setWarnings(e || '获取验证码当天次数已上限！')
+        return false;
+      })
   };
 
   // 表单提交事件

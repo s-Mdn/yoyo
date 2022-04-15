@@ -7,18 +7,20 @@ export const PlayAutoActions = {
   AddPlayItem: 'ADD_PLAY_ITEM',
   // 清空播放
   ClearPlayItem: 'CLEAR_PLAY_ITEM',
-  // 更新背景图
-  UpdateBackGround: 'UPDATE_BACK_GROUND',
+  // 更新背景图(竖向)
+  UpdateBackGroundVertical: 'UPDATE_BACK_GROUND_L',
+  // 更新背景图(横向)
+  UpdateBackGroundHorizontal: 'UPDATE_BACK_GROUND_H',
   // 播放状态
   UpdatePlayState: 'UPDATE_PLAY_STATE',
   // 添加播放商品
   AddGoodsList: 'ADD_GOODS_LIST',
   // 清空播放商品
   ClearGoodsList: 'CLEAR_GOODS_LIST',
-  // 添加竖背景图
-  AddBackGroungVertical: 'ADD_BACK_GROUND_L',
-  // 添加横背景图
-  AddBackGroungHorizontal: 'ADD_BACK_GROUND_H'
+  // 添加竖背景图列表
+  AddBackGroungVertical: 'ADD_BACK_GROUND_LIST_L',
+  // 添加横背景图列表
+  AddBackGroungHorizontal: 'ADD_BACK_GROUND_LIST_H',
 }
 
 export const LoginActions = {

@@ -17,9 +17,14 @@ import constData from '@/constant/play-auto'
 
 const AutoPlay = (props) => {
   const {
-    playList, handleUpdatePlayList, handleAddPlayItem, playItem, goodsList, handleAddGoodsList, backGroungL, backGroungH, playState,
-    handleAddBackGroundListVertical, handleAddBackGroundListHorizontal
+    playList, playItem, backGroungListL, backGroungListH, playState,
+    backGroundL, backGroundH,
+    handleUpdatePlayList, handleAddPlayItem, handleAddGoodsList,
+    handleAddBackGroundListVertical, handleAddBackGroundListHorizontal,
+    handleUpdateBackGroundL, handleUpdateBackGroundH
   } = props;
+
+  console.log( backGroundL, backGroundH )
   // 横竖屏
   const [reverse, setReverse] = useState(true);
   // ws
@@ -44,14 +49,11 @@ const AutoPlay = (props) => {
 
   // 选中背景图
   const handleSelectBackGround = (m, i) => {
-    setBackGroundVertica(backGroundListVertical[i]);
-    setBackGroundHorizontal(backGroundListHorizontal[i])
+    backGroungListL.filter((e, v)=>{e.checked = i === v; return e})
+    backGroungListH.filter((e, v)=>{e.checked = i === v; return e})
 
-    let l = backGroundListVertical.filter((e, v) => {e.checked = i === v;return e});
-    let h = backGroundListHorizontal.filter((e, v) => {e.checked = i === v;return e});
-
-    setBackgroundListVertical(l)
-    setBackgroundListHorizontal(h)
+    handleUpdateBackGroundL(backGroungListL[i])
+    handleUpdateBackGroundH(backGroungListH[i])
   };
 
   // 删除背景图
@@ -122,7 +124,7 @@ const AutoPlay = (props) => {
   };
 
   // 上传背景图
-  const handleUploadChange = async ({ fileList, file }) => {
+  const uploadBackGround = async ({ fileList, file }) => {
     if (file.status === 'done') {
       const image = file.response.data
 
@@ -179,7 +181,7 @@ const AutoPlay = (props) => {
           <div className='flex flex-wrap background_list_h pt-4'>
             {reverse ? (
               <>
-                {backGroungL.map((e, i) => (
+                {backGroungListL.map((e, i) => (
                   <div
                     className='h_100px w_100px m_l_20px m_b_20px relative'
                     key={e?.id}
@@ -193,9 +195,9 @@ const AutoPlay = (props) => {
                       />
                     </div>
                     {
-                      // <div className='selected_icon flex items-center justify-center absolute -top_7px -right_7px'>
-                      //   {e.checked && <CheckCircleTwoTone twoToneColor='#ff8462' />}
-                      // </div>
+                      <div className='selected_icon flex items-center justify-center absolute -top_7px -right_7px'>
+                        {e.checked && <CheckCircleTwoTone twoToneColor='#ff8462' />}
+                      </div>
                     }
                     {
                       (i > 4) &&
@@ -211,7 +213,7 @@ const AutoPlay = (props) => {
               </>
             ) : (
               <>
-                {backGroungH.map((e, i) => (
+                {backGroungListH.map((e, i) => (
                   <div
                     className='h_100px w_100px m_l_20px m_b_20px relative'
                     key={e?.id}
@@ -233,7 +235,7 @@ const AutoPlay = (props) => {
                 ))}
               </>
             )}
-            {backGroungL.length < 9 && (
+            {backGroungListH.length < 9 && (
               <div className='h_100px w_100px m_l_20px m_b_20px'>
                 <div className='border w-full h-full rounded overflow-hidden'>
                   <Upload
@@ -241,7 +243,7 @@ const AutoPlay = (props) => {
                       suffix: file.name.slice(file.name.lastIndexOf('.')),
                       preffix: 'feedbackImg'
                     })}
-                    onChange={handleUploadChange}
+                    onChange={uploadBackGround}
                     action={`${process.env.REACT_APP_API}/api/common/upload`}
                     accept='.jpg, .png, .gif, .webp'
                   >
@@ -263,7 +265,7 @@ const AutoPlay = (props) => {
         <div className='flex relative rounded play_window_h'>
           {reverse ? (
             <div className='h-full w-full window_level relative'>
-              <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundVertica.image}/>
+              <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundL.image}/>
               <div className='goods absolute top_20vh right-0 w_20vh h_20vh rounded border overflow-hidden'>
                 <img
                   src={playItem.cover_image}
@@ -279,7 +281,7 @@ const AutoPlay = (props) => {
             <div className='flex items-center h-full w-full'>
               {/* 横 */}
               <div className='window_straight w-full relative'>
-                <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundHorizontal.image}/>
+                <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundH.image}/>
                 <div className='goods absolute top-8 right-6 w_20vh h_20vh rounded border overflow-hidden'>
                   <img
                     src={playItem.cover_image}
@@ -337,8 +339,10 @@ const mapStateToProps = (state) => ({
   goodsList: state.goodsList,
   playItem: state.playItem,
   playState: state.playState,
-  backGroungL: state.backGroungL,
-  backGroungH: state.backGroungH,
+  backGroungListL: state.backGroungListL,
+  backGroungListH: state.backGroungListH,
+  backGroundL: state.backGroundL,
+  backGroundH: state.backGroundH
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -378,7 +382,7 @@ const mapDispatchToProps = (dispatch) => ({
     })
   },
 
-  // 添加竖背景
+  // 添加竖背景列表
   handleAddBackGroundListVertical: (data) => {
     dispatch({
       type: PlayAutoActions.AddBackGroungVertical,
@@ -386,10 +390,26 @@ const mapDispatchToProps = (dispatch) => ({
     })
   },
 
-  // 添加横背景
+  // 添加横背景列表
   handleAddBackGroundListHorizontal: (data) => {
     dispatch({
       type: PlayAutoActions.AddBackGroungHorizontal,
+      data
+    })
+  },
+
+  // 更新竖背景
+  handleUpdateBackGroundL: (data) =>{
+    dispatch({
+      type: PlayAutoActions.UpdateBackGroundVertical,
+      data
+    })
+  },
+
+  // 添加横背景
+  handleUpdateBackGroundH: (data) =>{
+    dispatch({
+      type: PlayAutoActions.UpdateBackGroundHorizontal,
       data
     })
   }
