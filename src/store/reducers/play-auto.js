@@ -145,13 +145,10 @@ const PlayAutoReducer = {
    * @param {array} state
    * @param {*} action
    */
-  UpdateBackGroundListVertical: (state = backGroundListVertical, action) => {
+  UpdateBackGroundListVertical: (state = [], action) => {
     switch( action.type ) {
       case PlayAutoActions.AddBackGroungVertical:
-        return[
-          ...state,
-          ...action.data
-        ]
+        return[...action.data]
       default:
         return state
     }
@@ -162,13 +159,10 @@ const PlayAutoReducer = {
    * @param {array} state
    * @param {*} action
    */
-  UpdateBackGroundListHorizontal: (state = backgroundListHorizontal, action) => {
+  UpdateBackGroundListHorizontal: (state = [], action) => {
     switch( action.type ) {
       case PlayAutoActions.AddBackGroungHorizontal:
-        return[
-          ...state,
-          ...action.data
-        ]
+        return[...action.data]
       default:
         return state
     }

@@ -9,91 +9,17 @@ import {
 } from '@ant-design/icons';
 import { PlayAutoActions } from '@/store/actions'
 
-import utils from '@/utils';
-import API from '@/services';
 
+import API from '@/services';
 import yoyo from '@/assets/images/character_model_yoyo.png';
 import './index.less';
-import background_one_ver from '@/assets/images/background-1.png';
-import background_two_ver from '@/assets/images/background-2.png';
-import background_three_ver from '@/assets/images/background-3.png';
-import background_four_ver from '@/assets/images/background-4.png';
-import background_five_ver from '@/assets/images/background-5.png';
-
-import background_one_hor from '@/assets/images/background-1-1.jpg';
-import background_two_hor from '@/assets/images/background-2-2.png';
-import background_three_hor from '@/assets/images/background-3-3.png';
-import background_four_hor from '@/assets/images/background-4-4.png';
-import background_five_hor from '@/assets/images/background-5-5.png';
-
-const {
-  type: { toObject },
-  auth: { getLocal },
-} = utils;
-
-// 竖向默认背景
-const backGroundListVerticalConstant = [
-  {
-    id: 999,
-    checked: false,
-    image: background_one_ver,
-  },
-  {
-    id: 998,
-    checked: false,
-    image: background_two_ver,
-  },
-  {
-    id: 997,
-    checked: false,
-    image: background_three_ver,
-  },
-  {
-    id: 996,
-    checked: true,
-    image: background_four_ver,
-  },
-  {
-    id: 995,
-    checked: false,
-    image: background_five_ver,
-  },
-];
-// 横向默认背景
-const backgroundListHorizontalConstant = [
-  {
-    id: 999,
-    checked: false,
-    image: background_one_hor,
-  },
-  {
-    id: 998,
-    checked: false,
-    image: background_two_hor,
-  },
-  {
-    id: 997,
-    checked: false,
-    image: background_three_hor,
-  },
-  {
-    id: 996,
-    checked: true,
-    image: background_four_hor,
-  },
-  {
-    id: 995,
-    checked: false,
-    image: background_five_hor,
-  },
-];
+import constData from '@/constant/play-auto'
 
 const AutoPlay = (props) => {
   const {
     playList, handleUpdatePlayList, handleAddPlayItem, playItem, goodsList, handleAddGoodsList, backGroungL, backGroungH, playState,
     handleAddBackGroundListVertical, handleAddBackGroundListHorizontal
   } = props;
-  console.log(backGroungL,  backGroungH)
   // 横竖屏
   const [reverse, setReverse] = useState(true);
   // ws
@@ -180,9 +106,14 @@ const AutoPlay = (props) => {
     API.autoPlayApi
       .getBackground()
       .then((r) => {
-        console.log(r)
-        handleAddBackGroundListVertical(r.data.content)
-        handleAddBackGroundListHorizontal(r.data.content)
+        let l = constData.backGroundListL.slice()
+        let h = constData.backGroundListH.slice()
+
+        l.push(...r.data.content)
+        h.push(...r.data.content)
+
+        handleAddBackGroundListVertical(l)
+        handleAddBackGroundListHorizontal(h)
       })
       .catch((e) => {
         message.error(e || '获取背景图失败！');
@@ -190,10 +121,18 @@ const AutoPlay = (props) => {
       });
   };
 
-  // Upload 组件方法
+  // 上传背景图
   const handleUploadChange = async ({ fileList, file }) => {
     if (file.status === 'done') {
-      const url = file.response.data
+      const image = file.response.data
+
+      API.autoPlayApi.addBackground({image})
+        .then(r => {
+          getBackground()
+        }).catch(e => {
+          message.error(e || '上传失败！')
+          return false
+        })
     }
   };
 
