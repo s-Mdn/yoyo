@@ -27,6 +27,6 @@ function ContentMain(props) {
 }
 
 const mapStateToProps = (state) => ({
-  token: state.profile.token,
+  token: state.userInfo.token,
 });
 export default connect(mapStateToProps)(ContentMain);

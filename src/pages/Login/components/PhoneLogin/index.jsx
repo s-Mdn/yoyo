@@ -23,7 +23,7 @@ const PhoneLogin = (props) => {
   const [warnings, setWarnings] = useState();
   const [time, setTime] = useState(0);
   const [initTime, setIntTime] = useState(false)
-  const [submitTag, setSubmitTag] = useState(true);
+  const [submitState, setSubmitState] = useState(true);
 
   // hook 根据依赖自动计算倒计时
   useEffect(() => {
@@ -37,32 +37,31 @@ const PhoneLogin = (props) => {
 
   // 获取验证码
   const handleValidCode = async () => {
-    setTime(60)
-    // if (!phone) {
-    //   setWarnings('请输入手机号码')
-    //   return false;
-    // } else if(!validPhone(phone)) {
-    //   setWarnings('手机号码格式不正确')
-    //   return false;
-    // }
+    if (!phone) {
+      setWarnings('请输入手机号码')
+      return false;
+    } else if(!validPhone(phone)) {
+      setWarnings('手机号码格式不正确')
+      return false;
+    }
 
-    // let res = null
-    // const data = {
-    //   phone_num: phone,
-    //   sms_use: 'login',
-    // };
-    // try {
-    //   res = await API.loginApi.getValidCode(data);
-    // } catch (error) {
-    //   console.log(error)
-    //   setWarnings(error || '获取验证码当天次数已上限！')
-    //   return false;
-    // }
+    let res = null
+    const data = {
+      phone_num: phone,
+      sms_use: 'login',
+    };
+    try {
+      res = await API.loginApi.getValidCode(data);
+    } catch (error) {
+      console.log(error)
+      setWarnings(error || '获取验证码当天次数已上限！')
+      return false;
+    }
 
-    // // 指定倒计时间
-    // setTime(60);
-    // // 首次获取验证码状态
-    // if(!initTime) { setIntTime(true) }
+    // 指定倒计时间
+    setTime(60);
+    // 首次获取验证码状态
+    if(!initTime) { setIntTime(true) }
   };
 
   // 表单提交事件
@@ -81,8 +80,8 @@ const PhoneLogin = (props) => {
     }
 
     // 请求还没有结果，限制第二次触发
-    if( !submitTag ) { return false }
-    setSubmitTag(false)
+    if( !submitState ) { return false }
+    setSubmitState(false)
     handleLogin({ phone, code });
   };
 
@@ -99,17 +98,16 @@ const PhoneLogin = (props) => {
         clearTimeout(timeOut)
         setTime(0)
         setIntTime(false)
-        setSubmitTag(true)
+        setSubmitState(true)
         handleUpdateUserInfo(r.data)
       }).catch(e => {
-        setSubmitTag(true)
+        setSubmitState(true)
         setWarnings(e || '验证码或手机号正确！')
         return false
       })
   };
 
   if ( token ) {
-    clearTimeout(timeOut)
     return <Redirect to='/' />;
   }
 
@@ -180,6 +178,4 @@ const mapStateToProps = ( state ) => ({
 });
 
 
-export default connect(
-  mapStateToProps,
-)(PhoneLogin);
+export default connect(mapStateToProps)(PhoneLogin);

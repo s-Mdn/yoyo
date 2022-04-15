@@ -15,11 +15,12 @@ const TokenKey = 'token';
 
 const Login = (props) => {
   const { token, handleUpdateUserInfo } = props;
+  console.log( handleUpdateUserInfo )
   const [account, setAccount] = useState(accountCache?.account);
   const [password, setPassword] = useState(accountCache?.password);
   const [checked, setChecked] = useState(true);
   const [warnings, setWarnings] = useState();
-  const [submitTag, setSubmitTag] = useState(true);
+  const [submitState, setSubmitState] = useState(true);
 
   // 提交
   const handleSubmit = async () => {
@@ -37,16 +38,16 @@ const Login = (props) => {
     }
 
     // 请求还没有结果，限制第二次触发
-    if( !submitTag ) { return false }
-    setSubmitTag(false)
-    
+    if( !submitState ) { return false }
+    setSubmitState(false)
+
     const data = { phone_num: account, password }
     API.loginApi.loginByPassword(data)
       .then(r => {
-        setSubmitTag(true)
+        setSubmitState(true)
         handleUpdateUserInfo(r.data)
       }).catch(e => {
-        setSubmitTag(true)
+        setSubmitState(true)
         setWarnings(e || '账号或密码不对')
         return false
       })
@@ -126,6 +127,8 @@ const Login = (props) => {
 const mapStateToProps = (state) => ({
   token: state.userInfo.token,
 });
+const mapDispatchToProps = (dispatch) => ({
 
+})
 
-export default connect(mapStateToProps)(Login);
+export default connect(mapStateToProps, )(Login);

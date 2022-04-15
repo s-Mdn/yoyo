@@ -110,10 +110,10 @@ const AutoPlay = (props) => {
 
   // 选中播放
   const handleSelectPlays = (p) => {
-    let tempList = playList.filter((e) => {e.checked = p.id === e.id;return e})
+    // let tempList = playList.filter((e) => {e.checked = p.id === e.id;return e})
 
     handleUpdatePlayItem(p)
-    handleUpdatePlayList(tempList)
+    // handleUpdatePlayList(tempList)
     // 根据ID获取商品
     getGoodsList(p.id);
   };
@@ -150,6 +150,7 @@ const AutoPlay = (props) => {
 
   // 获取播放内容
   const getPlaylist = () => {
+    console.log( 0 )
     API.autoPlayApi.getPlaylist()
       .then(r =>{
         let tempRes = r.data.content
