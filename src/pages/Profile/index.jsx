@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Upload, Input, message, Radio, Avatar } from 'antd';
+import { Upload, Input, message, Radio } from 'antd';
 import { CameraOutlined, EditFilled } from '@ant-design/icons';
 import { validate } from '@/utils';
 import API from '@/services';
 import './index.less';
 
+// const changePhoneTag = 'check_phone_num';
+// const changePasTag = 'reset_password';
+// const checkNewPhoneTag = 'reset_phone_num';
 let timer;
 const resetPasswordTag = 'reset_password';
+const checkPhoneNumTag = 'check_phone_num';
+const resetPhoneNumTag = 'reset_phone_num';
 const { hidePhoneNum } = validate
 
 const Modal = React.lazy(() => import('@/components/Modal'))
 
 const Profile = ( props ) => {
-  const { userInfo, radioValue } = props
+  const { userInfo, radioValue, playState } = props
   // 默认昵称
   const [defNickName] = useState('YoYo')
   // modal标题
@@ -31,9 +36,17 @@ const Profile = ( props ) => {
   // 倒计时
   const [time, setTime] = useState(0);
   // 登陆页首次获取验证码
-  const [initTime, setIntTime] = useState(false)
+  const [initTime, setIntTime] = useState(false);
   // 是否已经获取过验证码
-  const [isGetCode, setIsGetCode] = useState(false)
+  const [isGetCode, setIsGetCode] = useState(false);
+  // 旧手机号验证码
+  const [oldPhoneCode, setOldPhoneCode] = useState();
+  // 新手机号验证码
+  const [newPhoneCode, setNewPhoneCode] = useState();
+  // 新手机号
+  const [newPhoneNumber, setNewPhoneNumber] = useState();
+  // 弹窗VNdom
+  const [VNdom, setVNdom] = useState(0);
 
   // 修改密码
   const changePasVNdom = () =>(
@@ -95,8 +108,65 @@ const Profile = ( props ) => {
         </div>
       </div>
     </>
-  )
+  );
 
+  // 修改手机号第一步VNdom
+  const oldPhoneVNdom = () => (
+    <>
+      <div className='item flex h_32px mb-4'>
+        <span className='border flex-1 py-1 px-1'>{hidePhoneNum(userInfo.phone_num)}</span>
+        <div className='flex items-center justify-center flex-none border-t border-r border-b px-2 font_12'>
+          {
+            time?(
+              <span>{time}秒后重发</span>
+            ):(
+              <button onClick={handleCode}>
+                {
+                  initTime?(<>重新发送</>):(<>获取验证码</>)
+                }
+              </button>
+            )
+          }
+        </div>
+      </div>
+      <div className='item flex h_32px mb-4 border-b'>
+        <Input
+          value={oldPhoneCode}
+          bordered={false}
+          autoComplete='new-password'
+          placeholder='请输入验证码'
+          onChange={e=>setOldPhoneCode(e.target.value)}
+        />
+      </div>
+    </>
+  );
+
+  // 修改手机号第二步VNdom
+  const newPhoneVNdom = () => (
+    <>
+      <div className='item flex h_32px mb-4'>
+        <div className='border flex-1 py-1 px-1'>
+          <Input
+            value={newPhoneNumber}
+            bordered={false}
+            autoComplete='new-password'
+            placeholder='请输入新手机号码'
+            onChange={e=>setNewPhoneNumber(e.target.value)}
+          />
+        </div>
+        <button className='flex-none border-t border-r border-b px-2 font_12'>获取验证码</button>
+      </div>
+      <div className='item flex h_32px mb-4 border-b'>
+        <Input
+          value={newPhoneCode}
+          bordered={false}
+          autoComplete='new-password'
+          placeholder='请输入验证码'
+          onChange={e=>setNewPhoneCode(e.target.value)}
+        />
+      </div>
+    </>
+  )
 
   // hook 根据依赖自动计算倒计时
   useEffect(() => {
@@ -114,12 +184,18 @@ const Profile = ( props ) => {
   // 获取验证码
   const handleCode = () => {
     setTime(10);
-    setIntTime(true);
+    // setIntTime(true);
+    // setIsGetCode(true)
   }
 
   // 弹出弹窗
-  const handleOpenModal = (txt) => {
+  const handleOpenModal = (txt, VNdom) => {
+    if( playState ) {
+      message.warning('播放中，无法进行修改手机哈或密码操作！', 0.5)
+      return false
+    }
     setModalTitle(txt)
+    setVNdom(VNdom)
     setModalVisible(true)
   }
 
@@ -135,17 +211,34 @@ const Profile = ( props ) => {
   }
 
   // 弹窗onOk
-  const handleSubmit = () => {
+  const handleSubmit = (VNdom) => {
+    switch ( VNdom ){
+      case 3:
+        changePassword()
+        break;
+      case 2:
+        changePhoneNext()
+        break;
+      case 1:
+        changePhonePre()
+        break;
+      default:
+        return
+    }
+  }
+
+  // 修改密码
+  const changePassword = () => {
     if( !isGetCode ){
-      message.error('请先获取验证码！')
+      message.error('请先获取验证码！', 0.5)
       return false
     }
     if( !pasCode || !newPassWord || !comfirPassWord) {
-      message.error('请输入完整信息！')
+      message.error('请输入完整信息！', 0.5)
       return false
     }
     if( newPassWord !== comfirPassWord ) {
-      message.error('密码不一致！')
+      message.error('密码不一致！', 0.5)
       return false
     }
     const data = {
@@ -164,9 +257,49 @@ const Profile = ( props ) => {
           clearTimeout(timeOut);
         }, 1000)
       }).catch(e => {
-        message.error(e || '修改密码失败')
+        message.error(e || '修改密码失败!', 0.5)
         return false
       })
+  }
+
+  // 修改手机号第一步
+  const changePhonePre = () => {
+    if( !isGetCode ){
+      message.error('请先获取验证码！', 0.5)
+      return false
+    }
+    if( !oldPhoneCode ) {
+      message.error('验证码不能为空！', 0.5)
+      return false
+    }
+
+    const data ={
+      phone_num: userInfo.phone_num,
+      code: oldPhoneCode,
+      sms_use: checkPhoneNumTag,
+    }
+    API.profileApi.checkOldPhone(data)
+      .then(r => {
+        setIntTime(false)
+        setTime(0)
+        setVNdom(2)
+      }).catch(e => {
+
+        message.error(e || '无法进行下一步！', 0.5)
+        return false
+      })
+  }
+
+  // 修改手机号第二步
+  const changePhoneNext = () => {
+    if( !newPhoneNumber ) {
+      message.warning('请输入要更换的要手机号码！', 0.5)
+      return false
+    }
+    if( !isGetCode ){
+      message.error('请先获取验证码！', 0.5)
+      return false
+    }
   }
 
   return(
@@ -194,7 +327,7 @@ const Profile = ( props ) => {
         <div className='item m_l_120px p_y_25px w_60 border-b flex'>
           <span className='w_100px'>手机号码</span>
           <span className='w_300px'>{hidePhoneNum(userInfo.phone_num)}</span>
-          <div className='flex items-center cursor-default'>
+          <div className='flex items-center cursor-default' onClick={handleOpenModal.bind(this, '修改手机号', 1)}>
             <EditFilled/>
             <span className='ml-2 font-normal'>修改</span>
           </div>
@@ -202,7 +335,7 @@ const Profile = ( props ) => {
         <div className='item m_l_120px p_y_25px w_60 border-b flex'>
           <span className='w_100px'>账户密码</span>
           <span className='w_300px'>*****</span>
-          <div className='flex items-center cursor-default' onClick={handleOpenModal.bind(this, '修改密码')}>
+          <div className='flex items-center cursor-default' onClick={handleOpenModal.bind(this, '修改密码', 3)}>
             <EditFilled/>
             <span className='ml-2 font-normal'>修改</span>
           </div>
@@ -227,9 +360,17 @@ const Profile = ( props ) => {
         bodyStyle={bodyStyle}
         title={modalTitle}
         onCancel={handleCloseModal}
-        onOk={handleSubmit}
+        onOk={handleSubmit.bind(this, VNdom)}
       >
-        {changePasVNdom()}
+        {
+          (VNdom === 1) && oldPhoneVNdom()
+        }
+        {
+          (VNdom === 2) && newPhoneVNdom()
+        }
+        {
+          (VNdom === 3) && changePasVNdom()
+        }
       </Modal>
     </div>
   )
