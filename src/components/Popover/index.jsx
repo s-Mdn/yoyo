@@ -9,15 +9,9 @@ const _Popover = (props) => {
         trigger='click'
         content={content({ userInfo, loginOut })}
       >
-        {userInfo.avatar ? (
-          <img
-            style={{ width: '32px', height: '32px', borderRadius: '100%' }}
-            src={userInfo.avatar}
-            alt=''
-          />
-        ) : (
-          <Avatar src={<img src='https://joeschmoe.io/api/v1/random' alt='' style={{ width: '32px', height: '32px', borderRadius: '100%' }} />} />
-        )}
+        <img style={{ width: '32px', height: '32px', borderRadius: '100%' }}
+          src={userInfo.avatar || 'https://joeschmoe.io/api/v1/random'}
+          alt='' />
       </Popover>
     </>
   );

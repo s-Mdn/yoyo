@@ -1,19 +1,180 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Upload, Input, message, Radio } from 'antd';
+import { Upload, Input, message, Radio, Avatar } from 'antd';
 import { CameraOutlined, EditFilled } from '@ant-design/icons';
 import { validate } from '@/utils';
+import API from '@/services';
 import './index.less';
 
+let timer;
+const resetPasswordTag = 'reset_password';
 const { hidePhoneNum } = validate
+
+const Modal = React.lazy(() => import('@/components/Modal'))
+
 const Profile = ( props ) => {
   const { userInfo, radioValue } = props
+  // 默认昵称
+  const [defNickName] = useState('YoYo')
+  // modal标题
+  const [modalTitle, setModalTitle] = useState()
+  // modal visible
+  const [modalVisible, setModalVisible] = useState(false)
+  // modal bodyStyle
+  const [bodyStyle] = useState({padding: '10px 15px', height: 'auto'})
+  // 修改密码验证码
+  const [pasCode, setPasCode] = useState()
+  // 新密码
+  const [newPassWord, setPassWord] = useState()
+  // 确认新密码
+  const [comfirPassWord, setComfirPassWord] = useState()
+  // 倒计时
+  const [time, setTime] = useState(0);
+  // 登陆页首次获取验证码
+  const [initTime, setIntTime] = useState(false)
+  // 是否已经获取过验证码
+  const [isGetCode, setIsGetCode] = useState(false)
+
+  // 修改密码
+  const changePasVNdom = () =>(
+    <>
+      <div className='item flex justify-between items-center relative border-b px-2 py-1 mb-3'>
+        <span>{hidePhoneNum(userInfo.phone_num)}</span>
+        <div className='right-0 py-1 px-3 font_12 border rounded-full flex-none'>
+          {
+            time?(
+              <span>{time}秒后重发</span>
+            ):(
+              <button onClick={handleCode}>
+                {
+                  initTime?(<>重新发送</>):(<>获取验证码</>)
+                }
+              </button>
+            )
+          }
+        </div>
+      </div>
+      <div className='item flex items-center font_12 mb-3'>
+        <span className='flex-none mr-2 pl-2'>输入验证码：</span>
+        <div className='border-b flex-1'>
+          <Input
+            value={pasCode}
+            bordered={false}
+            autoComplete='new-password'
+            placeholder='请输入新密码'
+            onChange={e=>setPasCode(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className='item flex items-center font_12 mb-3'>
+        <span className='flex-none mr-2 pl-2'>输入新密码：</span>
+        <div className='border-b flex-1'>
+          <Input.Password
+            value={newPassWord}
+            minLength={6}
+            maxLength={20}
+            bordered={false}
+            autoComplete='new-password'
+            placeholder='请输入新密码'
+            onChange={e=>setPassWord(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className='item flex items-center font_12 mb-3'>
+        <span className='flex-none mr-2 pl-2'>确认新密码：</span>
+        <div className='border-b flex-1'>
+          <Input.Password
+            value={comfirPassWord}
+            minLength={6}
+            maxLength={20}
+            bordered={false}
+            autoComplete='new-password'
+            placeholder='请输入新密码'
+            onChange={e=>setComfirPassWord(e.target.value)}
+          />
+        </div>
+      </div>
+    </>
+  )
+
+
+  // hook 根据依赖自动计算倒计时
+  useEffect(() => {
+    timer = setTimeout(() => {
+      if (time > 0) {
+        clearTimeout(timer)
+        setTime((t) => t - 1);
+      }
+    }, 1000);
+    return function () {
+      clearInterval(timer)
+    }
+  }, [time]);
+
+  // 获取验证码
+  const handleCode = () => {
+    setTime(10);
+    setIntTime(true);
+  }
+
+  // 弹出弹窗
+  const handleOpenModal = (txt) => {
+    setModalTitle(txt)
+    setModalVisible(true)
+  }
+
+  // 关闭弹窗
+  const handleCloseModal = () => {
+    clearTimeout(timer)
+    setModalVisible(false)
+    setIntTime(false)
+    setTime(0)
+    setPasCode('')
+    setPassWord('')
+    setComfirPassWord('')
+  }
+
+  // 弹窗onOk
+  const handleSubmit = () => {
+    if( !isGetCode ){
+      message.error('请先获取验证码！')
+      return false
+    }
+    if( !pasCode || !newPassWord || !comfirPassWord) {
+      message.error('请输入完整信息！')
+      return false
+    }
+    if( newPassWord !== comfirPassWord ) {
+      message.error('密码不一致！')
+      return false
+    }
+    const data = {
+      phone_num: this.props.userInfo.phone_num,
+      new_password: newPassWord,
+      code: pasCode,
+      sms_use: resetPasswordTag,
+    }
+    API.profileApi.resetPassword(data)
+      .then(r => {
+        message.success('修改成功，即将退出重新登录！', 0.5);
+        handleCloseModal()
+        const timeOut = setTimeout(()=>{
+          window.location.reload();
+          localStorage.clear();
+          clearTimeout(timeOut);
+        }, 1000)
+      }).catch(e => {
+        message.error(e || '修改密码失败')
+        return false
+      })
+  }
+
   return(
     <div className='profile overflow-hidden bg-white'>
       <div className='box-border p_15px font-semibold text-black'>
         <div className='flex'>
           <div className='w_100px h_100px rounded overflow-hidden m_r_20px relative hover'>
-            <img alt='' className='absolute w_100px h_100px object-fit-cover rounded' src={userInfo.avatar}/>
+            <img alt='' className='absolute w_100px h_100px object-fit-cover rounded' src={userInfo.avatar || 'https://joeschmoe.io/api/v1/random'}/>
             <div className='absolute w_100px h_100px z-20 rounded bg_gray_3 hidden upload'>
               <Upload>
                 <div className='w_100px h_100px flex justify-center items-center flex-col font-normal'>
@@ -23,7 +184,12 @@ const Profile = ( props ) => {
               </Upload>
             </div>
           </div>
-          <div className='item flex items-center border-b w_60'></div>
+          <div className='item flex items-center border-b w_60 font_26'>
+            <span >{userInfo.nickname || defNickName}</span>
+            <div className='flex items-center justify-center ml-2'>
+              <EditFilled/>
+            </div>
+          </div>
         </div>
         <div className='item m_l_120px p_y_25px w_60 border-b flex'>
           <span className='w_100px'>手机号码</span>
@@ -36,7 +202,7 @@ const Profile = ( props ) => {
         <div className='item m_l_120px p_y_25px w_60 border-b flex'>
           <span className='w_100px'>账户密码</span>
           <span className='w_300px'>*****</span>
-          <div className='flex items-center cursor-default'>
+          <div className='flex items-center cursor-default' onClick={handleOpenModal.bind(this, '修改密码')}>
             <EditFilled/>
             <span className='ml-2 font-normal'>修改</span>
           </div>
@@ -56,6 +222,15 @@ const Profile = ( props ) => {
           </div>
         </div>
       </div>
+      <Modal
+        visible={modalVisible}
+        bodyStyle={bodyStyle}
+        title={modalTitle}
+        onCancel={handleCloseModal}
+        onOk={handleSubmit}
+      >
+        {changePasVNdom()}
+      </Modal>
     </div>
   )
 }
