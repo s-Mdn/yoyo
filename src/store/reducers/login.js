@@ -11,7 +11,8 @@ const LoginReducer = {
       case LoginActions.ClearUserInfo:
         return {}
       default:
-        return state
+        return localStorage.getItem('userInfo') && JSON.parse(localStorage.getItem('userInfo'))
+        // return state
     }
   }
 }

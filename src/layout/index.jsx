@@ -29,6 +29,6 @@ function _Layout(props) {
 }
 
 const mapStateToProps = (state) => ({
-  token: state.userInfo.token,
+  token: state?.userInfo?.token,
 });
 export default connect(mapStateToProps, dispatch=>({}))(_Layout);

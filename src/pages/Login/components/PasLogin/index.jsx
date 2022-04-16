@@ -56,6 +56,9 @@ const Login = (props) => {
     API.loginApi.loginByPassword(data)
       .then(r => {
         setSubmitRes(true)
+        localStorage.setItem('token', r.data.token)
+        localStorage.setItem('userInfo', JSON.stringify(r.data))
+
         handleUpdateUserInfo(r.data)
       }).catch(e => {
         setSubmitRes(true)
@@ -130,7 +133,7 @@ const Login = (props) => {
 };
 
 const mapStateToProps = (state) => ({
-  token: state.userInfo.token,
+  token: state?.userInfo?.token,
 });
 
 export default connect(mapStateToProps, )(Login);

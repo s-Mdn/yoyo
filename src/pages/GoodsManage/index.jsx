@@ -8,13 +8,13 @@ import {
   CheckCircleTwoTone,
   SyncOutlined,
 } from '@ant-design/icons';
+import { validate } from '@/utils';
+
 import Modal from '@/components/Modal';
 import Content from './component/Content';
 import API from '@/services';
-import { validate } from '@/utils';
 import './index.less';
 
-const { TabPane } = Tabs;
 const { isImage } = validate;
 
 class GoodsManage extends React.Component {
@@ -229,7 +229,7 @@ class GoodsManage extends React.Component {
       <div className='box-border goodsmanage overflow-hidden'>
         <div className='pb-6 pt-4 pl-6 pr-6 bg-white rounder relative goodsmanage_h_full box-border'>
           <Tabs onChange={this.handleTabChange} defaultActiveKey='1'>
-            <TabPane tab='所有商品' key='1'>
+            <Tabs.TabPane tab='所有商品' key='1'>
               <Content
                 isView={false}
                 content={goodsList}
@@ -237,8 +237,8 @@ class GoodsManage extends React.Component {
                 handleDelete={this.handleGoodsDelete}
                 handleEdit={this.handleGoodsEdit}
               />
-            </TabPane>
-            <TabPane tab='播放列表' key='2'>
+            </Tabs.TabPane>
+            <Tabs.TabPane tab='播放列表' key='2'>
               <Content
                 isView={true}
                 content={playList}
@@ -247,7 +247,7 @@ class GoodsManage extends React.Component {
                 handleDelete={this.handlePlaysDelete}
                 handleEdit={this.handlePlaysEdit}
               />
-            </TabPane>
+            </Tabs.TabPane>
           </Tabs>
 
           {/* 右上角新增和刷新 */}

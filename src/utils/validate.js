@@ -89,8 +89,9 @@ export function validPhone(phone) {
  * @returns {Boolean}
  */
 export function hidePhoneNum(phone) {
+  const str = phone.toString()
   const reg = /^(\d{3})\d{4}(\d{4})$/;
-  return phone.replace(reg, '$1****$2');
+  return str.replace(reg, '$1****$2');
 }
 
 /**

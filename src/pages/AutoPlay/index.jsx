@@ -28,7 +28,7 @@ const AutoPlay = (props) => {
     playList.filter((e) => {e.checked = p.id === e.id;return e})
     handleAddPlayItem(p)
 
-    // 根据ID获取商品
+    // 根据ID获取播放商品
     getGoodsList(p.id);
   };
 
@@ -44,7 +44,7 @@ const AutoPlay = (props) => {
   // 删除背景图
   const handelDeleteBackGround = (m, i) => {
     if( m.checked ){
-      message.warning('正在使用，无法删除！')
+      message.warning('正在使用，无法删除！', 0.5)
       return false
     }
 

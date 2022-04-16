@@ -5,27 +5,13 @@ import { message } from 'antd';
 import TitleBar from 'frameless-titlebar';
 
 import { PlayAutoActions, LoginActions } from '@/store/actions'
-import { main } from '@/utils';
+import { titleBar } from '@/utils';
 import logo from '@/assets/images/logo.png';
 
 const Popover = React.lazy(()=>import('@/components/Popover'))
 
-// 读取Electro
-const getCurrentWindow = () => {
-  if (window.isElectron) {
-    const remote = main.getElectronModule('remote');
-    if (remote) {
-      return remote.getCurrentWindow();
-    } else {
-      return null;
-    }
-  } else {
-    return null;
-  }
-};
-
 // 当前窗口
-const currentWindow = getCurrentWindow();
+const currentWindow = titleBar.getCurrentWindow();
 
 function Titlebar(props) {
   const { userInfo, playState } = props
@@ -62,10 +48,6 @@ function Titlebar(props) {
       currentWindow?.unmaximize();
     }
   }, [maximized]);
-
-  if( !userInfo.token ) {
-    return null
-  }
 
   return (
     <TitleBar
@@ -149,7 +131,7 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 const mapStateToProps = (state) => ({
-  userInfo: state.userInfo,
+  userInfo: state.userInfo || {},
   playState: state.playState,
 });
 

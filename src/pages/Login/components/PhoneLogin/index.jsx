@@ -171,7 +171,7 @@ const PhoneLogin = (props) => {
 };
 
 const mapStateToProps = ( state ) => ({
-  token: state.userInfo.token,
+  token: state?.userInfo?.token,
 });
 
 

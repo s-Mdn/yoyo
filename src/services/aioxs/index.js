@@ -55,8 +55,9 @@ const service = Axios.create({
 service.interceptors.request.use(
   ( config ) => {
     needLoading = config.needLoading
-    store.getState().userInfo.token &&
-    (config.headers.Authorization = 'JWT ' + store.getState().userInfo.token);
+    localStorage.getItem('token') && (config.headers.Authorization = 'JWT ' + localStorage.getItem('token'));
+    // store.getState().userInfo.token &&
+    // (config.headers.Authorization = 'JWT ' + store.getState().userInfo.token);
 
     if (
       config.method.toLocaleLowerCase() === 'post' ||

@@ -7,3 +7,18 @@ export function getElectronModule (moduleKey) {
     return null;
   }
 };
+
+
+// 读取Electro
+export const getCurrentWindow = () => {
+  if (window.isElectron) {
+    const remote = getElectronModule('remote');
+    if (remote) {
+      return remote.getCurrentWindow();
+    } else {
+      return null;
+    }
+  } else {
+    return null;
+  }
+};
