@@ -6,9 +6,7 @@ import { validate } from '@/utils';
 import API from '@/services';
 import './index.less';
 
-// const changePhoneTag = 'check_phone_num';
-// const changePasTag = 'reset_password';
-// const checkNewPhoneTag = 'reset_phone_num';
+
 let timer;
 const resetPasswordTag = 'reset_password';
 const checkPhoneNumTag = 'check_phone_num';
@@ -184,8 +182,8 @@ const Profile = ( props ) => {
   // 获取验证码
   const handleCode = () => {
     setTime(10);
-    // setIntTime(true);
-    // setIsGetCode(true)
+    setIntTime(true);
+    setIsGetCode(true)
   }
 
   // 弹出弹窗
