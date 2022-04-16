@@ -2,14 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Upload, Input, message, Radio } from 'antd';
 import { CameraTwoTone, EditFilled } from '@ant-design/icons';
-import utils from '@/utils';
+import { validate, type, auth } from '@/utils';
 import API from '@/services';
 import action from '@/actions';
 import './index.less';
-import defaultAvatar from '@/assets/images/character_model_yoyo.png';
+import defaultAvatar from '@/assets/images/model_yoyo.png';
 const ModelTempLate = React.lazy(() => import('@/components/ModelTempLate'));
 
-const { validate, type, auth } = utils;
 const { profile, quality } = action;
 const changePhoneTag = 'check_phone_num';
 const changePasTag = 'reset_password';

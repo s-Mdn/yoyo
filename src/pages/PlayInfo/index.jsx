@@ -4,13 +4,11 @@ import { CloseCircleTwoTone, ArrowLeftOutlined } from '@ant-design/icons';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { connect } from 'react-redux';
 import { nanoid } from 'nanoid';
-import utils from '@/utils';
+import { validate } from '@/utils';
 import API from '@/services';
 import './index.less';
 
-const {
-  validate: { isImage },
-} = utils;
+const {isImage} = validate;
 class PlayInfo extends React.Component {
   constructor(props) {
     super(props);

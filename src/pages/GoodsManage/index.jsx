@@ -11,13 +11,11 @@ import {
 import Modal from '@/components/Modal';
 import Content from './component/Content';
 import API from '@/services';
-import utils from '@/utils';
+import { validate } from '@/utils';
 import './index.less';
 
 const { TabPane } = Tabs;
-const {
-  validate: { isImage },
-} = utils;
+const { isImage } = validate;
 
 class GoodsManage extends React.Component {
   constructor(props) {

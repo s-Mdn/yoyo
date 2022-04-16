@@ -2,29 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { Input } from 'antd';
-import utils from '@/utils';
+
+import { validate } from '@/utils';
 import API from '@/services';
 import phoneIcon from '@/assets/icons/phone_icon.png';
 import pasIcon from '@/assets/icons/pas_icon.png';
 
-
-const {  validate: { validPhone } } = utils;
-let timeOut;
+const { validPhone} = validate;
+let timer;
 
 const PhoneLogin = (props) => {
   const { token, handleUpdateUserInfo } = props;
+  // 手机号码
   const [phone, setPhone] = useState();
+  // 验证码
   const [code, setCode] = useState();
+  // 报错提示语
   const [warnings, setWarnings] = useState();
+  // 倒计时
   const [time, setTime] = useState(0);
+  // 登陆页首次获取验证码
   const [initTime, setIntTime] = useState(false)
-  const [submitState, setSubmitState] = useState(true);
+  // 点击登陆是否已经响应了
+  const [isSubmitRes, setSubmitRes] = useState(false)
 
   // hook 根据依赖自动计算倒计时
   useEffect(() => {
-    timeOut = setTimeout(() => {
+    timer = setTimeout(() => {
       if (time > 0) {
-        clearTimeout(timeOut)
+        clearTimeout(timer)
         setTime((t) => t - 1);
       }
     }, 1000);
@@ -69,9 +75,9 @@ const PhoneLogin = (props) => {
       return false;
     }
 
-    // 请求还没有结果，限制第二次触发
-    if( !submitState ) { return false }
-    setSubmitState(false)
+    // 请求还没有响应，限制第二次触发
+    if( isSubmitRes ) { return false }
+    setSubmitRes(true)
     handleLogin({ phone, code });
   };
 
@@ -85,18 +91,19 @@ const PhoneLogin = (props) => {
 
     API.loginApi.loginByValidCode(data)
       .then(r => {
-        clearTimeout(timeOut)
+        clearTimeout(timer)
         setTime(0)
         setIntTime(false)
-        setSubmitState(true)
+        setSubmitRes(false)
         handleUpdateUserInfo(r.data)
       }).catch(e => {
-        setSubmitState(true)
+        setSubmitRes(false)
         setWarnings(e || '验证码或手机号正确！')
         return false
       })
   };
 
+  // 登陆成功跳转主页
   if ( token ) {
     return <Redirect to='/' />;
   }

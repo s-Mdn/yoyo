@@ -79,6 +79,8 @@ const PlayAutoReducer = {
     switch( action.type ) {
       case PlayAutoActions.AddBackGroungVertical:
         return[...action.data]
+      case PlayAutoActions.ClearBackGroungVertical:
+        return []
       default:
         return state
     }
@@ -93,6 +95,8 @@ const PlayAutoReducer = {
     switch( action.type ) {
       case PlayAutoActions.AddBackGroungHorizontal:
         return[...action.data]
+      case PlayAutoActions.ClearBackGroungHorizontal:
+        return []
       default:
         return state
     }
@@ -121,6 +125,20 @@ const PlayAutoReducer = {
     switch( action.type ) {
       case PlayAutoActions.UpdateBackGroundHorizontal:
         return {...action.data}
+      default:
+        return state
+    }
+  },
+
+  /**
+   * @description 横竖屏切换
+   * @param {bolean} state
+   * @param {*} action
+   */
+  UpdateDirection: (state = true, action) => {
+    switch( action.type ) {
+      case PlayAutoActions.UpdateDirection:
+        return action.data
       default:
         return state
     }

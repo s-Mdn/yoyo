@@ -2,23 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { Form, Input, Checkbox } from 'antd';
-import utils from '@/utils';
+
+import { auth, type, validate } from '@/utils'
 import API from '@/services';
 import userIcon from '@/assets/icons/user_icon.png';
 import eyeIcon from '@/assets/icons/eye_icon.png';
 
-
-const { auth: { getLocal, setLocal }, validate: { validPhone } } = utils;
-const accountCache =
-  getLocal('accountCache') && JSON.parse(getLocal('accountCache'));
+const { getLocal, setLocal } = auth;
+const { validPhone } = validate;
+const { toObject } = type;
+const accountCache = toObject(getLocal('accountCache'));
 
 const Login = (props) => {
   const { token, handleUpdateUserInfo } = props;
+  // 账号
   const [account, setAccount] = useState(accountCache?.account);
+  // 密码
   const [password, setPassword] = useState(accountCache?.password);
+  // 是否记住密码
   const [checked, setChecked] = useState(true);
+  // 报错提示语
   const [warnings, setWarnings] = useState();
-  const [submitState, setSubmitState] = useState(true);
+  // 点击登陆是否已经响应了
+  const [isSubmitRes, setSubmitRes] = useState(false)
+
+  // 是否保存账号密码
+  useEffect(() => {
+    if (checked && validPhone(account)) {
+      setLocal('accountCache', JSON.stringify({ account, password }));
+    }
+  }, [checked, account, password]);
 
   // 提交
   const handleSubmit = async () => {
@@ -36,28 +49,22 @@ const Login = (props) => {
     }
 
     // 请求还没有结果，限制第二次触发
-    if( !submitState ) { return false }
-    setSubmitState(false)
+    if( isSubmitRes ) { return false }
+    setSubmitRes(false)
 
     const data = { phone_num: account, password }
     API.loginApi.loginByPassword(data)
       .then(r => {
-        setSubmitState(true)
+        setSubmitRes(true)
         handleUpdateUserInfo(r.data)
       }).catch(e => {
-        setSubmitState(true)
+        setSubmitRes(true)
         setWarnings(e || '账号或密码不对')
         return false
       })
   };
 
-  // 是否保存账号密码
-  useEffect(() => {
-    if (checked && validPhone(account)) {
-      setLocal('accountCache', JSON.stringify({ account, password }));
-    }
-  }, [checked, account, password]);
-
+  // 登陆成功跳转主页
   if ( token ) {
     return <Redirect to='/' />;
   }

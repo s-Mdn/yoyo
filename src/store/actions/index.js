@@ -21,6 +21,12 @@ export const PlayAutoActions = {
   AddBackGroungVertical: 'ADD_BACK_GROUND_LIST_L',
   // 添加横背景图列表
   AddBackGroungHorizontal: 'ADD_BACK_GROUND_LIST_H',
+  // 清除竖背景图列表
+  ClearBackGroungVertical: 'CLEAR_BACK_GROUND_LIST_L',
+  // 清除横背景图列表
+  ClearBackGroungHorizontal: 'CLEAR_BACK_GROUND_LIST_H',
+  // 横竖屏切换
+  UpdateDirection: 'UPDATE_DIRECTION'
 }
 
 export const LoginActions = {

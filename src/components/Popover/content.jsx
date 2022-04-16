@@ -1,5 +1,5 @@
-import utils from '@/utils';
-const { validate, type } = utils;
+import { validate, type } from '@/utils';
+
 
 const content = (props) => {
   const { userInfo } = props;

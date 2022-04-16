@@ -1,6 +1,7 @@
 import React from 'react'
 import { Tabs } from 'antd';
 import { connect } from 'react-redux';
+
 import { LoginActions } from '@/store/actions'
 import loginBgImage from '@/assets/images/login_bg.png';
 import './index.less';
@@ -8,11 +9,8 @@ import './index.less';
 const PasLogin = React.lazy(()=> import('./components/PasLogin'))
 const PhoneLogin = React.lazy(()=> import('./components/PhoneLogin'))
 
-
-
 const Login = ( props ) => {
   const { handleUpdateUserInfo } = props
-
   return (
     <div className='login flex-1'>
       <div className='login_container'>

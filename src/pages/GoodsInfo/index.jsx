@@ -6,14 +6,13 @@ import {
   ArrowLeftOutlined,
 } from '@ant-design/icons';
 
-import utils from '@/utils';
+import { common, validate } from '@/utils';
 import API from '@/services';
 import './index.less';
 
-const {
-  common: { downloadUrlFile },
-  validate: { isImage },
-} = utils;
+
+const { downloadUrlFile } = common
+const { isImage } = validate
 
 class GoodsInfo extends React.Component {
   constructor(props) {

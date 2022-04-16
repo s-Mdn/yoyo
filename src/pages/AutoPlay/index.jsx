@@ -1,42 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { Empty, message, Upload } from 'antd';
 import {
   CameraTwoTone,
   CloseCircleTwoTone,
   CheckCircleTwoTone,
 } from '@ant-design/icons';
+
 import { PlayAutoActions } from '@/store/actions'
-
-
-import API from '@/services';
-import yoyo from '@/assets/images/character_model_yoyo.png';
-import './index.less';
 import constData from '@/constant/play-auto'
+import API from '@/services';
+import yoyo from '@/assets/images/model_yoyo.png';
+import './index.less';
+
 
 const AutoPlay = (props) => {
   const {
     playList, playItem, backGroungListL, backGroungListH, playState,
-    backGroundL, backGroundH,
-    handleUpdatePlayList, handleAddPlayItem, handleAddGoodsList,
+    wiwnDirection, goodsList, backGroundL, backGroundH,
+    handleUpdatePlayList, handleAddPlayItem, handleClearPlayItem, handleAddGoodsList,
     handleAddBackGroundListVertical, handleAddBackGroundListHorizontal,
-    handleUpdateBackGroundL, handleUpdateBackGroundH
+    handleUpdateBackGroundL, handleUpdateBackGroundH, handleWinDirection,
   } = props;
-
-  console.log( backGroundL, backGroundH )
-  // 横竖屏
-  const [reverse, setReverse] = useState(true);
-  // ws
-  const localServerUrl = process.env.REACT_APP_LOCAL_SERVER_URL;
-  // 背景图(竖向)
-  const [backGroundVertica, setBackGroundVertica] = useState({});
-  // 背景图(横向)
-  const [backGroundHorizontal, setBackGroundHorizontal] = useState({});
-  // 背景图列表(竖向)
-  const [backGroundListVertical, setBackgroundListVertical] = useState([]);
-  // 背景图列表(横向)
-  const [backGroundListHorizontal, setBackgroundListHorizontal] = useState([]);
 
   // 选中播放
   const handleSelectPlays = (p) => {
@@ -62,12 +47,13 @@ const AutoPlay = (props) => {
       message.warning('正在使用，无法删除！')
       return false
     }
-    API.autoPlayApi.deleteBackground(m.id).then(r => {
-      let l = backGroundListVertical.filter((e, v) =>{ return i !== v })
-      let h = backGroundListHorizontal.filter((e, v) =>{ return i !== v })
 
-      setBackgroundListVertical(l)
-      setBackgroundListHorizontal(h)
+    API.autoPlayApi.deleteBackground(m.id).then(r => {
+      let l = backGroungListL.filter((e, v) =>{ return i !== v })
+      let h = backGroungListH.filter((e, v) =>{ return i !== v })
+
+      handleAddBackGroundListVertical(l)
+      handleAddBackGroundListHorizontal(h)
     }).catch(e =>{
       message.error(e || '删除失败！')
       return false
@@ -82,6 +68,11 @@ const AutoPlay = (props) => {
         // 匹配上一次选中的play
         tempList.forEach(p =>p.checked = p.id === playItem.id)
         handleUpdatePlayList(tempList)
+
+        // 如果播放列表为空 || 没有匹配到上一次选中的，则清空playItem
+        if(!tempList.length || tempList.some(e=>e.checked)) {
+          handleClearPlayItem()
+        }
       }).catch(e =>{
         message.error(e || '获取数据失败！');
         return false
@@ -142,7 +133,7 @@ const AutoPlay = (props) => {
   useEffect(() => {
     getPlaylist();
     getBackground();
-  }, []);
+  }, [])// eslint-disable-line
 
   return (
     <div className='auto_play flex justify-between h-full overflow-hidden'>
@@ -179,7 +170,7 @@ const AutoPlay = (props) => {
         <div className='background_list'>
           <div className='border-b text-center h_45 line_h_44'>直播背景</div>
           <div className='flex flex-wrap background_list_h pt-4'>
-            {reverse ? (
+            {wiwnDirection ? (
               <>
                 {backGroungListL.map((e, i) => (
                   <div
@@ -196,7 +187,7 @@ const AutoPlay = (props) => {
                     </div>
                     {
                       <div className='selected_icon flex items-center justify-center absolute -top_7px -right_7px'>
-                        {e.checked && <CheckCircleTwoTone twoToneColor='#ff8462' />}
+                        {/* {e.checked && <CheckCircleTwoTone twoToneColor='#ff8462' />} */}
                       </div>
                     }
                     {
@@ -263,13 +254,13 @@ const AutoPlay = (props) => {
 
       <div className='center m_l_r_15px w_405  box-border'>
         <div className='flex relative rounded play_window_h'>
-          {reverse ? (
+          {wiwnDirection ? (
             <div className='h-full w-full window_level relative'>
               <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundL.image}/>
-              <div className='goods absolute top_20vh right-0 w_20vh h_20vh rounded border overflow-hidden'>
+              <div className='goods absolute top_20vh right-0 w_20vh h_20vh rounded overflow-hidden'>
                 <img
                   src={playItem.cover_image}
-                  className='w-full h-full object-fit-fill'
+                  className='object-fit-cover w-full h-full'
                   alt=''
                 />
               </div>
@@ -282,10 +273,10 @@ const AutoPlay = (props) => {
               {/* 横 */}
               <div className='window_straight w-full relative'>
                 <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundH.image}/>
-                <div className='goods absolute top-8 right-6 w_20vh h_20vh rounded border overflow-hidden'>
+                <div className='goods absolute top-8 right-6 w_20vh h_20vh rounded overflow-hidden'>
                   <img
                     src={playItem.cover_image}
-                    className='w-full h-full object-fit-fill'
+                    className='object-fit-cover w-full h-full'
                     alt=''
                   />
                 </div>
@@ -297,14 +288,14 @@ const AutoPlay = (props) => {
           )}
           <div
             className='absolute right-0 top-2 font_12 color_FF8462 px-1 bg-001529 rounded-l cursor-pointer'
-            onClick={() => setReverse((reverse) => !reverse)}
+            onClick={handleWinDirection.bind(this, !wiwnDirection)}
           >
-            {reverse ? '横屏' : '竖屏'}
+            {wiwnDirection ? '横屏' : '竖屏'}
           </div>
         </div>
 
         <div className='h_60px rounded bg-white mt_15px flex items-center justify-center px-4 box-border'>
-          {Object.keys(playItem).length ? (
+          {goodsList.length ? (
             <button
               className='bg-FF8462 px-6 py-1.5 rounded-full text-white'
             >
@@ -332,8 +323,6 @@ const AutoPlay = (props) => {
   );
 };
 
-
-
 const mapStateToProps = (state) => ({
   playList: state.playList,
   goodsList: state.goodsList,
@@ -342,15 +331,12 @@ const mapStateToProps = (state) => ({
   backGroungListL: state.backGroungListL,
   backGroungListH: state.backGroungListH,
   backGroundL: state.backGroundL,
-  backGroundH: state.backGroundH
+  backGroundH: state.backGroundH,
+
+  wiwnDirection: state.winDirection
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  // 开始播放 || 停止播放
-  handlePlay: (actions) => {
-    dispatch(actions);
-  },
-
   // 添加播放列表
   handleUpdatePlayList: (data) => {
     dispatch({
@@ -410,6 +396,14 @@ const mapDispatchToProps = (dispatch) => ({
   handleUpdateBackGroundH: (data) =>{
     dispatch({
       type: PlayAutoActions.UpdateBackGroundHorizontal,
+      data
+    })
+  },
+
+  // 横竖屏切换
+  handleWinDirection: (data) => {
+    dispatch({
+      type: PlayAutoActions.UpdateDirection,
       data
     })
   }
