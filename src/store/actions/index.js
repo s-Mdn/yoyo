@@ -35,3 +35,8 @@ export const LoginActions = {
   // 清空个人信息
   ClearUserInfo: 'CLEAR_USER_INFO'
 }
+
+export const ProfileActions = {
+  // 清晰度切换
+  UpdateResolute: 'UPDATE_RESOLUTE'
+}

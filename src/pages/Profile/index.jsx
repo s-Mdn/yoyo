@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Upload, Input, message, Radio } from 'antd';
 import { CameraOutlined, EditFilled } from '@ant-design/icons';
-import { LoginActions, PlayAutoActions } from '@/store/actions'
+import { LoginActions, PlayAutoActions, ProfileActions } from '@/store/actions'
 import { validate, type } from '@/utils';
 import API from '@/services';
 import './index.less';
@@ -17,7 +17,7 @@ const { toObject, toString } = type
 const Modal = React.lazy(() => import('@/components/Modal'))
 
 const Profile = ( props ) => {
-  const { userInfo, radioValue, playState, handleUpdateUserInfo } = props;
+  const { userInfo, resolute, playState, handleUpdateUserInfo } = props;
   // 默认昵称
   const [defNickName] = useState('YoYo');
   // 昵称输入框占位符
@@ -482,7 +482,10 @@ const Profile = ( props ) => {
         <div className='item m_l_120px p_y_25px w_60 border-b flex'>
           <span className='w_100px '>动画质量</span>
           <div className='w_300px'>
-            <Radio.Group value={radioValue}>
+            <Radio.Group
+              value={resolute}
+              onChange={e=>props.handleResolute(e.target.value)}
+            >
               <Radio value={'FLUENCY'}>流畅</Radio>
               <Radio value={'MEDIUM'}>平衡</Radio>
               <Radio value={'HEIGHT'}>高清</Radio>
@@ -516,7 +519,7 @@ const Profile = ( props ) => {
 
 const mapStateToProps = (state) => ({
   userInfo: state.userInfo,
-  radioValue: state.quality,
+  resolute: state.resolute,
   playState: state.playState,
 });
 const mapDispatchToProps = (dispatch) => ({
@@ -526,6 +529,16 @@ const mapDispatchToProps = (dispatch) => ({
   handleUpdateUserInfo: (data) => {
     dispatch({
       type: LoginActions.UpdateUserInfo,
+      data
+    })
+  },
+
+  /**
+   * 更新清晰度
+   */
+  handleResolute: (data) => {
+    dispatch({
+      type: ProfileActions.UpdateResolute,
       data
     })
   },

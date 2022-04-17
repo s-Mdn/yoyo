@@ -1,13 +1,12 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
-import quality from '@/reducers/quality';
 
 import PlayAutoReducer from './reducers/play-auto'
 import LoginReducer from './reducers/login'
-
+import ProfileReducer from './reducers/profile'
 
 const rootReducer = combineReducers({
-  quality,
+  resolute: ProfileReducer.UpdateResolute,
   userInfo: LoginReducer.UpdateUserInfo,
   playItem: PlayAutoReducer.UpdatePlayItem,
   playList: PlayAutoReducer.UpdatePlayList,
