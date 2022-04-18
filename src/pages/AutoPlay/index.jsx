@@ -1,20 +1,14 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Empty, message, Upload } from 'antd';
-import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import {
-  CameraTwoTone,
-  CloseCircleTwoTone,
-  CheckCircleTwoTone,
-} from '@ant-design/icons';
-
+import { CameraTwoTone, CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 import { PlayAutoActions } from '@/store/actions'
+import Socket from '@/services/socket'
 import constData from '@/constant/play-auto'
 import API from '@/services';
 import yoyo from '@/assets/images/model_yoyo.png';
 import './index.less';
 
-const client = new W3CWebSocket()
 const AutoPlay = (props) => {
   const {
     playList, playItem, backGroungListL, backGroungListH, playState,
@@ -133,7 +127,6 @@ const AutoPlay = (props) => {
 
   // 商品 && 人物缩放
   const handleScale = (dom, winDom) => {
-    console.log( dom, winDom )
     const o = document.getElementsByClassName(dom)[0];
     const c = document.getElementsByClassName(winDom)[0];
     let r = wiwnDirection
@@ -181,6 +174,12 @@ const AutoPlay = (props) => {
       }
     };
   };
+
+  // 播放
+  const handlePlay = () => {
+
+
+  }
 
 
   // 请求播放列表
@@ -370,6 +369,7 @@ const AutoPlay = (props) => {
           {goodsList.length ? (
             <button
               className='bg-ff8462 px-6 py-1.5 rounded-full text-white'
+              onClick={handlePlay}
             >
               {!playState ? <span>开始直播</span> : <span>关闭直播</span>}
             </button>
