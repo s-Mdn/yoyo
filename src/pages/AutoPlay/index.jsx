@@ -466,7 +466,7 @@ const AutoPlay = (props) => {
                   alt=''
                 />
               </div>
-              <div className='person_h_straight absolute bottom-0 left-0 bg-black' onClick={e=>handleDragStart(e, 'person_h_straight', 'window_straight')}>
+              <div className='person_h_straight absolute bottom-0 left-0' onClick={e=>handleDragStart(e, 'person_h_straight', 'window_straight')}>
                 <img src={yoyo} alt='人物' />
               </div>
             </div>
