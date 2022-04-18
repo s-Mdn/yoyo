@@ -132,9 +132,10 @@ const AutoPlay = (props) => {
 
   // 商品 && 人物缩放
   const handleScale = (dom, winDom) => {
+    console.log( dom, winDom )
     const o = document.getElementsByClassName(dom)[0];
     const c = document.getElementsByClassName(winDom)[0];
-    let r = !reverse
+    let r = wiwnDirection
       ? (o.offsetWidth / o.offsetHeight / 10).toFixed(6)
       : (o.offsetHeight / o.offsetWidth / 10).toFixed(6);
 
@@ -150,7 +151,7 @@ const AutoPlay = (props) => {
         o.style.height = setHeight + 'px';
 
         // 竖屏状态下，图片的缩放宽度如果大于等于限制窗口的宽度，即不可以在放大，横屏则人物的缩放的高度如果大于等于窗口的高度，则不可在放大
-        if (!reverse) {
+        if (wiwnDirection) {
           // 限宽
           if (setWidth >= c.offsetWidth) {
             o.style.width = c.offsetWidth + 'px';
@@ -187,6 +188,14 @@ const AutoPlay = (props) => {
     getBackground();
   }, [])// eslint-disable-line
 
+  // 缩放
+  useEffect(()=>{
+    if( wiwnDirection ) {
+      handleScale('person_h_level', 'window_level');
+    } else {
+      handleScale('person_h_straight', 'window_straight');
+    }
+  }, [wiwnDirection])
 
 
   return (
@@ -325,7 +334,7 @@ const AutoPlay = (props) => {
                   alt=''
                 />
               </div>
-              <div className='person_h_level absolute bottom-0 left-0'>
+              <div className='person_h_level absolute bottom-0 left-0 bg-black'>
                 <img src={yoyo} alt='人物' />
               </div>
             </div>
@@ -370,10 +379,10 @@ const AutoPlay = (props) => {
       </div>
 
       <div className='flex-1 rounded bg-white'>
-        <div className='border-b text-center mb-3 h_45 line_h_44'>
+        <div className='border-b text-center h_45 line_h_44'>
           直播间互动
         </div>
-        <div className='relative'>
+        <div className='flex flex-wrap pt-4'>
           <div className='empty_icon mt-24 mx-auto'>
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
           </div>

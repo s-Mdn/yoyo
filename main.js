@@ -57,7 +57,7 @@ log.log(cwd)
 // 创建窗口
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1175,
+    width: 1300,
     height: 875,
     frame: false,
     titleBarStyle: 'hidden',
@@ -72,7 +72,7 @@ function createWindow() {
   });
 
   // 设置窗口最小尺寸
-  mainWindow.setMinimumSize(1100, 720)
+  mainWindow.setMinimumSize(1300, 875)
   // 根据环境执行
   if (isDev(process.env.NODE_ENV)) {
     mainWindow.loadURL(`http://localhost:3000`);
