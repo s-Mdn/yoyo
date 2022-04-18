@@ -130,11 +130,64 @@ const AutoPlay = (props) => {
     }
   };
 
+  // 商品 && 人物缩放
+  const handleScale = (dom, winDom) => {
+    const o = document.getElementsByClassName(dom)[0];
+    const c = document.getElementsByClassName(winDom)[0];
+    let r = !reverse
+      ? (o.offsetWidth / o.offsetHeight / 10).toFixed(6)
+      : (o.offsetHeight / o.offsetWidth / 10).toFixed(6);
+
+    o.onmousewheel = function (e) {
+      //获取图片的宽高
+      const offsetWidth = o.offsetWidth;
+      const offsetHeight = o.offsetHeight;
+      if (e.wheelDelta > 0) {
+        const setWidth = offsetWidth + offsetWidth * r;
+        const setHeight = offsetHeight + offsetHeight * r;
+
+        o.style.width = setWidth + 'px';
+        o.style.height = setHeight + 'px';
+
+        // 竖屏状态下，图片的缩放宽度如果大于等于限制窗口的宽度，即不可以在放大，横屏则人物的缩放的高度如果大于等于窗口的高度，则不可在放大
+        if (!reverse) {
+          // 限宽
+          if (setWidth >= c.offsetWidth) {
+            o.style.width = c.offsetWidth + 'px';
+            o.style.height = c.offsetWidth / (r * 10) + 'px';
+          }
+        } else {
+          // 限高
+          if (setHeight >= c.offsetHeight) {
+            o.style.height = c.offsetHeight + 'px';
+            o.style.width = c.offsetHeight / (r * 10) + 'px';
+          }
+        }
+
+        // 限制上下位置
+        if (c.offsetHeight <= o.offsetHeight + o.offsetTop) {
+          o.style.top = c.offsetHeight - o.offsetHeight + 'px';
+        }
+
+        // 限制左右位置
+        if (c.offsetWidth <= o.offsetWidth + o.offsetLeft) {
+          o.style.left = c.offsetWidth - o.offsetWidth + 'px';
+        }
+      } else {
+        o.style.width = offsetWidth - offsetWidth * r + 'px';
+        o.style.height = offsetHeight - offsetHeight * r + 'px';
+      }
+    };
+  };
+
+
   // 请求播放列表
   useEffect(() => {
     getPlaylist();
     getBackground();
   }, [])// eslint-disable-line
+
+
 
   return (
     <div className='auto_play flex justify-between h-full overflow-hidden'>
