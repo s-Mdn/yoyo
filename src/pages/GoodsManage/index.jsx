@@ -16,7 +16,6 @@ import API from '@/services';
 import './index.less';
 
 const { isImage } = validate;
-
 class GoodsManage extends React.Component {
   constructor(props) {
     super(props);
@@ -192,13 +191,13 @@ class GoodsManage extends React.Component {
       return (
         <>
           {g.image && isImage(g.image[0]) ? (
-            <img src={g.image[0]} alt='' />
+            <img src={g.image[0]} alt='' className='w-full h-full object-fit' />
           ) : (
             <video className='w-full h-full object-fit' src={g.video_url} />
           )}
           <div className='absolute left-0 top-0 z-10'>
             {g.status === 'f' ? (
-              <div className=' flex items-center ml_3 mt-1'>
+              <div className='flex items-center ml_3 mt-1'>
                 <AudioTwoTone twoToneColor='#ff8462' />
                 <span className='font_12 color-ee6843'>语音合成中....</span>
               </div>
@@ -217,7 +216,7 @@ class GoodsManage extends React.Component {
       return (
         <>
           {isImage(p.cover_image) ? (
-            <img src={p.cover_image} alt='' />
+            <img src={p.cover_image} alt='' className='w-full h-full object-fit' />
           ) : (
             <video className='object-fit h-full' src={p.cover_image} />
           )}
