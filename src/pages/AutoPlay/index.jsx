@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Empty, message, Upload } from 'antd';
 import { CameraTwoTone, CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 import { PlayAutoActions } from '@/store/actions'
-import { validate } from '@/utils'
+import { validate, type } from '@/utils'
 import Socket from '@/services/socket'
 import constData from '@/constant/play-auto'
 import API from '@/services';
@@ -12,6 +12,7 @@ import './index.less';
 
 Socket();
 const { validURL } = validate;
+const { toString } = type;
 const AutoPlay = (props) => {
   const {
     playList, playItem, backGroungListL, backGroungListH, playState,
@@ -178,15 +179,42 @@ const AutoPlay = (props) => {
     };
   };
 
-  // 商品位置
-  const getGoodsPositions = () => {
+  // 获取商品的位置
+  const getGoodsPositions = (dom, winDom) => {
+    const o = document.getElementsByClassName(winDom)[0];
+    const c = document.getElementsByClassName(dom)[0];
 
-  }
+    const size = {
+      window: {
+        w: o.offsetWidth,
+        h: o.offsetHeight,
+      },
+      product_resize: {
+        w: c.offsetWidth,
+        h: c.offsetHeight,
+        x1: c.offsetLeft,
+        y1: c.offsetTop,
+        x2: o.offsetWidth - c.offsetLeft,
+        y2: o.offsetHeight - c.offsetTop,
+      },
+    };
+    return size;
+  };
 
-  // 人物位置
-  const getPersonPositions = () =>{
+  // 获取人物位置和尺寸
+  const getPersonPositions = (dom, winDom) => {
+    const o = document.getElementsByClassName(winDom)[0];
+    const c = document.getElementsByClassName(dom)[0];
 
-  }
+    return {
+      w: c.offsetWidth,
+      h: c.offsetHeight,
+      x1: c.offsetLeft,
+      y1: c.offsetTop,
+      x2: o.offsetWidth - c.offsetLeft,
+      y2: o.offsetHeight - c.offsetTop,
+    };
+  };
 
   const goodsListData = ({ client, goods }) => {
     const data = goods.map(e => ({
@@ -199,11 +227,15 @@ const AutoPlay = (props) => {
       is_landscape: wiwnDirection,
       resize: false,
       // 位置参数
+      window: wiwnDirection?getGoodsPositions('goods_straight', 'window_straight').window : getGoodsPositions('goods_level', 'window_leve').window,
+      product_resize: wiwnDirection?getGoodsPositions('goods_straight', 'window_straight').product_resize : getGoodsPositions('goods_level', 'window_leve').product_resize,
+      avatar_resize: wiwnDirection?getPersonPositions('person_h_straight', 'window_straight') : getPersonPositions('person_h_level', 'window_leve'),
     }))
+    client.send('sequence->' + toString(data));
   }
 
-  // 播放
-  const handlePlay = () => {
+  // 开始播放
+  const handleStartPlay = () => {
     const { socket } = window
     if( !socket ) { Socket() }
 
@@ -216,6 +248,12 @@ const AutoPlay = (props) => {
     const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
 
     socket.send(initData)
+    goodsListData(socket, goodsList)
+  }
+
+  // 关闭播放
+  const handleClosePlay = () => {
+    // const stop =
   }
 
 
@@ -228,11 +266,11 @@ const AutoPlay = (props) => {
   // 缩放
   useEffect(()=>{
     if(wiwnDirection) {
-      handleScale('person_h_level', 'window_level');
-      handleScale('person_h_level', 'window_level');
-    } else {
       handleScale('person_h_straight', 'window_straight');
+      handleScale('goods_straight', 'window_straight');
+    } else {
       handleScale('person_h_level', 'window_level');
+      handleScale('goods_level', 'window_level');
     }
   })
 
@@ -364,31 +402,31 @@ const AutoPlay = (props) => {
       <div className='center m_l_r_15px w_405  box-border'>
         <div className='flex relative rounded play_window_h'>
           {wiwnDirection ? (
-            <div className='h-full w-full window_level relative'>
+            <div className='h-full w-full window_straight relative'>
               <img className='h-full w-full object-fit-cover' alt='背景图' src={backGroundL.image}/>
-              <div className='goods_level absolute top_20vh right-0 w_20vh h_20vh rounded overflow-hidden'>
+              <div className='goods_straight absolute top_20vh right-0 w_20vh h_20vh rounded overflow-hidden'>
                 <img
                   src={playItem.cover_image}
                   className='object-fit-cover w-full h-full'
                   alt=''
                 />
               </div>
-              <div className='person_h_level absolute bottom-0 left-0 bg-black'>
+              <div className='person_h_straight absolute bottom-0 left-0 bg-black'>
                 <img src={yoyo} alt='人物' />
               </div>
             </div>
           ) : (
             <div className='flex items-center h-full w-full'>
-              <div className='window_straight w-full relative'>
+              <div className='window_level w-full relative'>
                 <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundH.image}/>
-                <div className='goods_straight absolute top-8 right-6 w_20vh h_20vh rounded overflow-hidden'>
+                <div className='goods_level absolute top-8 right-6 w_20vh h_20vh rounded overflow-hidden'>
                   <img
                     src={playItem.cover_image}
                     className='object-fit-cover w-full h-full'
                     alt=''
                   />
                 </div>
-                <div className='person_h_straight absolute bottom-0 left-5'>
+                <div className='person_h_level  absolute bottom-0 left-5'>
                   <img src={yoyo} alt='人物' />
                 </div>
               </div>
@@ -403,15 +441,14 @@ const AutoPlay = (props) => {
         </div>
 
         <div className='h_60px rounded bg-white m_t_15px flex items-center justify-center px-4 box-border'>
-          {goodsList.length ? (
+          {!goodsList.length ? (
             <button
-              className='bg-ff8462 px-6 py-1.5 rounded-full text-white'
-              onClick={handlePlay}
+              className='bg-ff8462 px-6 py-1.5 rounded-full text-white overflow-hidden'
             >
-              {!playState ? <span>开始直播</span> : <span>关闭直播</span>}
+              {!playState ? <div className='w-full h-full' onClick={handleStartPlay}>开始直播</div> : <div>关闭直播</div>}
             </button>
           ) : (
-            <button className='bg_ccc px-6 py-1.5 rounded-full text-white' onClick={handlePlay}>
+            <button className='bg_ccc px-6 py-1.5 rounded-full text-white'>
               开始直播
             </button>
           )}
