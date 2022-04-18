@@ -253,7 +253,8 @@ const AutoPlay = (props) => {
 
   // 关闭播放
   const handleClosePlay = () => {
-    // const stop =
+    const { socket } = window
+    socket.send('stop->{}');
   }
 
 
@@ -369,6 +370,15 @@ const AutoPlay = (props) => {
                         <CheckCircleTwoTone twoToneColor='#ff8462' />
                       )} */}
                     </div>
+                    {
+                      (i > 4) &&
+                      <div
+                        className='delete_icon flex items-center justify-center absolute -top_7px -right_7px'
+                        onClick={handelDeleteBackGround.bind(this, e, i)}
+                      >
+                        <CloseCircleTwoTone twoToneColor='#ff8462'/>
+                      </div>
+                    }
                   </div>
                 ))}
               </>
@@ -445,7 +455,7 @@ const AutoPlay = (props) => {
             <button
               className='bg-ff8462 px-6 py-1.5 rounded-full text-white overflow-hidden'
             >
-              {!playState ? <div className='w-full h-full' onClick={handleStartPlay}>开始直播</div> : <div>关闭直播</div>}
+              {!playState ? <div className='w-full h-full' onClick={handleStartPlay}>开始直播</div> : <div onClick={handleClosePlay}>关闭直播</div>}
             </button>
           ) : (
             <button className='bg_ccc px-6 py-1.5 rounded-full text-white'>
