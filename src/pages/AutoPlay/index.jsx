@@ -9,6 +9,7 @@ import API from '@/services';
 import yoyo from '@/assets/images/model_yoyo.png';
 import './index.less';
 
+const socket = Socket();
 const AutoPlay = (props) => {
   const {
     playList, playItem, backGroungListL, backGroungListH, playState,
@@ -177,7 +178,7 @@ const AutoPlay = (props) => {
 
   // 播放
   const handlePlay = () => {
-
+    console.log( socket )
 
   }
 
@@ -374,7 +375,7 @@ const AutoPlay = (props) => {
               {!playState ? <span>开始直播</span> : <span>关闭直播</span>}
             </button>
           ) : (
-            <button className='bg_ccc px-6 py-1.5 rounded-full text-white'>
+            <button className='bg_ccc px-6 py-1.5 rounded-full text-white' onClick={handlePlay}>
               开始直播
             </button>
           )}
