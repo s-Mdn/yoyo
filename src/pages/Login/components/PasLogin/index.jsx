@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { Form, Input, Checkbox } from 'antd';
-
 import { auth, type, validate } from '@/utils'
+import Socket from '@/services/socket';
 import API from '@/services';
 import userIcon from '@/assets/icons/user_icon.png';
 import eyeIcon from '@/assets/icons/eye_icon.png';
@@ -35,6 +35,9 @@ const Login = (props) => {
 
   // 提交
   const handleSubmit = async () => {
+    const { clent } = window
+    if( !clent ) { Socket() }
+
     if( !account ) {
       setWarnings('请重新输入帐号！')
       return false;

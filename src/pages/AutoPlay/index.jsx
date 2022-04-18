@@ -178,7 +178,12 @@ const AutoPlay = (props) => {
 
   // 播放
   const handlePlay = () => {
-    console.log( socket )
+    const { socket } = window
+    if( !socket ) { Socket() }
+
+    socket.open = () => {
+
+    }
 
   }
 
