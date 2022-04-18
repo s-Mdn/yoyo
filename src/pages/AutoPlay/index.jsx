@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Empty, message, Upload } from 'antd';
+import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import {
   CameraTwoTone,
   CloseCircleTwoTone,
@@ -13,7 +14,7 @@ import API from '@/services';
 import yoyo from '@/assets/images/model_yoyo.png';
 import './index.less';
 
-
+const client = new W3CWebSocket()
 const AutoPlay = (props) => {
   const {
     playList, playItem, backGroungListL, backGroungListH, playState,
