@@ -256,7 +256,7 @@ const AutoPlay = (props) => {
     };
   };
 
-  const goodsListData = ({ client, goods }) => {
+  const goodsListData = (client, goods) => {
     const data = goods.map(e => ({
       action_tag_list: e.action_tag_list,
       word_list: e.word_list || null,
@@ -271,33 +271,33 @@ const AutoPlay = (props) => {
       product_resize: wiwnDirection?getGoodsPositions('goods_straight', 'window_straight').product_resize : getGoodsPositions('goods_level', 'window_leve').product_resize,
       avatar_resize: wiwnDirection?getPersonPositions('person_h_straight', 'window_straight') : getPersonPositions('person_h_level', 'window_leve'),
     }))
+    console.log( data, 'data' )
     client.send('sequence->' + toString(data));
   }
 
   // 开始播放
   const handleStartPlay = () => {
-    const { socket } = window
-    if( !socket ) { Socket() }
-
+    let { client } = window
     let backGround = validURL(backGroundL.image)? backGroundL.image : `../build${backGroundL.image}`
-    // 横屏背景图
     if( !wiwnDirection ) {
       backGround =  validURL(backGroundH.image)? backGroundH.image : `../build${backGroundH.image}`
     }
-    // 背景图，清晰图
+    if( !client ) { 
+      Socket()
+      client = window.client
+    }
     const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
-
-    socket.send(initData)
-    goodsListData(socket, goodsList)
-    handleUpdatePlayState(true)
-
+    console.log( initData, 'initData' )
+    client.send(initData)
+    handleUpdatePlayState({state: true})
+    goodsListData(client, goodsList)
   }
 
   // 关闭播放
   const handleClosePlay = () => {
-    const { socket } = window
-    socket.send('stop->{}');
-    handleUpdatePlayState(false)
+    const { client } = window
+    client.send('stop->{}');
+    handleUpdatePlayState({state:false})
   }
 
 
@@ -561,10 +561,10 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   // 更新播放状态
-  handleUpdatePlayState: (data) => {
+  handleUpdatePlayState: (state) => {
     dispatch({
       type: PlayAutoActions.UpdatePlayState,
-      data
+      state
     })
   },
 
