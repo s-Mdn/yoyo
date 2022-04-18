@@ -189,7 +189,6 @@ const AutoPlay = (props) => {
     const o = document.getElementsByClassName(winDom)[0];
     const c = document.getElementsByClassName(dom)[0];
 
-    console.log( o, c )
     // 计算
     const disX = e.clientX - c.offsetLeft;
     const disY = e.clientY - c.offsetTop;
@@ -458,6 +457,7 @@ const AutoPlay = (props) => {
             <div className='h-full w-full window_straight relative'>
               <img className='h-full w-full object-fit-cover' alt='背景图' src={backGroundL.image}/>
               <div
+                onDragStart={e=>handleDragStart(e, 'goods_straight', 'window_straight')}
                 className='goods_straight absolute top_20vh right-0 w_20vh h_20vh rounded overflow-hidden'
               >
                 <img
@@ -466,7 +466,7 @@ const AutoPlay = (props) => {
                   alt=''
                 />
               </div>
-              <div className='person_h_straight absolute bottom-0 left-0' onClick={e=>handleDragStart(e, 'person_h_straight', 'window_straight')}>
+              <div className='person_h_straight absolute bottom-0 left-0' onDragStart={e=>handleDragStart(e, 'person_h_straight', 'window_straight')}>
                 <img src={yoyo} alt='人物' />
               </div>
             </div>
@@ -474,14 +474,16 @@ const AutoPlay = (props) => {
             <div className='flex items-center h-full w-full'>
               <div className='window_level w-full relative'>
                 <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundH.image}/>
-                <div className='goods_level absolute top-8 right-6 w_20vh h_20vh rounded overflow-hidden'>
+                <div
+                  onDragStart={e=>handleDragStart(e, 'goods_level', 'window_level')}
+                  className='goods_level absolute top-8 right-6 w_20vh h_20vh rounded overflow-hidden'>
                   <img
                     src={playItem.cover_image}
                     className='object-fit-cover w-full h-full'
                     alt=''
                   />
                 </div>
-                <div className='person_h_level  absolute bottom-0 left-5' onClick={e=>handleDragStart(e, 'person_h_level', 'window_level')}>
+                <div className='person_h_level  absolute bottom-0 left-5' onDragStart={e=>handleDragStart(e, 'person_h_level', 'window_level')}>
                   <img src={yoyo} alt='人物' />
                 </div>
               </div>
