@@ -178,6 +178,30 @@ const AutoPlay = (props) => {
     };
   };
 
+  // 商品位置
+  const getGoodsPositions = () => {
+
+  }
+
+  // 人物位置
+  const getPersonPositions = () =>{
+
+  }
+
+  const goodsListData = ({ client, goods }) => {
+    const data = goods.map(e => ({
+      action_tag_list: e.action_tag_list,
+      word_list: e.word_list || null,
+      video_url: e.video_url || null,
+      speed_list: e.speed_list,
+      wav_url_list: e.wav_url_list,
+      image: e.image || null,
+      is_landscape: wiwnDirection,
+      resize: false,
+      // 位置参数
+    }))
+  }
+
   // 播放
   const handlePlay = () => {
     const { socket } = window
