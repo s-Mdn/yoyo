@@ -18,7 +18,7 @@ const AutoPlay = (props) => {
   const {
     playList, playItem, backGroungListL, backGroungListH, playState,
     wiwnDirection, goodsList, backGroundL, backGroundH,
-    handleUpdatePlayList, handleAddPlayItem, handleClearPlayItem, handleAddGoodsList,
+    handleUpdatePlayList, handleAddPlayItem, handleClearPlayItem, handleClearGoodsList, handleAddGoodsList,
     handleAddBackGroundListVertical, handleAddBackGroundListHorizontal,
     handleUpdateBackGroundL, handleUpdateBackGroundH, handleWinDirection,
   } = props;
@@ -69,9 +69,10 @@ const AutoPlay = (props) => {
         tempList.forEach(p =>p.checked = p.id === playItem.id)
         handleUpdatePlayList(tempList)
 
-        // 如果播放列表为空 || 没有匹配到上一次选中的，则清空playItem
+        // 如果播放列表为空 || 没有匹配到上一次选中的，则清空playItem和goodsList
         if(!tempList.length || tempList.some(e=>e.checked)) {
           handleClearPlayItem()
+          handleClearGoodsList()
         }
       }).catch(e =>{
         message.error(e || '获取数据失败！');
@@ -141,6 +142,13 @@ const AutoPlay = (props) => {
         <div className='play_list'>
           <div className='border-b text-center h_45 line_h_44'>直播列表</div>
           <div className='flex flex-wrap play_list_h pt-4'>
+            {
+              !playList.length && (
+                <div className='relative mt-24 mx-auto'>
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                </div>
+              )
+            }
             {playList.map((e) => (
               <div
                 className='w_100px h_120px m_l_20px m_b_20px relative'
@@ -238,8 +246,8 @@ const AutoPlay = (props) => {
                     action={`${process.env.REACT_APP_API}/api/common/upload`}
                     accept='.jpg, .png, .gif, .webp'
                   >
-                    <div className='relative w-full h-full'>
-                      <div className='absolute top-0 left-0 z-10 w-full h-full rounded text-center mt-4'>
+                    <div className='relative h_100px w_100px'>
+                      <div className='absolute top-0 left-0 z-10 w-full h-full rounded text-center mt-5'>
                         <CameraTwoTone twoToneColor='#000' />
                         <p style={{ marginTop: '10px' }} className='font_12'>image</p>
                       </div>
@@ -256,7 +264,7 @@ const AutoPlay = (props) => {
         <div className='flex relative rounded play_window_h'>
           {wiwnDirection ? (
             <div className='h-full w-full window_level relative'>
-              <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundL.image}/>
+              <img className='h-full w-full object-fit-cover' alt='背景图' src={backGroundL.image}/>
               <div className='goods absolute top_20vh right-0 w_20vh h_20vh rounded overflow-hidden'>
                 <img
                   src={playItem.cover_image}
@@ -270,7 +278,6 @@ const AutoPlay = (props) => {
             </div>
           ) : (
             <div className='flex items-center h-full w-full'>
-              {/* 横 */}
               <div className='window_straight w-full relative'>
                 <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundH.image}/>
                 <div className='goods absolute top-8 right-6 w_20vh h_20vh rounded overflow-hidden'>
@@ -287,22 +294,22 @@ const AutoPlay = (props) => {
             </div>
           )}
           <div
-            className='absolute right-0 top-2 font_12 color_FF8462 px-1 bg-001529 rounded-l cursor-pointer'
+            className='absolute right-0 top-2 px-1 font_12 color_ff8462 bg-001529 rounded-l cursor-pointer'
             onClick={handleWinDirection.bind(this, !wiwnDirection)}
           >
             {wiwnDirection ? '横屏' : '竖屏'}
           </div>
         </div>
 
-        <div className='h_60px rounded bg-white mt_15px flex items-center justify-center px-4 box-border'>
+        <div className='h_60px rounded bg-white m_t_15px flex items-center justify-center px-4 box-border'>
           {goodsList.length ? (
             <button
-              className='bg-FF8462 px-6 py-1.5 rounded-full text-white'
+              className='bg-ff8462 px-6 py-1.5 rounded-full text-white'
             >
               {!playState ? <span>开始直播</span> : <span>关闭直播</span>}
             </button>
           ) : (
-            <button className='bg_CCC px-6 py-1.5 rounded-full text-white'>
+            <button className='bg_ccc px-6 py-1.5 rounded-full text-white'>
               开始直播
             </button>
           )}
@@ -313,8 +320,8 @@ const AutoPlay = (props) => {
         <div className='border-b text-center mb-3 h_45 line_h_44'>
           直播间互动
         </div>
-        <div className='interactive_area_h relative'>
-          <div className='absolute empty_icon'>
+        <div className='relative'>
+          <div className='empty_icon mt-24 mx-auto'>
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
           </div>
         </div>
@@ -365,6 +372,14 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch({
       type: PlayAutoActions.AddGoodsList,
       data
+    })
+  },
+
+  // 清空商品
+  handleClearGoodsList: () => {
+    dispatch({
+      type: PlayAutoActions.ClearGoodsList,
+      data: []
     })
   },
 
