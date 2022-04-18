@@ -19,7 +19,7 @@ const AutoPlay = (props) => {
     wiwnDirection, goodsList, backGroundL, backGroundH,
     handleUpdatePlayList, handleAddPlayItem, handleClearPlayItem, handleClearGoodsList, handleAddGoodsList,
     handleAddBackGroundListVertical, handleAddBackGroundListHorizontal,
-    handleUpdateBackGroundL, handleUpdateBackGroundH, handleWinDirection,
+    handleUpdateBackGroundL, handleUpdateBackGroundH, handleWinDirection, handleUpdatePlayState
   } = props;
 
   // 选中播放
@@ -249,12 +249,15 @@ const AutoPlay = (props) => {
 
     socket.send(initData)
     goodsListData(socket, goodsList)
+    handleUpdatePlayState(true)
+
   }
 
   // 关闭播放
   const handleClosePlay = () => {
     const { socket } = window
     socket.send('stop->{}');
+    handleUpdatePlayState(false)
   }
 
 
@@ -493,6 +496,14 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  // 更新播放状态
+  handleUpdatePlayState: (data) => {
+    dispatch({
+      type: PlayAutoActions.UpdatePlayState,
+      data
+    })
+  },
+
   // 添加播放列表
   handleUpdatePlayList: (data) => {
     dispatch({
