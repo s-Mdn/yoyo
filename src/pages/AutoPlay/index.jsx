@@ -190,12 +190,14 @@ const AutoPlay = (props) => {
 
   // 缩放
   useEffect(()=>{
-    if( wiwnDirection ) {
+    if(wiwnDirection) {
+      handleScale('person_h_level', 'window_level');
       handleScale('person_h_level', 'window_level');
     } else {
       handleScale('person_h_straight', 'window_straight');
+      handleScale('person_h_level', 'window_level');
     }
-  }, [wiwnDirection])
+  })
 
 
   return (
@@ -327,7 +329,7 @@ const AutoPlay = (props) => {
           {wiwnDirection ? (
             <div className='h-full w-full window_level relative'>
               <img className='h-full w-full object-fit-cover' alt='背景图' src={backGroundL.image}/>
-              <div className='goods absolute top_20vh right-0 w_20vh h_20vh rounded overflow-hidden'>
+              <div className='goods_level absolute top_20vh right-0 w_20vh h_20vh rounded overflow-hidden'>
                 <img
                   src={playItem.cover_image}
                   className='object-fit-cover w-full h-full'
@@ -342,7 +344,7 @@ const AutoPlay = (props) => {
             <div className='flex items-center h-full w-full'>
               <div className='window_straight w-full relative'>
                 <img className='h-full w-full object-fit-cover block' alt='背景图' src={backGroundH.image}/>
-                <div className='goods absolute top-8 right-6 w_20vh h_20vh rounded overflow-hidden'>
+                <div className='goods_straight absolute top-8 right-6 w_20vh h_20vh rounded overflow-hidden'>
                   <img
                     src={playItem.cover_image}
                     className='object-fit-cover w-full h-full'
