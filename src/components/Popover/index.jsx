@@ -1,4 +1,4 @@
-import { Popover, Avatar } from 'antd';
+import { Popover } from 'antd';
 import content from './content.jsx';
 const _Popover = (props) => {
   const { userInfo, loginOut } = props;

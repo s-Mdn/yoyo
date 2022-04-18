@@ -69,8 +69,9 @@ const backgroundListHorizontal = [
   },
 ];
 
-
-export default {
+const constData = {
   backGroundListL: backGroundListVertical,
   backGroundListH: backgroundListHorizontal
 }
+export default constData
+

@@ -3,13 +3,15 @@ import { connect } from 'react-redux';
 import { Empty, message, Upload } from 'antd';
 import { CameraTwoTone, CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 import { PlayAutoActions } from '@/store/actions'
+import { validate } from '@/utils'
 import Socket from '@/services/socket'
 import constData from '@/constant/play-auto'
 import API from '@/services';
 import yoyo from '@/assets/images/model_yoyo.png';
 import './index.less';
 
-const socket = Socket();
+Socket();
+const { validURL } = validate;
 const AutoPlay = (props) => {
   const {
     playList, playItem, backGroungListL, backGroungListH, playState,
@@ -181,10 +183,15 @@ const AutoPlay = (props) => {
     const { socket } = window
     if( !socket ) { Socket() }
 
-    socket.open = () => {
-
+    let backGround = validURL(backGroundL.image)? backGroundL.image : `../build${backGroundL.image}`
+    // 横屏背景图
+    if( !wiwnDirection ) {
+      backGround =  validURL(backGroundH.image)? backGroundH.image : `../build${backGroundH.image}`
     }
+    // 背景图，清晰图
+    const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
 
+    socket.send(initData)
   }
 
 
