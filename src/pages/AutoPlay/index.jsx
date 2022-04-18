@@ -179,6 +179,45 @@ const AutoPlay = (props) => {
     };
   };
 
+  // 商品 && 人物拖动
+  const handleDragStart = (e, dom, winDom) => {
+    document.getElementsByTagName('body')[0].ondragstart = function () {
+      window.event.returnValue = false;
+      return false;
+    };
+
+    const o = document.getElementsByClassName(winDom)[0];
+    const c = document.getElementsByClassName(dom)[0];
+
+    // 计算
+    const disX = e.clientX - c.offsetLeft;
+    const disY = e.clientY - c.offsetTop;
+
+    document.onmousemove = function (e) {
+      // 计算移动对象在限定的范围内的位置
+      let left = e.clientX - disX;
+      let top = e.clientY - disY;
+
+      // 左右侧限制
+      left <= 0 && (left = 0);
+      left >= o.offsetWidth - c.offsetWidth &&
+        (left = o.offsetWidth - c.offsetWidth);
+
+      // 上下侧限制
+      top <= 0 && (top = 0);
+      top >= o.offsetHeight - c.offsetHeight &&
+        (top = o.offsetHeight - c.offsetHeight);
+
+      c.style.left = left + 'px';
+      c.style.top = top + 'px';
+    };
+
+    document.onmouseup = function () {
+      document.onmousemove = null;
+      document.onmousedown = null;
+    };
+  };
+
   // 获取商品的位置
   const getGoodsPositions = (dom, winDom) => {
     const o = document.getElementsByClassName(winDom)[0];
