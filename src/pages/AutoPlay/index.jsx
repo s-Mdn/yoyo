@@ -464,10 +464,16 @@ const AutoPlay = (props) => {
                 className='goods_straight absolute top-0 right-0 w_20vh h_20vh rounded overflow-hidden'
               >
                 {
-                  isImage(playItem.cover_image)?(
-                    <img src={playItem.cover_image} className='object-fit-cover w-full h-full' alt=''/>
-                  ):(
-                    <img src={video} className='object-fit-cover w-full h-full' alt='' />
+                  playItem.cover_image && (
+                    <>
+                      {
+                        isImage(playItem.cover_image)?(
+                          <img src={playItem.cover_image} className='object-fit-cover w-full h-full' alt=''/>
+                        ):(
+                          <img src={video} className='object-fit-cover w-full h-full' alt='' title='视频缩略图'/>
+                        )
+                      }
+                    </>
                   )
                 }
               </div>
@@ -483,12 +489,19 @@ const AutoPlay = (props) => {
                   onDragStart={e=>handleDragStart(e, 'goods_level', 'window_level')}
                   className='goods_level absolute top-8 right-6 w_20vh h_20vh rounded overflow-hidden'>
                   {
-                    isImage(playItem.cover_image)?(
-                      <img src={playItem.cover_image} className='object-fit-cover w-full h-full' alt='' />
-                    ):(
-                      <img src={video} className='object-fit-cover w-full h-full' alt='' />
+                    playItem.cover_image && (
+                      <>
+                        {
+                          isImage(playItem.cover_image)?(
+                            <img src={playItem.cover_image} className='object-fit-cover w-full h-full' alt='' />
+                          ):(
+                            <img src={video} className='object-fit-cover w-full h-full' alt='' title='视频缩略图'/>
+                          )
+                        }
+                      </>
                     )
                   }
+
                 </div>
                 <div className='person_h_level  absolute bottom-0 left-5' onDragStart={e=>handleDragStart(e, 'person_h_level', 'window_level')}>
                   <img src={yoyo} alt='人物' />
