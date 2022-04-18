@@ -8,10 +8,11 @@ import Socket from '@/services/socket'
 import constData from '@/constant/play-auto'
 import API from '@/services';
 import yoyo from '@/assets/images/model_yoyo.png';
+import video from '@/assets/images/video.jpeg'
 import './index.less';
 
 Socket();
-const { validURL } = validate;
+const { validURL, isImage } = validate;
 const { toString } = type;
 const AutoPlay = (props) => {
   const {
@@ -21,7 +22,6 @@ const AutoPlay = (props) => {
     handleAddBackGroundListVertical, handleAddBackGroundListHorizontal,
     handleUpdateBackGroundL, handleUpdateBackGroundH, handleWinDirection, handleUpdatePlayState
   } = props;
-
   // 选中播放
   const handleSelectPlays = (p) => {
     playList.filter((e) => {e.checked = p.id === e.id;return e})
@@ -65,11 +65,12 @@ const AutoPlay = (props) => {
       .then(r =>{
         const tempList = r.data.content
         // 匹配上一次选中的play
-        tempList.forEach(p =>p.checked = p.id === playItem.id)
+        // console.log( playItem )
+        tempList.forEach(p =>p.checked = p.id == playItem.id)
         handleUpdatePlayList(tempList)
-
         // 如果播放列表为空 || 没有匹配到上一次选中的，则清空playItem和goodsList
-        if(!tempList.length || tempList.some(e=>e.checked)) {
+        // console.log(tempList.length, !tempList.length,  !tempList.some(e=>e.checked))
+        if(!tempList.length || !tempList.some(e=>e.checked)) {
           handleClearPlayItem()
           handleClearGoodsList()
         }
@@ -340,11 +341,13 @@ const AutoPlay = (props) => {
                   className='felx items-center justify-centers border w-full h_100px rounded overflow-hidden'
                   onClick={handleSelectPlays.bind(this, e)}
                 >
-                  <img
-                    src={e.cover_image}
-                    className='object-fit-cover w-full h-full'
-                    alt=''
-                  />
+                  {
+                    isImage(e.cover_image)?(
+                      <img src={e.cover_image} className='object-fit-cover w-full h-full' alt='' />
+                    ):(
+                      <video src={e.cover_image} className='object-fit-cover w-full h-full' />
+                    )
+                  }
                 </div>
                 <div className='text-center px-2 text-overflow font_12'>
                   {e.name}
@@ -458,13 +461,15 @@ const AutoPlay = (props) => {
               <img className='h-full w-full object-fit-cover' alt='背景图' src={backGroundL.image}/>
               <div
                 onDragStart={e=>handleDragStart(e, 'goods_straight', 'window_straight')}
-                className='goods_straight absolute top_20vh right-0 w_20vh h_20vh rounded overflow-hidden'
+                className='goods_straight absolute top-0 right-0 w_20vh h_20vh rounded overflow-hidden'
               >
-                <img
-                  src={playItem.cover_image}
-                  className='object-fit-cover w-full h-full'
-                  alt=''
-                />
+                {
+                  isImage(playItem.cover_image)?(
+                    <img src={playItem.cover_image} className='object-fit-cover w-full h-full' alt=''/>
+                  ):(
+                    <img src={video} className='object-fit-cover w-full h-full' alt='' />
+                  )
+                }
               </div>
               <div className='person_h_straight absolute bottom-0 left-0' onDragStart={e=>handleDragStart(e, 'person_h_straight', 'window_straight')}>
                 <img src={yoyo} alt='人物' />
@@ -477,11 +482,13 @@ const AutoPlay = (props) => {
                 <div
                   onDragStart={e=>handleDragStart(e, 'goods_level', 'window_level')}
                   className='goods_level absolute top-8 right-6 w_20vh h_20vh rounded overflow-hidden'>
-                  <img
-                    src={playItem.cover_image}
-                    className='object-fit-cover w-full h-full'
-                    alt=''
-                  />
+                  {
+                    isImage(playItem.cover_image)?(
+                      <img src={playItem.cover_image} className='object-fit-cover w-full h-full' alt='' />
+                    ):(
+                      <img src={video} className='object-fit-cover w-full h-full' alt='' />
+                    )
+                  }
                 </div>
                 <div className='person_h_level  absolute bottom-0 left-5' onDragStart={e=>handleDragStart(e, 'person_h_level', 'window_level')}>
                   <img src={yoyo} alt='人物' />
@@ -498,7 +505,7 @@ const AutoPlay = (props) => {
         </div>
 
         <div className='h_60px rounded bg-white m_t_15px flex items-center justify-center px-4 box-border'>
-          {!goodsList.length ? (
+          {goodsList.length ? (
             <button
               className='bg-ff8462 px-6 py-1.5 rounded-full text-white overflow-hidden'
             >

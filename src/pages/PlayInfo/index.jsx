@@ -346,7 +346,7 @@ class PlayInfo extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  user: state.profile.id,
+  user: state.userInfo.id,
 });
 
 export default connect(mapStateToProps)(PlayInfo);
