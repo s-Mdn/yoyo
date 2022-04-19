@@ -299,6 +299,7 @@ const AutoPlay = (props) => {
           content: '初始化中，请耐心等待...'
         })
       }
+      return false
     }
     client.send(initData)
     goodsListData(client, goodsList)
