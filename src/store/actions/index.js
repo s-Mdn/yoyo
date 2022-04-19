@@ -11,8 +11,10 @@ export const PlayAutoActions = {
   UpdateBackGroundVertical: 'UPDATE_BACK_GROUND_L',
   // 更新背景图(横向)
   UpdateBackGroundHorizontal: 'UPDATE_BACK_GROUND_H',
-  // 播放状态
-  UpdatePlayState: 'UPDATE_PLAY_STATE',
+  // 开始播放
+  UpdateStartPlay: 'UPDATE_STATE_PLAY',
+  // 关闭播放
+  UpdateStopPlay: 'UPDATE_STOP_PLAY',
   // 添加播放商品
   AddGoodsList: 'ADD_GOODS_LIST',
   // 清空播放商品

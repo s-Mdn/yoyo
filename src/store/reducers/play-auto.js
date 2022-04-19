@@ -46,8 +46,10 @@ const PlayAutoReducer = {
    */
   UpdatePlayState: (state = false, action) => {
     switch( action.type ) {
-      case PlayAutoActions.UpdatePlayState:
-        return action.state
+      case PlayAutoActions.UpdateStartPlay:
+        return true
+      case PlayAutoActions.UpdateStopPlay:
+        return false
       default:
         return state
     }

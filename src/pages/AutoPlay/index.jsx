@@ -21,7 +21,7 @@ const AutoPlay = (props) => {
     wiwnDirection, goodsList, backGroundL, backGroundH,
     handleUpdatePlayList, handleAddPlayItem, handleClearPlayItem, handleClearGoodsList, handleAddGoodsList,
     handleAddBackGroundListVertical, handleAddBackGroundListHorizontal,
-    handleUpdateBackGroundL, handleUpdateBackGroundH, handleWinDirection, handleUpdatePlayState
+    handleUpdateBackGroundL, handleUpdateBackGroundH, handleWinDirection, handleUpdateStopPlay
   } = props;
   // 选中播放
   const handleSelectPlays = (p) => {
@@ -276,31 +276,39 @@ const AutoPlay = (props) => {
     client.send('sequence->' + toString(data));
   }
 
-  // socket
-  const Socket = () => {
-    const { client } = window
-    const socket = new W3CWebSocket(localServerUrl)
-  }
-
   // 开始播放
   const handleStartPlay = () => {
-    handleUpdatePlayState({state: true})
-    // let backGround = validURL(backGroundL.image)? backGroundL.image : `../build${backGroundL.image}`
-    // if( !wiwnDirection ) {
-    //   backGround =  validURL(backGroundH.image)? backGroundH.image : `../build${backGroundH.image}`
-    // }
+    let backGround = validURL(backGroundL.image)? backGroundL.image : `../build${backGroundL.image}`
+    if( !wiwnDirection ) {
+      backGround =  validURL(backGroundH.image)? backGroundH.image : `../build${backGroundH.image}`
+    }
+    const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
 
-    // const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
-    // console.log( initData, 'initData' )
-
-    // goodsListData(client, goodsList)
+    let { client } = window
+    if( !client ) {
+      let client = new W3CWebSocket(localServerUrl)
+      client.onopen = () => {
+        client.send(initData)
+        goodsListData(client, goodsList)
+        window.client = client
+      }
+      client.onerror = () => {
+        message.warning({
+          icon: null,
+          top: 0,
+          content: '初始化中，请耐心等待...'
+        })
+      }
+    }
+    client.send(initData)
+    goodsListData(client, goodsList)
   }
 
   // 关闭播放
   const handleClosePlay = () => {
-    // const { client } = window
-    // client.send('stop->{}');
-    handleUpdatePlayState({state:false})
+    const { client } = window
+    client.send('stop->{}');
+    handleUpdateStopPlay()
   }
 
 
@@ -563,11 +571,17 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  // 更新播放状态
-  handleUpdatePlayState: (state) => {
+  // 更新开始播放状态
+  handleUpdateStartPlay: () => {
     dispatch({
-      type: PlayAutoActions.UpdatePlayState,
-      state
+      type: PlayAutoActions.UpdateStartPlay
+    })
+  },
+
+  // 更新结束播放状态
+  handleUpdateStopPlay: () => {
+    dispatch({
+      type: PlayAutoActions.UpdateStopPlay
     })
   },
 
