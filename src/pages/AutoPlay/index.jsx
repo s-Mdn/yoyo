@@ -2,18 +2,19 @@ import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Empty, message, Upload } from 'antd';
 import { CameraTwoTone, CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
+import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { PlayAutoActions } from '@/store/actions'
 import { validate, type } from '@/utils'
-import Socket from '@/services/socket'
 import constData from '@/constant/play-auto'
 import API from '@/services';
 import yoyo from '@/assets/images/model_yoyo.png';
 import video from '@/assets/images/video.jpeg'
 import './index.less';
 
-Socket();
 const { validURL, isImage } = validate;
 const { toString } = type;
+const localServerUrl = process.env.REACT_APP_LOCAL_SERVER_URL;
+
 const AutoPlay = (props) => {
   const {
     playList, playItem, backGroungListL, backGroungListH, playState,
@@ -275,28 +276,30 @@ const AutoPlay = (props) => {
     client.send('sequence->' + toString(data));
   }
 
+  // socket
+  const Socket = () => {
+    const { client } = window
+    const socket = new W3CWebSocket(localServerUrl)
+  }
+
   // 开始播放
   const handleStartPlay = () => {
-    let { client } = window
-    let backGround = validURL(backGroundL.image)? backGroundL.image : `../build${backGroundL.image}`
-    if( !wiwnDirection ) {
-      backGround =  validURL(backGroundH.image)? backGroundH.image : `../build${backGroundH.image}`
-    }
-    if( !client ) { 
-      Socket()
-      client = window.client
-    }
-    const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
-    console.log( initData, 'initData' )
-    client.send(initData)
     handleUpdatePlayState({state: true})
-    goodsListData(client, goodsList)
+    // let backGround = validURL(backGroundL.image)? backGroundL.image : `../build${backGroundL.image}`
+    // if( !wiwnDirection ) {
+    //   backGround =  validURL(backGroundH.image)? backGroundH.image : `../build${backGroundH.image}`
+    // }
+
+    // const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
+    // console.log( initData, 'initData' )
+
+    // goodsListData(client, goodsList)
   }
 
   // 关闭播放
   const handleClosePlay = () => {
-    const { client } = window
-    client.send('stop->{}');
+    // const { client } = window
+    // client.send('stop->{}');
     handleUpdatePlayState({state:false})
   }
 

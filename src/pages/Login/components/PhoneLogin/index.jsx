@@ -4,7 +4,6 @@ import { Redirect } from 'react-router-dom';
 import { Input } from 'antd';
 
 import { validate } from '@/utils';
-import Socket from '@/services/socket';
 import API from '@/services';
 import phoneIcon from '@/assets/icons/phone_icon.png';
 import pasIcon from '@/assets/icons/pas_icon.png';
@@ -63,9 +62,6 @@ const PhoneLogin = (props) => {
 
   // 表单提交事件
   const handleSubmit = () => {
-    const { clent } = window
-    if( !clent ) { Socket() }
-
     if ( !phone ) {
       setWarnings('手机号不能为空');
       return false;
