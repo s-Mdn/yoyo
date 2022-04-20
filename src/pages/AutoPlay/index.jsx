@@ -8,9 +8,11 @@ import { validate, type } from '@/utils'
 import constData from '@/constant/play-auto'
 import API from '@/services';
 import yoyo from '@/assets/images/model_yoyo.png';
+import clock from '@/assets/icons/icon-clock.png'
 import video from '@/assets/images/video.jpeg'
 import './index.less';
 
+const Clock = React.lazy(()=>import('./componets/Clock'))
 const { validURL, isImage } = validate;
 const { toString } = type;
 const localServerUrl = process.env.REACT_APP_LOCAL_SERVER_URL;
@@ -539,6 +541,10 @@ const AutoPlay = (props) => {
             onClick={handleWinDirection.bind(this, !wiwnDirection)}
           >
             {wiwnDirection ? '横屏' : '竖屏'}
+          </div>
+          <div className='clock absolute top-2 left-0 font_12 flex items-center w_20px h_20px text-black'>
+            <img src={clock} alt='' className='clock' />
+            <Clock/>
           </div>
         </div>
 
