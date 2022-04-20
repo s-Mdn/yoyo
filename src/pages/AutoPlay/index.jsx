@@ -20,7 +20,7 @@ const AutoPlay = (props) => {
     playList, playItem, backGroungListL, backGroungListH, playState,
     wiwnDirection, goodsList, backGroundL, backGroundH,
     handleUpdatePlayList, handleAddPlayItem, handleClearPlayItem, handleClearGoodsList, handleAddGoodsList,
-    handleAddBackGroundListVertical, handleAddBackGroundListHorizontal,
+    handleAddBackGroundListVertical, handleAddBackGroundListHorizontal, handleUpdateStartPlay,
     handleUpdateBackGroundL, handleUpdateBackGroundH, handleWinDirection, handleUpdateStopPlay
   } = props;
   // 选中播放
@@ -278,21 +278,24 @@ const AutoPlay = (props) => {
 
   // 开始播放
   const handleStartPlay = () => {
-    let backGround = validURL(backGroundL.image)? backGroundL.image : `../build${backGroundL.image}`
+    let backGround = validURL(backGroundL.image)? backGroundL.image : `../build${(backGroundL.image).slice(0)}`
     if( !wiwnDirection ) {
-      backGround =  validURL(backGroundH.image)? backGroundH.image : `../build${backGroundH.image}`
+      backGround =  validURL(backGroundH.image)? backGroundH.image : `../build${(backGroundH.image).slice(0)}`
     }
     const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
-
+    console.log( initData )
+    
     let { client } = window
     if( !client ) {
       let client = new W3CWebSocket(localServerUrl)
       client.onopen = () => {
+        handleUpdateStartPlay()
         client.send(initData)
         goodsListData(client, goodsList)
         window.client = client
       }
       client.onerror = () => {
+        handleUpdateStopPlay()
         message.warning({
           icon: null,
           top: 0,
@@ -301,6 +304,8 @@ const AutoPlay = (props) => {
       }
       return false
     }
+    console.log( initData )
+    handleUpdateStartPlay()
     client.send(initData)
     goodsListData(client, goodsList)
   }
