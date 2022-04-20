@@ -272,19 +272,27 @@ const AutoPlay = (props) => {
       product_resize: wiwnDirection?getGoodsPositions('goods_straight', 'window_straight').product_resize : getGoodsPositions('goods_level', 'window_leve').product_resize,
       avatar_resize: wiwnDirection?getPersonPositions('person_h_straight', 'window_straight') : getPersonPositions('person_h_level', 'window_leve'),
     }))
-    console.log( data, 'data' )
+    // console.log( data, 'data' )
     client.send('sequence->' + toString(data));
   }
 
   // 开始播放
   const handleStartPlay = () => {
-    let backGround = validURL(backGroundL.image)? backGroundL.image : `../build${(backGroundL.image).slice(0)}`
-    if( !wiwnDirection ) {
-      backGround =  validURL(backGroundH.image)? backGroundH.image : `../build${(backGroundH.image).slice(0)}`
+    let backGround = validURL(backGroundL.image)? backGroundL.image : `../build${(backGroundL.image)}`
+    if( process.env.NODE_ENV !== 'development' ) {
+      backGround =  validURL(backGroundL.image)? backGroundL.image : `../app.asar.unpacked${backGroundL.image}`
+      if(!wiwnDirection) {
+        backGround =  validURL(backGroundH.image)? backGroundH.image : `../app.asar.unpacked${backGroundH.image}`
+      }
+    } else {
+      if( !wiwnDirection ) {
+        backGround =  validURL(backGroundH.image)? backGroundH.image : `../build${(backGroundH.image)}`
+      }
     }
+
     const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
-    console.log( initData )
-    
+    // console.log( initData )
+    debugger
     let { client } = window
     if( !client ) {
       let client = new W3CWebSocket(localServerUrl)
@@ -304,7 +312,7 @@ const AutoPlay = (props) => {
       }
       return false
     }
-    console.log( initData )
+    // console.log( initData )
     handleUpdateStartPlay()
     client.send(initData)
     goodsListData(client, goodsList)
