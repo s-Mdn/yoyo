@@ -323,6 +323,15 @@ const AutoPlay = (props) => {
     handleUpdateStopPlay()
   }
 
+  // 初始化背景图
+  useEffect(()=>{
+    if( !backGroundH?.image || !backGroundL?.image ) {
+      const { backGroundListL, backGroundListH } = constData
+      handleUpdateBackGroundL(backGroundListL[3])
+      handleUpdateBackGroundH(backGroundListH[3])
+    }
+  },[backGroundH, backGroundL])
+
 
   // 请求播放列表
   useEffect(() => {

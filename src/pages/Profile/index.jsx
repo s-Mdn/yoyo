@@ -407,6 +407,15 @@ const Profile = ( props ) => {
       })
   }
 
+  // 退出
+  const handleLoginOut = () => {
+    if( playState ) {
+      message.warning('正在播放，无法退出！')
+      return false
+    }
+    props.handleLoginOut()
+  }
+
   return(
     <div className='profile overflow-hidden bg-white'>
       <div className='box-border p_15px font-semibold text-black'>
@@ -492,7 +501,7 @@ const Profile = ( props ) => {
             </Radio.Group>
           </div>
         </div>
-        <div className='item m_l_120px p_y_25px w_60 flex items-center justify-center' onClick={props.handleLoginOut}>
+        <div className='item m_l_120px p_y_25px w_60 flex items-center justify-center' onClick={handleLoginOut}>
           <button className='py-2 px-16 rounded-full border bg-FF8462 text-white'>退 出</button>
         </div>
       </div>

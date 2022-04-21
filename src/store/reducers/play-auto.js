@@ -1,6 +1,4 @@
 import { PlayAutoActions } from '../actions';
-import constData from '@/constant/play-auto'
-const { backGroundListL, backGroundListH } = constData
 
 const PlayAutoReducer = {
   /**
@@ -109,7 +107,7 @@ const PlayAutoReducer = {
    * @param {*} state
    * @param {*} action
    */
-  UpdateBackGroundL: (state=backGroundListL[3], action) => {
+  UpdateBackGroundL: (state={}, action) => {
     switch( action.type ) {
       case PlayAutoActions.UpdateBackGroundVertical:
         return {...action.data}
@@ -123,7 +121,7 @@ const PlayAutoReducer = {
    * @param {*} state
    * @param {*} action
    */
-  UpdateBackGroundH: (state=backGroundListH[3], action) => {
+  UpdateBackGroundH: (state={}, action) => {
     switch( action.type ) {
       case PlayAutoActions.UpdateBackGroundHorizontal:
         return {...action.data}

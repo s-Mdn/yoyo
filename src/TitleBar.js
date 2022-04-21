@@ -70,6 +70,7 @@ function Titlebar(props) {
 
 const mapDispatchToProps = (dispatch) => ({
   handleLoginOut: () => {
+    localStorage.clear()
     /**
      * 清除选中的播放
      */
