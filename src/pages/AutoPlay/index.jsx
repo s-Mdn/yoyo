@@ -248,7 +248,6 @@ const AutoPlay = (props) => {
   const getPersonPositions = (dom, winDom) => {
     const o = document.getElementsByClassName(winDom)[0];
     const c = document.getElementsByClassName(dom)[0];
-
     return {
       w: c.offsetWidth,
       h: c.offsetHeight,
@@ -267,14 +266,14 @@ const AutoPlay = (props) => {
       speed_list: e.speed_list,
       wav_url_list: e.wav_url_list,
       image: e.image || null,
-      is_landscape: wiwnDirection,
+      is_landscape: !wiwnDirection,
       resize: false,
       // 位置参数
-      window: wiwnDirection?getGoodsPositions('goods_straight', 'window_straight').window : getGoodsPositions('goods_level', 'window_leve').window,
-      product_resize: wiwnDirection?getGoodsPositions('goods_straight', 'window_straight').product_resize : getGoodsPositions('goods_level', 'window_leve').product_resize,
-      avatar_resize: wiwnDirection?getPersonPositions('person_h_straight', 'window_straight') : getPersonPositions('person_h_level', 'window_leve'),
+      window: wiwnDirection?getGoodsPositions('goods_straight', 'window_straight').window : getGoodsPositions('goods_level', 'window_level').window,
+      product_resize: wiwnDirection?getGoodsPositions('goods_straight', 'window_straight').product_resize : getGoodsPositions('goods_level', 'window_level').product_resize,
+      avatar_resize: wiwnDirection?getPersonPositions('person_h_straight', 'window_straight') : getPersonPositions('person_h_level', 'window_level'),
     }))
-    // console.log( data, 'data' )
+    console.log( data, 'data' )
     client.send('sequence->' + toString(data));
   }
 
@@ -293,8 +292,6 @@ const AutoPlay = (props) => {
     }
 
     const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
-    // console.log( initData )
-    debugger
     let { client } = window
     if( !client ) {
       let client = new W3CWebSocket(localServerUrl)
@@ -314,7 +311,6 @@ const AutoPlay = (props) => {
       }
       return false
     }
-    // console.log( initData )
     handleUpdateStartPlay()
     client.send(initData)
     goodsListData(client, goodsList)
