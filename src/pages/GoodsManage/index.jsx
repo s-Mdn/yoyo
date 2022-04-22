@@ -293,7 +293,7 @@ class GoodsManage extends React.Component {
               {imgList.map((e, i) => {
                 return (
                   <div
-                    key={e}
+                    key={i}
                     className='w_80 h_80 overflow-hidden ml_20px mb_20px rounded'
                   >
                     {isImage(e) ? (

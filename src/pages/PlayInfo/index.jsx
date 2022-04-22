@@ -147,6 +147,7 @@ class PlayInfo extends React.Component {
       return false;
     }
     if (response && response.code === 200) {
+      console.log( response )
       response.data.forEach((e, i) => {
         e.key = nanoid();
       });
