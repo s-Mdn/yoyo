@@ -6,13 +6,14 @@ import {
   ArrowLeftOutlined,
 } from '@ant-design/icons';
 
-import { common, validate } from '@/utils';
+import { common, validate} from '@/utils';
 import API from '@/services';
 import './index.less';
 
 
 const { downloadUrlFile } = common
 const { isImage } = validate
+
 
 class GoodsInfo extends React.Component {
   constructor(props) {
@@ -91,6 +92,7 @@ class GoodsInfo extends React.Component {
                     value={defaultSpeed}
                     onChange={(e) => {
                       this.state.dataSource[i].speed = e;
+                      this.state.dataSource[i].speedNum = e
                       this.setState({
                         dataSource: this.state.dataSource,
                       });
@@ -207,11 +209,12 @@ class GoodsInfo extends React.Component {
       return false;
     }
     if (response && response.code === 200 && response.data) {
+      localStorage.setItem('tabActive', '1')
       message.success('添加成功，退出等待语音生成！');
       let timeOut = setTimeout(() => {
         this.props.history.goBack();
         clearTimeout(timeOut);
-      }, 2000);
+      }, 1000);
     }
   };
 
@@ -258,11 +261,11 @@ class GoodsInfo extends React.Component {
     }
     if (response && response.code === 200 && response.data) {
       message.success('修改成功！');
-
+      localStorage.setItem('tabActive', '1')
       let timeOut = setTimeout(() => {
         clearTimeout(timeOut);
         this.props.history.goBack();
-      }, 1500);
+      }, 1000);
     }
   };
 
@@ -556,6 +559,7 @@ class GoodsInfo extends React.Component {
             <button
               className='cancal_btn foonter_btn py-1 px-8 border rounded-full mr-8'
               onClick={() => {
+                localStorage.setItem('tabActive', '1')
                 this.props.history.goBack();
               }}
             >
