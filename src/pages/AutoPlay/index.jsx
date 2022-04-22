@@ -91,7 +91,7 @@ const AutoPlay = (props) => {
     }
     API.autoPlayApi.getGoodsList(data)
       .then(r => {
-        handleAddGoodsList(r.data)
+        handleAddGoodsList(r.data.data)
       }).catch(e => {
         message.error(e || '获取商品信息失败！')
         return false
