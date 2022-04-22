@@ -438,10 +438,10 @@ class GoodsInfo extends React.Component {
                       >
                         <div className='w-full h-full overflow-hidden border_radius_5px'>
                           {isImage(e) ? (
-                            <img src={e} alt='' className='w-full h-full' />
+                            <img src={e} alt='' className='w-full h-full object-fit-cover' />
                           ) : (
                             <video
-                              className='w-full h-full object-fit'
+                              className='w-full h-full object-fit-cover'
                               src={e}
                             />
                           )}

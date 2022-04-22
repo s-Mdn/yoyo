@@ -227,7 +227,7 @@ class PlayInfo extends React.Component {
                         ) : (
                           <video
                             src={e.video_url}
-                            className='object-fit h-full w-full'
+                            className='object-fit-cover h-full w-full'
                           />
                         )}
                       </div>
@@ -292,7 +292,7 @@ class PlayInfo extends React.Component {
                                     ) : (
                                       <video
                                         src={e.video_url}
-                                        className='object-fit h-full w-full'
+                                        className='object-fit-cover h-full w-full'
                                       />
                                     )}
                                   </div>

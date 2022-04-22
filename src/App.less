@@ -41,27 +41,17 @@ code {
   font-size: 20px;
 }
 
-// video标签
+
 .object-fit {
   object-fit: cover
 }
-// icon位置
-._top_7px {
-  top: -7px;
-}
-._right_7px {
-  right: -7px;
-}
-._left_7px {
-  left: -7px;
+
+.object-fit-cover {
+  object-fit: cover
 }
 
-.h_80 {
-  height: 80px;
-}
-
-.w_80 {
-  width: 80px;
+.object-fit-content {
+  object-fit: contain;
 }
 
 .w_100px {
@@ -79,6 +69,17 @@ code {
 img[src=""],
 img:not([src]) {
   opacity:0;
+}
+
+a {
+  color: #000;
+  text-decoration: none;
+  &:visited {
+    color: #000;
+  }
+  &:hover {
+    color: #000;
+  }
 }
 
 .ant-input[disabled] {
@@ -130,7 +131,6 @@ input::-webkit-input-placeholder {
 
 // 但行显示
 .text-overflow {
-  // width:65px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow:ellipsis;
