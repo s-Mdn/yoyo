@@ -69,7 +69,7 @@ const AutoPlay = (props) => {
         const tempList = r.data.content
         // 匹配上一次选中的play
         // console.log( playItem )
-        tempList.forEach(p =>p.checked = p.id == playItem.id)
+        tempList.forEach(p =>p.checked = p.id === playItem.id)
         handleUpdatePlayList(tempList)
         // 如果播放列表为空 || 没有匹配到上一次选中的，则清空playItem和goodsList
         // console.log(tempList.length, !tempList.length,  !tempList.some(e=>e.checked))
