@@ -91,7 +91,7 @@ const AutoPlay = (props) => {
     }
     API.autoPlayApi.getGoodsList(data)
       .then(r => {
-        handleAddGoodsList(r.data.data)
+        handleAddGoodsList(r.data)
       }).catch(e => {
         message.error(e || '获取商品信息失败！')
         return false
@@ -635,6 +635,7 @@ const mapDispatchToProps = (dispatch) => ({
 
   // 添加商品
   handleAddGoodsList: (data) => {
+    console.log(data)
     dispatch({
       type: PlayAutoActions.AddGoodsList,
       data
