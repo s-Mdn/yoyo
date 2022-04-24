@@ -1,10 +1,13 @@
 import React from 'react';
-import { Radio, Upload, Input, Table, Select, message } from 'antd';
+import { Radio, Input, Table, Select, message } from 'antd';
 import { PlusOutlined, CloseCircleTwoTone, ArrowLeftOutlined } from '@ant-design/icons';
 import { common, validate} from '@/utils';
 import API from '@/services';
 import './index.less';
+import yoyo from '@/assets/images/background-5-5.png';
 
+
+const Upload = React.lazy(()=>import('@/components/Upload'))
 const { downloadUrlFile } = common;
 const { isImage } = validate
 class GoodsInfo extends React.Component {
@@ -23,12 +26,24 @@ class GoodsInfo extends React.Component {
           <div className='body m_l_30px font_12 text-black'>
             <div className='upload_image flex items-start'>
               <span className='w_60px'>商品展示</span>
-              <Radio.Group
-                buttonStyle={{fontSize: '12px'}}
-              >
-                <Radio value={1}>上传图片</Radio>
-                <Radio value={2}>上传视频</Radio>
-              </Radio.Group>
+              <div>
+                <Radio.Group>
+                  <Radio value={1}>上传图片</Radio>
+                  <Radio value={2}>上传视频</Radio>
+                </Radio.Group>
+                <div className='mt-3 flex flex-wrap'>
+                  <div className='relative w_100px h_100px border rounded m_r_20px'>
+                    <React.Fragment>
+                      <img src={yoyo} className='w-full h-full object-fit-cover' alt=''/>
+                      <i className='flex items-center absolute -top_5px -right_5px'>
+                        <CloseCircleTwoTone twoToneColor='#ff8462'/>
+                      </i>
+                    </React.Fragment>
+                  </div>
+                  <Upload/>
+                </div>
+                
+              </div>
             </div>
             <div className='goods_info'>
 
