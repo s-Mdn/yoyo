@@ -15,8 +15,6 @@ function isDev(env) {
 }
 
 // 版本更新
-
-
 function checkUpdate() {
   autoUpdater.setFeedURL('https://yoyolivewebpack-test.oss-cn-shenzhen.aliyuncs.com/yoyo/win32-x64')
 
@@ -53,7 +51,7 @@ if (!isDev(process.env.NODE_ENV)) {
   cwd = path.join(__dirname, '..', 'server');
 }
 
-log.log(cwd)
+
 // 创建窗口
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -128,6 +126,7 @@ function launchVideoProcess(flag) {
       workerProcess = null;
     })
     workerProcess.on('exit', () => {
+      console.log('出错了')
       workerProcess = null;
     })
     workerProcess.on('data', () => {
@@ -142,7 +141,7 @@ function launchVideoProcess(flag) {
 function onReady() {
   launchVideoProcess()
   createWindow()
-  checkUpdate()
+  // checkUpdate()
 }
 
 app.on('ready', onReady);
