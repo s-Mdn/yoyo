@@ -20,8 +20,22 @@ class GoodsInfo extends React.Component {
               <span className='ml-3'>商品管理/新增商品</span>
             </div>
           </div>
-          <div className='body m_l_30px'>
-            
+          <div className='body m_l_30px font_12 text-black'>
+            <div className='upload_image flex items-start'>
+              <span className='w_60px'>商品展示</span>
+              <Radio.Group
+                buttonStyle={{fontSize: '12px'}}
+              >
+                <Radio value={1}>上传图片</Radio>
+                <Radio value={2}>上传视频</Radio>
+              </Radio.Group>
+            </div>
+            <div className='goods_info'>
+
+            </div>
+            <div className='voice_info'>
+
+            </div>
           </div>
           <div className='footer m_l_30px'>
             
@@ -31,6 +45,7 @@ class GoodsInfo extends React.Component {
     )
   }
 }
+
 //     return (
 //       <div className='h-full overflow-hidden goodsinfo'>
 //         <div className='flex-1 bg-white goods_h-full p-6'>
