@@ -51,11 +51,13 @@ class GoodsManage extends React.Component {
 
   // 删除商品
   handleGoodsDelete = (goods) => {
-    console.log(goods);
     if (goods.status === 'f') {
       message.info('语音合成中，无法进行操作！');
       return;
-    } else {
+    } else if (goods.status === 'z') {
+      message.info('正在播放，无法删除！');
+      return;
+    }else {
       this.setState({
         isViewGoods: true,
         modalItem: goods,
@@ -75,7 +77,10 @@ class GoodsManage extends React.Component {
 
   // 播放列表删除
   handlePlaysDelete = (play) => {
-    console.log(play)
+    if( play.status === 'z' ) {
+      message.info('正在播放，无法删除！');
+      return;
+    }
     this.setState({
       modelVisible: true,
       modalItem: play,
@@ -207,6 +212,11 @@ class GoodsManage extends React.Component {
               </div>
             )}
           </div>
+          {
+            (g.status === 'z') && (
+              <div className='absolute right-0 top-0 z-10 color-ee6843 font_12'>直播中...</div>
+            )
+          }
         </>
       );
     };
@@ -220,6 +230,9 @@ class GoodsManage extends React.Component {
           ) : (
             <video className='object-fit h-full' src={p.cover_image} />
           )}
+          {
+            (p.status === 'z') && (<div className='absolute right-0 top-0 z-10 color-ee6843 font_12'>直播中...</div>)
+          }
         </>
       );
     };

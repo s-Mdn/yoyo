@@ -277,6 +277,26 @@ const AutoPlay = (props) => {
     client.send('sequence->' + toString(data));
   }
 
+  // 修改状态
+  const updateState = (data) =>{
+    API.autoPlayApi.updateState(data)
+      .then(r => {
+        console.log( r )
+      }).catch(e => {
+        return false
+      })
+  }
+
+  // 恢复状态
+  const resetState = (data) => {
+    API.autoPlayApi.resetState(data)
+      .then(r => {
+        console.log( r )
+      }).catch(e => {
+        return false
+      })
+  }
+
   // 开始播放
   const handleStartPlay = () => {
     let backGround = validURL(backGroundL.image)? backGroundL.image : `../build${(backGroundL.image)}`
@@ -298,6 +318,7 @@ const AutoPlay = (props) => {
       client.onopen = () => {
         handleUpdateStartPlay()
         client.send(initData)
+        updateState({'play_list_id': playItem.id})
         goodsListData(client, goodsList)
         window.client = client
       }
@@ -313,6 +334,7 @@ const AutoPlay = (props) => {
     }
     handleUpdateStartPlay()
     client.send(initData)
+    updateState({'play_list_id': playItem.id})
     goodsListData(client, goodsList)
   }
 
@@ -320,6 +342,7 @@ const AutoPlay = (props) => {
   const handleClosePlay = () => {
     const { client } = window
     client.send('stop->{}');
+    resetState({'play_list_id': playItem.id})
     handleUpdateStopPlay()
   }
 
