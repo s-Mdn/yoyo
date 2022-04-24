@@ -1,17 +1,158 @@
 import React from 'react';
-import { Radio, Input, Table, Select, message } from 'antd';
+import { Radio, Form, Input, Table, Select, message } from 'antd';
 import { PlusOutlined, CloseCircleTwoTone, ArrowLeftOutlined } from '@ant-design/icons';
-import { common, validate} from '@/utils';
 import API from '@/services';
 import './index.less';
-import yoyo from '@/assets/images/background-5-5.png';
 
 
 const Upload = React.lazy(()=>import('@/components/Upload'))
-const { downloadUrlFile } = common;
-const { isImage } = validate
 class GoodsInfo extends React.Component {
+  state = {
+    // 单选框
+    radValue: 1,
+    // 上传的图片
+    imageUrlList: [],
+    // 上传的视频
+    videoUrl:'',
+    // 上传图片内容格式
+    imageAccept:'.jpg, .png, .gif, .webp, .bmp,',
+    // 上传视频内容格式
+    videoAccept: '.mp4, .avi .flv',
+    // 表单数据
+    dataSource: [{
+      key: 0,
+      index: 0,
+      sentence: '00000000000000000000000000000000000000000000000000',
+      action: '标签',
+      voice: '语音',
+      speed: '速度',
+      operate: '操作'
+    }]
+  }
+
+  // 上传
+  handleUpload = ({ file }) => {
+    if( file.status === 'done' ) {
+      if ( this.state.radValue === 1 ) {
+        this.setState((state)=>{
+          const imageUrlList = [...state.imageUrlList, file.response.data]
+          return { imageUrlList }
+        })
+      } else {
+        this.setState({
+          videoUrl: file.response.data
+        })
+      }
+    }
+    if( file.status === 'error' ) {
+      message.error('上传失败！')
+      return false
+    }
+  }
+
+  // 上传图片data参数
+  imgData = (file) =>({
+    suffix: file.name.slice(file.name.lastIndexOf('.')),
+    preffix: 'goodsImg',
+  })
+
+  // 上传视频data参数
+  videoData = (file) =>({
+    suffix: file.name.slice(file.name.lastIndexOf('.')),
+  })
+
+  // 删除上传内容
+  handleDeleteGoods = (i) => {
+    const { radValue } = this.state
+    if( radValue === 2 ) {
+      this.setState({ videoUrl: '' })
+    } else {
+      this.setState(state=>{
+        state.imageUrlList.splice(i, 1)
+        return {imageUrlList: state.imageUrlList}
+      })
+    }
+  }
+
+  // 改标签
+  handleLabelChange = (i, l) => {
+    this.setState(state=>{
+      state.dataSource[i].action = l
+      console.log(state.dataSource)
+      return {dataSource: state.dataSource}
+    })
+  }
+
+  // 动作标签
+  options = [
+    { label: '开场', value: '开场' },
+    { label: '自然', value: '自然' },
+    { label: '赞美', value: '赞美' },
+    { label: '欢迎', value: '欢迎' },
+    { label: '感谢', value: '感谢' },
+  ]
+
+  // 表单
+  columns = [
+    {
+      align: 'center',
+      title: '序号',
+      dataIndex: 'index',
+      key: 'index',
+      className: 'font_12',
+      width: '60px'
+    },
+    {
+      align: 'center',
+      title: '文案',
+      dataIndex: 'sentence',
+      key: 'sentence',
+      className: 'font_12 w_20rem text-overflow',
+    },
+    {
+      align: 'center',
+      title: '动作',
+      dataIndex: 'action',
+      key: 'action',
+      className: 'font_12 w_10rem',
+      render:(text, record, index)=>(
+        <>
+          <Select
+            bordered={false}
+            value={this.options[0]}
+            options={this.options}
+            onChange={this.handleLabelChange.bind(this, index)}
+          />
+        </>
+      )
+    },
+    {
+      align: 'center',
+      title: '语音',
+      dataIndex: 'voice',
+      key: 'voice',
+      className: 'font_12',
+    },
+    {
+      align: 'center',
+      title: '速度',
+      dataIndex: 'speed',
+      key: 'speed',
+      className: 'font_12',
+    },
+    {
+      align: 'center',
+      title: '操作',
+      dataIndex: 'operate',
+      key: 'operate',
+      className: 'font_12',
+    },
+  ]
+
+
   render() {
+    const { radValue, imageAccept, videoAccept, imageUrlList, videoUrl, dataSource } = this.state
+    const { imgData, videoData, handleUpload, handleDeleteGoods, columns } = this
     return(
       <div className='goodsinfo h-full overflow-hidden'>
         <div className='flex-1 goods_h_full p-6 bg-white'>
@@ -20,40 +161,125 @@ class GoodsInfo extends React.Component {
               <div className='flex items-center cursor-pointer w_30px'>
                 <ArrowLeftOutlined />
               </div>
-              <span className='ml-3'>商品管理/新增商品</span>
+              <span className='ml-3' onClick={()=>console.log( imageUrlList )}>商品管理/新增商品</span>
             </div>
           </div>
           <div className='body m_l_30px font_12 text-black'>
-            <div className='upload_image flex items-start'>
-              <span className='w_60px'>商品展示</span>
-              <div>
-                <Radio.Group>
+            <div className='upload_image flex items-start mb-6'>
+              <span className='w_60px flex-none'>商品展示：</span>
+              <div className='w-full'>
+                <Radio.Group value={radValue} onChange={e=>this.setState({radValue: e.target.value})}>
                   <Radio value={1}>上传图片</Radio>
                   <Radio value={2}>上传视频</Radio>
                 </Radio.Group>
-                <div className='mt-3 flex flex-wrap'>
-                  <div className='relative w_100px h_100px border rounded m_r_20px'>
-                    <React.Fragment>
-                      <img src={yoyo} className='w-full h-full object-fit-cover' alt=''/>
-                      <i className='flex items-center absolute -top_5px -right_5px'>
-                        <CloseCircleTwoTone twoToneColor='#ff8462'/>
-                      </i>
-                    </React.Fragment>
+                <div className='flex flex-wrap mt-3'>
+                  {
+                    (radValue===1) && (
+                      <>
+                        {
+                          imageUrlList.map((e, i)=>(
+                            <div className='relative w_100px h_100px border rounded m_r_20px' key={e}>
+                              <img src={e} className='w-full h-full object-fit-cover' alt=''/>
+                              <i className='flex items-center absolute -top_5px -right_5px' onClick={handleDeleteGoods.bind(this, i)}>
+                                <CloseCircleTwoTone twoToneColor='#ff8462'/>
+                              </i>
+                            </div>
+                          ))
+                        }
+                      </>
+                    )
+                  }
+                  {
+                    (radValue===2 && videoUrl) && (
+                      <>
+                        <div className='relative w_100px h_100px border rounded m_r_20px'>
+                          <video src={videoUrl} className='w-full h-full object-fit-cover' alt=''/>
+                          <i className='flex items-center absolute -top_5px -right_5px'>
+                            <CloseCircleTwoTone twoToneColor='#ff8462'/>
+                          </i>
+                        </div>
+                      </>
+                    )
+                  }
+                  <div className='w_100px h_100px border rounded'>
+                    {
+                      (radValue===1)? (
+                        <Upload
+                          multiple={true}
+                          accept={imageAccept}
+                          data={imgData}
+                          handleUpload={handleUpload}
+                        />
+                      ):(
+                        <>
+                          {
+                            !videoUrl && (
+                              <Upload
+                                multiple={false}
+                                accept={videoAccept}
+                                data={videoData}
+                                handleUpload={handleUpload}
+                              />
+                            )
+                          }
+                        </>
+                      )
+                    }
                   </div>
-                  <Upload/>
                 </div>
-                
               </div>
             </div>
-            <div className='goods_info'>
-
+            <div className='goods_info '>
+              <Form autoComplete='off'>
+                <Form.Item className='flex'>
+                  <div className='flex items-center'>
+                    <span className='w_60px flex-none font_12'>商品名称：</span>
+                    <p className='border rounded w-3/4'>
+                      <Input 
+                        bordered={false}
+                        placeholder='请输入商品名称'
+                      />
+                    </p>
+                  </div>
+                </Form.Item>
+                <Form.Item>
+                  <div className='flex items-center'>
+                    <span className='w_60px flex-none font_12'>商品价格：</span>
+                    <p className='border rounded w-3/4'>
+                      <Input 
+                        bordered={false}
+                        placeholder='请输入商品价格'
+                      />
+                    </p>
+                  </div>
+                </Form.Item>
+                <Form.Item>
+                  <div className='flex items-start'>
+                    <span className='w_60px flex-none font_12'>商品介绍：</span>
+                    <div className='border rounded w-3/4'>
+                      <Input.TextArea
+                        style={{ height: '10rem', resize: 'none' }}
+                        bordered={false}
+                        autoSize={false}
+                        placeholder='请输入商品介绍'
+                      />
+                    </div>
+                  </div>
+                  <span className='font_12 m_l_60px'>介绍文件以句号为段落结束</span>
+                </Form.Item>
+              </Form>
             </div>
-            <div className='voice_info'>
-
+            <div className='goods_tabe font_12'>
+              <Table
+                columns={columns}
+                dataSource={dataSource}
+                pagination={false}
+              />
             </div>
           </div>
-          <div className='footer m_l_30px'>
-            
+          <div className='footer flex justify-center w-full mt-10'>
+            <button className='flex items-center justify-center h_35px w_120px border rounded-full mr-10'>取消</button>
+            <button className='flex items-center justify-center h_35px w_120px border rounded-full bg-ff8462 text-white'>确定</button>
           </div>
         </div>
       </div>
