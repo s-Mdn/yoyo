@@ -371,7 +371,7 @@ const AutoPlay = (props) => {
       handleScale('person_h_level', 'window_level');
       handleScale('goods_level', 'window_level');
     }
-  })
+  }, [wiwnDirection])
 
 
   return (
@@ -513,7 +513,7 @@ const AutoPlay = (props) => {
         <div className='flex relative rounded play_window_h'>
           {wiwnDirection ? (
             <div className='h-full w-full window_straight relative'>
-              <img className='h-full w-full object-fit-cover' alt='背景图' src={backGroundL.image}/>
+              <img className='h-full w-full object-fit-cover bg-black' alt='背景图' src={backGroundL.image}/>
               <div
                 onDragStart={e=>handleDragStart(e, 'goods_straight', 'window_straight')}
                 className='goods_straight absolute top-0 right-0 w_20vh h_20vh rounded overflow-hidden'
@@ -532,7 +532,7 @@ const AutoPlay = (props) => {
                   )
                 }
               </div>
-              <div className='person_h_straight absolute bottom-0 left-0' onDragStart={e=>handleDragStart(e, 'person_h_straight', 'window_straight')}>
+              <div className='person_h_straight absolute bottom-0 left-0 bg-black' onDragStart={e=>handleDragStart(e, 'person_h_straight', 'window_straight')}>
                 <img src={yoyo} alt='人物' />
               </div>
             </div>
@@ -558,7 +558,7 @@ const AutoPlay = (props) => {
                   }
 
                 </div>
-                <div className='person_h_level  absolute bottom-0 left-5' onDragStart={e=>handleDragStart(e, 'person_h_level', 'window_level')}>
+                <div className='person_h_level  absolute bottom-0 left-5 bg-black' onDragStart={e=>handleDragStart(e, 'person_h_level', 'window_level')}>
                   <img src={yoyo} alt='人物' />
                 </div>
               </div>
