@@ -1,12 +1,15 @@
 import React from 'react';
 import { Radio, Form, Input, Table, Select, message } from 'antd';
-import { PlusOutlined, CloseCircleTwoTone, ArrowLeftOutlined } from '@ant-design/icons';
+import { CloseCircleTwoTone, ArrowLeftOutlined } from '@ant-design/icons';
 import API from '@/services';
 import './index.less';
 
 
 const Upload = React.lazy(()=>import('@/components/Upload'))
 class GoodsInfo extends React.Component {
+  constructor(props) {
+    super(props)
+  }
   state = {
     // 单选框
     radValue: 1,
@@ -19,15 +22,7 @@ class GoodsInfo extends React.Component {
     // 上传视频内容格式
     videoAccept: '.mp4, .avi .flv',
     // 表单数据
-    dataSource: [{
-      key: 0,
-      index: 0,
-      sentence: '00000000000000000000000000000000000000000000000000',
-      action: '标签',
-      voice: '语音',
-      speed: '速度',
-      operate: '操作'
-    }]
+    dataSource: [],
   }
 
   // 上传
@@ -75,22 +70,12 @@ class GoodsInfo extends React.Component {
   }
 
   // 改标签
-  handleLabelChange = (i, l) => {
+  handleLabelChange = (i, t, l) => {
     this.setState(state=>{
-      state.dataSource[i].action = l
-      console.log(state.dataSource)
-      return {dataSource: state.dataSource}
+      state.dataSource[i][t][0] = l
+      return {dataSource: state.dataSource }
     })
   }
-
-  // 动作标签
-  options = [
-    { label: '开场', value: '开场' },
-    { label: '自然', value: '自然' },
-    { label: '赞美', value: '赞美' },
-    { label: '欢迎', value: '欢迎' },
-    { label: '感谢', value: '感谢' },
-  ]
 
   // 表单
   columns = [
@@ -105,23 +90,23 @@ class GoodsInfo extends React.Component {
     {
       align: 'center',
       title: '文案',
-      dataIndex: 'sentence',
-      key: 'sentence',
+      dataIndex: 'introduce',
+      key: 'introduce',
       className: 'font_12 w_20rem text-overflow',
     },
     {
       align: 'center',
-      title: '动作',
+      title: '标签',
       dataIndex: 'action',
       key: 'action',
       className: 'font_12 w_10rem',
-      render:(text, record, index)=>(
+      render: (text, record, index)=>(
         <>
           <Select
             bordered={false}
-            value={this.options[0]}
-            options={this.options}
-            onChange={this.handleLabelChange.bind(this, index)}
+            value={record.action_tag_list[0]}
+            options={record.action}
+            onChange={this.handleLabelChange.bind(this, index, 'action_tag_list')}
           />
         </>
       )
@@ -129,9 +114,14 @@ class GoodsInfo extends React.Component {
     {
       align: 'center',
       title: '语音',
-      dataIndex: 'voice',
-      key: 'voice',
+      dataIndex: 'wav_url_list',
+      key: 'wav_url_list',
       className: 'font_12',
+      render:(text, record, index)=>(
+        <>
+          <audio />
+        </>
+      )
     },
     {
       align: 'center',
@@ -139,6 +129,16 @@ class GoodsInfo extends React.Component {
       dataIndex: 'speed',
       key: 'speed',
       className: 'font_12',
+      render:(text, record, index)=>(
+        <>
+          <Select
+            bordered={false}
+            value={record.speed_list[0]}
+            options={record.speed}
+            onChange={this.handleLabelChange.bind(this, index, 'speed_list')}
+          />
+        </>
+      )
     },
     {
       align: 'center',
@@ -146,9 +146,15 @@ class GoodsInfo extends React.Component {
       dataIndex: 'operate',
       key: 'operate',
       className: 'font_12',
+      render: (text, record, index)=>(
+        <>
+          <button className='border rounded w_5rem py-1'>替换语音</button>
+          <button className='border rounded w_5rem py-1 mx-3'>复原</button>
+          <button className='border rounded w_5rem py-1'>下载语音</button>
+        </>
+      )
     },
   ]
-
 
   render() {
     const { radValue, imageAccept, videoAccept, imageUrlList, videoUrl, dataSource } = this.state
@@ -269,13 +275,17 @@ class GoodsInfo extends React.Component {
                 </Form.Item>
               </Form>
             </div>
-            <div className='goods_tabe font_12'>
-              <Table
-                columns={columns}
-                dataSource={dataSource}
-                pagination={false}
-              />
-            </div>
+            {
+              (dataSource.length)? (
+                <div className='goods_tabe font_12'>
+                  <Table
+                    columns={columns}
+                    dataSource={dataSource}
+                    pagination={false}
+                  />
+                </div>
+              ):(null)
+            }
           </div>
           <div className='footer flex justify-center w-full mt-10'>
             <button className='flex items-center justify-center h_35px w_120px border rounded-full mr-10'>取消</button>
@@ -286,197 +296,6 @@ class GoodsInfo extends React.Component {
     )
   }
 }
-
-//     return (
-//       <div className='h-full overflow-hidden goodsinfo'>
-//         <div className='flex-1 bg-white goods_h-full p-6'>
-//           <div className='flex head items-center mb-4'>
-//             <div className='font_20 flex items-center text-black font-semibold w-auto'>
-//               <div
-//                 className='flex items-center cursor-pointer w_30px'
-//                 onClick={this.props.history.goBack}
-//               >
-//                 <ArrowLeftOutlined />
-//               </div>
-//               <span className='ml-3'>商品管理/新增商品</span>
-//             </div>
-//           </div>
-//           <div className='content'>
-//             <div className='content_upload flex ml_30px'>
-//               <span className='mr-4'>商品展示</span>
-//               <div className='upload-area'>
-//                 <div className='upload_type mb-2'>
-//                   <Radio.Group
-//                     value={selectRadio}
-//                     onChange={(e) => {
-//                       this.setState({
-//                         selectRadio: e.target.value,
-//                         goodsList: [],
-//                       });
-//                     }}
-//                   >
-//                     <Radio value={1}>上传图片</Radio>
-//                     <Radio value={2}>上传视频</Radio>
-//                   </Radio.Group>
-//                 </div>
-//                 <div className='flex'>
-//                   <div className='goods_wrap flex flex-wrap'>
-//                     {goodsList.map((e, i) => (
-//                       <div
-//                         className={[
-//                           'w_100px h_100px border relative',
-//                           i > 0 && 'ml_15px',
-//                         ].join(' ')}
-//                         key={e}
-//                       >
-//                         <div className='w-full h-full overflow-hidden border_radius_5px'>
-//                           {isImage(e) ? (
-//                             <img src={e} alt='' className='w-full h-full object-fit-cover' />
-//                           ) : (
-//                             <video
-//                               className='w-full h-full object-fit-cover'
-//                               src={e}
-//                             />
-//                           )}
-//                         </div>
-//                         <div
-//                           className='absolute top-0 _right_7px _top_7px z-20 flex justify-center items-center'
-//                           onClick={() => this.handleDeleteGoods(i)}
-//                         >
-//                           <CloseCircleTwoTone twoToneColor='#ee6843' />
-//                         </div>
-//                       </div>
-//                     ))}
-//                   </div>
-//                   {selectRadio == 1 ? (
-//                     <Upload
-//                       showUploadList={false}
-//                       data={this.data}
-//                       action={`${process.env.REACT_APP_API}/api/common/upload`}
-//                       accept='.jpg, .png, .gif, .webp, .bmp,'
-//                       multiple={true}
-//                       onChange={this.handleChange}
-//                     >
-//                       <div
-//                         className={[
-//                           'w_100px h_100px border_radius_5px border flex justify-center items-center flex-col',
-//                           goodsList.length && 'ml_15px',
-//                         ].join(' ')}
-//                       >
-//                         <PlusOutlined />
-//                         <div style={{ marginTop: 8 }}>image</div>
-//                       </div>
-//                     </Upload>
-//                   ) : (
-//                     <>
-//                       {selectRadio == 2 && (
-//                         <>
-//                           {!(goodsList.length >= 1) && (
-//                             <Upload
-//                               showUploadList={false}
-//                               data={this.videoData}
-//                               action={`${process.env.REACT_APP_API}/api/common/upload`}
-//                               accept='.mp4, .avi .flv'
-//                               multiple={true}
-//                               onChange={this.handleChange}
-//                             >
-//                               <div
-//                                 className={[
-//                                   'w_100px h_100px border_radius_5px border flex justify-center items-center flex-col',
-//                                   goodsList.length && 'ml_15px',
-//                                 ].join(' ')}
-//                               >
-//                                 <PlusOutlined />
-//                                 <div style={{ marginTop: 8 }}>video</div>
-//                               </div>
-//                             </Upload>
-//                           )}
-//                         </>
-//                       )}
-//                     </>
-//                   )}
-//                 </div>
-//               </div>
-//             </div>
-//             <div className='content_info mt-4 '>
-//               <div className='goods_name flex items-center ml_30px'>
-//                 <span className='mr-4'>商品名称</span>
-//                 <Input
-//                   style={{ width: '50%' }}
-//                   placeholder='请输入商品名称'
-//                   value={goodsName}
-//                   onChange={(e) => this.setState({ goodsName: e.target.value })}
-//                 />
-//               </div>
-//               <div className='goods_price flex mb-6 mt-6 ml_30px'>
-//                 <span className='mr-4'>商品价格</span>
-//                 <Input
-//                   style={{ width: '50%' }}
-//                   placeholder='请输入商品价格'
-//                   value={goodsPrice}
-//                   onChange={(e) =>
-//                     this.setState({ goodsPrice: e.target.value })
-//                   }
-//                 />
-//               </div>
-//               <div className='goods_introduce flex ml_30px'>
-//                 <span className='mr-4'>商品介绍</span>
-//                 <div className='w-2/4 h_200 relative'>
-//                   <Input.TextArea
-//                     style={{ height: '100%', resize: 'none' }}
-//                     placeholder='请输入商品介绍'
-//                     value={introduce}
-//                     onChange={(e) =>
-//                       this.setState({ introduce: e.target.value })
-//                     }
-//                   />
-//                   <div className='font_12'>介绍文案以句号为段落结束</div>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//           {dataSource.length > 0 && (
-//             <div className='tabel_voice mt-12 ml-3 '>
-//               {
-//                 <Table
-//                   pagination={false}
-//                   columns={columns}
-//                   dataSource={dataSource}
-//                   className='text-center font_12'
-//                 />
-//               }
-//             </div>
-//           )}
-
-//           <div className='footer flex justify-center mt-20'>
-//             <button
-//               className='cancal_btn foonter_btn py-1 px-8 border rounded-full mr-8'
-//               onClick={() => {
-//                 localStorage.setItem('tabActive', '1')
-//                 this.props.history.goBack();
-//               }}
-//             >
-//               取消
-//             </button>
-//             {isAdd ? (
-//               <button
-//                 className='save_btn foonter_btn py-1 px-8 border rounded-full bg-FF8462 border-color text-white'
-//                 onClick={this.handleAddGoods}
-//               >
-//                 保存
-//               </button>
-//             ) : (
-//               <button
-//                 className='save_btn foonter_btn py-1 px-8 border rounded-full bg-FF8462 border-color text-white'
-//                 onClick={this.handleUpdataGoods}
-//               >
-//                 保存
-//               </button>
-//             )}
-//           </div>
-//         </div>
-//       </div>
-//     );
 
 export default GoodsInfo
 // import React from 'react';
