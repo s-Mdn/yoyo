@@ -532,7 +532,7 @@ const AutoPlay = (props) => {
                   )
                 }
               </div>
-              <div className='person_h_straight absolute bottom-0 left-0 bg-black' onDragStart={e=>handleDragStart(e, 'person_h_straight', 'window_straight')}>
+              <div className='person_h_straight absolute bottom-0 left-0' onDragStart={e=>handleDragStart(e, 'person_h_straight', 'window_straight')}>
                 <img src={yoyo} alt='人物' />
               </div>
             </div>
@@ -558,7 +558,7 @@ const AutoPlay = (props) => {
                   }
 
                 </div>
-                <div className='person_h_level  absolute bottom-0 left-5 bg-black' onDragStart={e=>handleDragStart(e, 'person_h_level', 'window_level')}>
+                <div className='person_h_level  absolute bottom-0 left-5' onDragStart={e=>handleDragStart(e, 'person_h_level', 'window_level')}>
                   <img src={yoyo} alt='人物' />
                 </div>
               </div>
