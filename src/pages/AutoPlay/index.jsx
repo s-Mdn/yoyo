@@ -371,7 +371,7 @@ const AutoPlay = (props) => {
       handleScale('person_h_level', 'window_level');
       handleScale('goods_level', 'window_level');
     }
-  }, [wiwnDirection])
+  })
 
 
   return (
