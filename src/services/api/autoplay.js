@@ -60,11 +60,34 @@ function addBackground(data) {
   })
 }
 
+/**
+ * @description 添加背景图
+ * @param {object} data 
+ * @returns 
+ */
+function updateState(data) {
+  return request({
+    url: '/api/play_list/update_live_status',
+    method: 'POST',
+    data
+  })
+}
+
+function resetState(data) {
+  return request({
+    url: '/api/play_list/recover_status',
+    method: 'POST',
+    data
+  })
+}
+
 
 export {
   getPlaylist,
   getGoodsList,
   getBackground,
   addBackground,
-  deleteBackground
+  deleteBackground,
+  updateState,
+  resetState
 }
