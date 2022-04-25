@@ -275,7 +275,7 @@ const AutoPlay = (props) => {
     }))
     console.log( data, 'data' )
     client.send('sequence->' + toString(data));
-  }
+  };
 
   // 开始播放
   const handleStartPlay = () => {
@@ -314,14 +314,14 @@ const AutoPlay = (props) => {
     handleUpdateStartPlay()
     client.send(initData)
     goodsListData(client, goodsList)
-  }
+  };
 
   // 关闭播放
   const handleClosePlay = () => {
     const { client } = window
     client.send('stop->{}');
     handleUpdateStopPlay()
-  }
+  };
 
   // 初始化背景图
   useEffect(()=>{
