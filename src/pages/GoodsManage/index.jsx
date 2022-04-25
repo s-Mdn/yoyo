@@ -136,10 +136,10 @@ const GoodsManage = ( props )=> {
   const handleItemEdit = (e) => {
     switch( tabsKey ) {
       case '1':
-        history.push({pathname: '/goods', e})
+        history.push({pathname: '/goods', query: JSON.stringify(e)})
         break
       case '2':
-        history.push({pathname: '/plays', e})
+        history.push({pathname: '/plays', query: JSON.stringify(e)})
         break
       default:
         break

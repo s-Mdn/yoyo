@@ -1,11 +1,11 @@
 import React from 'react';
-import { Radio, Form, Input, Table, Select, message } from 'antd';
+import { Radio, Form, Input, Table, Select, message, Upload } from 'antd';
 import { CloseCircleTwoTone, ArrowLeftOutlined } from '@ant-design/icons';
 import API from '@/services';
 import './index.less';
 
 
-const Upload = React.lazy(()=>import('@/components/Upload'))
+const $Upload = React.lazy(()=>import('@/components/Upload'))
 class GoodsInfo extends React.Component {
   constructor(props) {
     super(props)
@@ -22,7 +22,32 @@ class GoodsInfo extends React.Component {
     // 上传视频内容格式
     videoAccept: '.mp4, .avi .flv',
     // 表单数据
-    dataSource: [],
+    dataSource: [
+      // {
+      //   key: 0,
+      //   index: 0,
+      //   introduce: '文案',
+      //   action: [
+      //     {value: '开场', label: '开场'},
+      //     {value: '自然', label: '自然'},
+      //     {value: '赞美', label: '赞美'},
+      //   ],
+      //   action_tag_list:['赞美'],
+      //   wav_url_list: [],
+      //   speed:[
+      //     {value: '0.5', label: '0.5'},
+      //     {value: '0.75', label: '0.75'},
+      //     {value: '1.0', label: '1.0'},
+      //     {value: '1.25', label: '1.25'},
+      //     {value: '1.5', label: '1.5'},
+      //     {value: '1.75', label: '1.75'},
+      //     {value: '2.0', label: '2.0'},
+      //   ],
+      //   speed_list: ['1'],
+      // }
+    ],
+    // 商品信息
+    goodsInfo: {}
   }
 
   // 上传
@@ -30,13 +55,13 @@ class GoodsInfo extends React.Component {
     if( file.status === 'done' ) {
       if ( this.state.radValue === 1 ) {
         this.setState((state)=>{
-          const imageUrlList = [...state.imageUrlList, file.response.data]
-          return { imageUrlList }
+          const imageUrlList = [...state.goodsInfo.image, file.response.data]
+          state.goodsInfo.image = imageUrlList
+          return {goodsInfo: state.goodsInfo }
         })
       } else {
-        this.setState({
-          videoUrl: file.response.data
-        })
+        this.state.goodsInfo.video.url = file.response.data
+        this.setState({goodsInfo: this.state.goodsInfo})
       }
     }
     if( file.status === 'error' ) {
@@ -58,23 +83,61 @@ class GoodsInfo extends React.Component {
 
   // 删除上传内容
   handleDeleteGoods = (i) => {
-    const { radValue } = this.state
+    const { radValue, goodsInfo } = this.state
     if( radValue === 2 ) {
-      this.setState({ videoUrl: '' })
+      goodsInfo.video_url = ''
+      this.setState({ goodsInfo })
     } else {
       this.setState(state=>{
-        state.imageUrlList.splice(i, 1)
-        return {imageUrlList: state.imageUrlList}
+        state.goodsInfo.image.splice(i, 1)
+        return {goodsInfo: state.goodsInfo}
       })
     }
   }
 
-  // 改标签
+  // 修改下拉框内容
   handleLabelChange = (i, t, l) => {
     this.setState(state=>{
       state.dataSource[i][t][0] = l
       return {dataSource: state.dataSource }
     })
+  }
+
+  // 修改商品名称 价格 介绍
+  handleGoodsInfo = (t, e) => {
+    this.state.goodsInfo[t] = e.target.value
+    this.setState({goodsInfo: this.state.goodsInfo})
+  }
+
+  // 更新语音
+  handleUpdateVoice = (i, file) => {
+    if (file.status === 'done') {
+      const { dataSource } = this.state;
+      const data = {
+        simple_id: dataSource[i].simple_sentence_id_list[0],
+        file_link: file.response.data,
+      }
+      API.goodsManageApi.updataVoice(data)
+        .then(r => {
+          dataSource[i].wav_url_list[0] = file.response.data
+          this.setState({ dataSource })
+        }).catch(e => {
+          message.error('语音更替失败！');
+          return false;
+        })
+    }
+  }
+
+  // 复原
+  handleRecovery = (r) => {
+    const data = {simple_id: r.simple_sentence_id_list[0]}
+    API.goodsManageApi.restoreVioce(data)
+      .then(r => {
+        message.success('复原成功')
+      }).catch(e => {
+        message.error(e || '复原失败！')
+        return false
+      })
   }
 
   // 表单
@@ -84,7 +147,7 @@ class GoodsInfo extends React.Component {
       title: '序号',
       dataIndex: 'index',
       key: 'index',
-      className: 'font_12',
+      className: 'font_12 p_8px',
       width: '60px'
     },
     {
@@ -92,14 +155,14 @@ class GoodsInfo extends React.Component {
       title: '文案',
       dataIndex: 'introduce',
       key: 'introduce',
-      className: 'font_12 w_20rem text-overflow',
+      className: 'font_12 w_10rem p_8px text-overflow',
     },
     {
       align: 'center',
       title: '标签',
       dataIndex: 'action',
       key: 'action',
-      className: 'font_12 w_10rem',
+      className: 'font_12 w_10rem p_8px',
       render: (text, record, index)=>(
         <>
           <Select
@@ -116,10 +179,10 @@ class GoodsInfo extends React.Component {
       title: '语音',
       dataIndex: 'wav_url_list',
       key: 'wav_url_list',
-      className: 'font_12',
+      className: 'font_12 p_8px',
       render:(text, record, index)=>(
         <>
-          <audio />
+          <audio controls src={record.wav_url_list[0]} className='w-64'>您的浏览器不支持 audio 标签。</audio>
         </>
       )
     },
@@ -128,7 +191,7 @@ class GoodsInfo extends React.Component {
       title: '速度',
       dataIndex: 'speed',
       key: 'speed',
-      className: 'font_12',
+      className: 'font_12 p_8px',
       render:(text, record, index)=>(
         <>
           <Select
@@ -145,20 +208,83 @@ class GoodsInfo extends React.Component {
       title: '操作',
       dataIndex: 'operate',
       key: 'operate',
-      className: 'font_12',
+      className: 'font_12 p_8px',
       render: (text, record, index)=>(
-        <>
-          <button className='border rounded w_5rem py-1'>替换语音</button>
-          <button className='border rounded w_5rem py-1 mx-3'>复原</button>
+        <div className='flex'>
+          <Upload 
+            maxCount={1}
+            className='border rounded w_5rem py-1'
+            data={(file)=>({suffix: file.name.slice(file.name.lastIndexOf('.'))})}
+            showUploadList={false}
+            accept='audio/ogg,audio/mp3,audio/wav,audio/m4a,audio/flac'
+            action={`${process.env.REACT_APP_API}/api/common/upload`}
+            onChange={this.handleUpdateVoice}
+          >替换语音</Upload>
+          <button className='border rounded w_5rem py-1 mx-3' onClick={this.handleRecovery.bind(this, record)}>复原</button>
           <button className='border rounded w_5rem py-1'>下载语音</button>
-        </>
+        </div>
       )
     },
   ]
 
+  // 标签
+  action = [
+    {value: '开场', label: '开场'},
+    {value: '自然', label: '自然'},
+    {value: '赞美', label: '赞美'},
+  ]
+
+  // 速度
+  speed = [
+    {value: '0.5', label: '0.5'},
+    {value: '0.75', label: '0.75'},
+    {value: '1.0', label: '1.0'},
+    {value: '1.25', label: '1.25'},
+    {value: '1.5', label: '1.5'},
+    {value: '1.75', label: '1.75'},
+    {value: '2.0', label: '2.0'},
+  ]
+
+  componentDidMount = () => {
+    if( this.props.location?.query ) {
+      const query = JSON.parse(this.props.location.query)
+      console.log( query )
+      const { speed_list } = query
+      const dataSource = []
+      speed_list.forEach((e, i) => {
+        dataSource.push({
+          key: i,
+          index: i,
+          introduce: query.introduce,
+          action: this.action,
+          speed: this.speed,
+          simple_sentence_id_list: query.simple_sentence_id_list,
+          speed_list: query.speed_list,
+          wav_url_list: query.wav_url_list,
+          action_tag_list: query.action_tag_list
+        })
+      })
+      
+
+      const goodsInfo = {
+        name: query.name,
+        introduce: query.introduce,
+        price: query.price,
+        image: query.image,
+        video_url: query.video_url
+      }
+
+      this.setState({
+        dataSource,
+        goodsInfo,
+        radValue: query.video_url? 2 : 1
+      })
+    }
+  }
+
   render() {
-    const { radValue, imageAccept, videoAccept, imageUrlList, videoUrl, dataSource } = this.state
-    const { imgData, videoData, handleUpload, handleDeleteGoods, columns } = this
+    const { radValue, imageAccept, videoAccept, imageUrlList, dataSource, goodsInfo } = this.state
+    const { imgData, videoData, handleUpload, handleDeleteGoods, handleGoodsInfo, columns } = this
     return(
       <div className='goodsinfo h-full overflow-hidden'>
         <div className='flex-1 goods_h_full p-6 bg-white'>
@@ -183,7 +309,7 @@ class GoodsInfo extends React.Component {
                     (radValue===1) && (
                       <>
                         {
-                          imageUrlList.map((e, i)=>(
+                          goodsInfo?.image?.map((e, i)=>(
                             <div className='relative w_100px h_100px border rounded m_r_20px' key={e}>
                               <img src={e} className='w-full h-full object-fit-cover' alt=''/>
                               <i className='flex items-center absolute -top_5px -right_5px' onClick={handleDeleteGoods.bind(this, i)}>
@@ -196,10 +322,10 @@ class GoodsInfo extends React.Component {
                     )
                   }
                   {
-                    (radValue===2 && videoUrl) && (
+                    (radValue===2 && goodsInfo?.video_url) && (
                       <>
                         <div className='relative w_100px h_100px border rounded m_r_20px'>
-                          <video src={videoUrl} className='w-full h-full object-fit-cover' alt=''/>
+                          <video src={goodsInfo.video_url} className='w-full h-full object-fit-cover' alt=''/>
                           <i className='flex items-center absolute -top_5px -right_5px'>
                             <CloseCircleTwoTone twoToneColor='#ff8462'/>
                           </i>
@@ -210,7 +336,7 @@ class GoodsInfo extends React.Component {
                   <div className='w_100px h_100px border rounded'>
                     {
                       (radValue===1)? (
-                        <Upload
+                        <$Upload
                           multiple={true}
                           accept={imageAccept}
                           data={imgData}
@@ -219,8 +345,8 @@ class GoodsInfo extends React.Component {
                       ):(
                         <>
                           {
-                            !videoUrl && (
-                              <Upload
+                            !goodsInfo.video_url && (
+                              <$Upload
                                 multiple={false}
                                 accept={videoAccept}
                                 data={videoData}
@@ -241,9 +367,11 @@ class GoodsInfo extends React.Component {
                   <div className='flex items-center'>
                     <span className='w_60px flex-none font_12'>商品名称：</span>
                     <p className='border rounded w-3/4'>
-                      <Input 
+                      <Input
                         bordered={false}
+                        value={goodsInfo.name}
                         placeholder='请输入商品名称'
+                        onChange={handleGoodsInfo.bind(this, 'name')}
                       />
                     </p>
                   </div>
@@ -252,9 +380,11 @@ class GoodsInfo extends React.Component {
                   <div className='flex items-center'>
                     <span className='w_60px flex-none font_12'>商品价格：</span>
                     <p className='border rounded w-3/4'>
-                      <Input 
+                      <Input
                         bordered={false}
+                        value={goodsInfo.price}
                         placeholder='请输入商品价格'
+                        onChange={handleGoodsInfo.bind(this, 'price')}
                       />
                     </p>
                   </div>
@@ -264,10 +394,12 @@ class GoodsInfo extends React.Component {
                     <span className='w_60px flex-none font_12'>商品介绍：</span>
                     <div className='border rounded w-3/4'>
                       <Input.TextArea
+                        value={goodsInfo.introduce}
                         style={{ height: '10rem', resize: 'none' }}
                         bordered={false}
                         autoSize={false}
                         placeholder='请输入商品介绍'
+                        onChange={handleGoodsInfo.bind(this, 'introduce')}
                       />
                     </div>
                   </div>
@@ -296,8 +428,8 @@ class GoodsInfo extends React.Component {
     )
   }
 }
+export default GoodsInfo;
 
-export default GoodsInfo
 // import React from 'react';
 // import { Radio, Upload, Input, Table, Select, message } from 'antd';
 // import {
