@@ -373,9 +373,12 @@ const AutoPlay = (props) => {
     }
   })
 
+  // loading效果
+  
+
 
   return (
-    <div className='auto_play flex justify-between h-full overflow-hidden'>
+    <div className='auto_play relactive flex justify-between h-full overflow-hidden'>
       <div className='left flex-1 rounded bg-white h-full p_b_15px'>
         <div className='play_list'>
           <div className='border-b text-center h_45 line_h_44'>直播列表</div>
