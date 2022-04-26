@@ -312,32 +312,58 @@ const AutoPlay = (props) => {
     }
 
     const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
-    let { client } = window
+    let client = window.client
     
-    if( !client ) {
-      let client = new W3CWebSocket(localServerUrl)
+    if( client ) {
+      client.send(initData)
+      goodsListData(client, goodsList)
+      updateState({'play_list_id': playItem.id})
+    } else {
+      client = new W3CWebSocket(localServerUrl)
       client.onopen = () => {
         handleUpdateStartPlay()
         client.send(initData)
-        updateState({'play_list_id': playItem.id})
         goodsListData(client, goodsList)
+        updateState({'play_list_id': playItem.id})
         window.client = client
       }
-      client.onerror = () => {
-        handleUpdateStopPlay()
-        message.warning({
-          icon: null,
-          top: 0,
-          content: '初始化中，请耐心等待...'
-        })
-      }
-      return false
     }
+    client.onerro = () => {
+      handleUpdateStopPlay()
+      message.warning({
+        icon: null,
+        top: 0,
+        content: '初始化中，请耐心等待...'
+      })
+    }
+    client.onclose = () => {
+      handleUpdateStopPlay()
+      window.client = null;
+    }
+    // if( !client ) {
+    //   let client = new W3CWebSocket(localServerUrl)
+    //   client.onopen = () => {
+    //     handleUpdateStartPlay()
+    //     client.send(initData)
+    //     updateState({'play_list_id': playItem.id})
+    //     goodsListData(client, goodsList)
+    //     window.client = client
+    //   }
+    //   client.onerror = () => {
+    //     handleUpdateStopPlay()
+    //     message.warning({
+    //       icon: null,
+    //       top: 0,
+    //       content: '初始化中，请耐心等待...'
+    //     })
+    //   }
+    //   return false
+    // }
     
-    handleUpdateStartPlay()
-    client.send(initData)
-    updateState({'play_list_id': playItem.id})
-    goodsListData(client, goodsList)
+    // handleUpdateStartPlay()
+    // client.send(initData)
+    // updateState({'play_list_id': playItem.id})
+    // goodsListData(client, goodsList)
   }
 
   // 关闭播放
