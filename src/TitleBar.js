@@ -70,7 +70,9 @@ function Titlebar(props) {
 
 const mapDispatchToProps = (dispatch) => ({
   handleLoginOut: () => {
+    const isLoad = localStorage.getItem('isLoad')
     localStorage.clear()
+    localStorage.setItem('isLoad', isLoad)
     /**
      * 清除选中的播放
      */

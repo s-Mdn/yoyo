@@ -141,7 +141,7 @@ function launchVideoProcess(flag) {
 function onReady() {
   launchVideoProcess()
   createWindow()
-  // checkUpdate()
+  checkUpdate()
 }
 
 app.on('ready', onReady);

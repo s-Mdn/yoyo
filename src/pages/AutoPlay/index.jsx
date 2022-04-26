@@ -273,7 +273,7 @@ const AutoPlay = (props) => {
       product_resize: wiwnDirection?getGoodsPositions('goods_straight', 'window_straight').product_resize : getGoodsPositions('goods_level', 'window_level').product_resize,
       avatar_resize: wiwnDirection?getPersonPositions('person_h_straight', 'window_straight') : getPersonPositions('person_h_level', 'window_level'),
     }))
-    console.log( data, 'data' )
+    // console.log( data, 'data' )
     client.send('sequence->' + toString(data));
   }
 
@@ -281,7 +281,7 @@ const AutoPlay = (props) => {
   const updateState = (data) =>{
     API.autoPlayApi.updateState(data)
       .then(r => {
-        console.log( r )
+        // console.log( r )
       }).catch(e => {
         return false
       })
@@ -291,7 +291,7 @@ const AutoPlay = (props) => {
   const resetState = (data) => {
     API.autoPlayApi.resetState(data)
       .then(r => {
-        console.log( r )
+        // console.log( r )
       }).catch(e => {
         return false
       })
@@ -313,6 +313,7 @@ const AutoPlay = (props) => {
 
     const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
     let { client } = window
+    
     if( !client ) {
       let client = new W3CWebSocket(localServerUrl)
       client.onopen = () => {
@@ -332,6 +333,7 @@ const AutoPlay = (props) => {
       }
       return false
     }
+    
     handleUpdateStartPlay()
     client.send(initData)
     updateState({'play_list_id': playItem.id})
