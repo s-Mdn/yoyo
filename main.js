@@ -123,6 +123,7 @@ function launchVideoProcess(flag) {
     } else {
       workerProcess = exec(cmdStr, { cwd: cwd }, childProcessCallback);
     }
+    
     workerProcess.on('close', () => {
       console.log('close!!!!');
       workerProcess = null;

@@ -22,32 +22,13 @@ class GoodsInfo extends React.Component {
     // 上传视频内容格式
     videoAccept: '.mp4, .avi .flv',
     // 表单数据
-    dataSource: [
-      // {
-      //   key: 0,
-      //   index: 0,
-      //   introduce: '文案',
-      //   action: [
-      //     {value: '开场', label: '开场'},
-      //     {value: '自然', label: '自然'},
-      //     {value: '赞美', label: '赞美'},
-      //   ],
-      //   action_tag_list:['赞美'],
-      //   wav_url_list: [],
-      //   speed:[
-      //     {value: '0.5', label: '0.5'},
-      //     {value: '0.75', label: '0.75'},
-      //     {value: '1.0', label: '1.0'},
-      //     {value: '1.25', label: '1.25'},
-      //     {value: '1.5', label: '1.5'},
-      //     {value: '1.75', label: '1.75'},
-      //     {value: '2.0', label: '2.0'},
-      //   ],
-      //   speed_list: ['1'],
-      // }
-    ],
+    dataSource: [],
     // 商品信息
-    goodsInfo: {}
+    goodsInfo: {},
+    // 商品ID
+    id: '',
+    // 更新或添加
+    isUpdate: false,
   }
 
   // 上传
@@ -138,6 +119,62 @@ class GoodsInfo extends React.Component {
         message.error(e || '复原失败！')
         return false
       })
+  }
+
+  // 保存
+  handleSubmit = () => {
+    const { goodsInfo, dataSource, isUpdate, id } = this.state;
+
+    if( !isUpdate ) {
+      this.addGoods(goodsInfo)
+    } else {
+      const data = {
+        ...goodsInfo,
+        action_tag_list: [],
+        speed_list: [],
+        simple_sentence_id_list:[],
+        id
+      }
+      dataSource.forEach(e => {
+        data.action_tag_list.push(...e.action_tag_list)
+        data.speed_list.push(...e.speed_list)
+        data.simple_sentence_id_list.push(...e.simple_sentence_id_list)
+      })
+      console.log( data )
+      this.updateGoods(data)
+    }
+  }
+
+  // 添加商品
+  addGoods = (data) => {
+    API.goodsManageApi.addGoods(data)
+      .then(r => {
+        message.success('添加成功，退出等待语音生成！');
+        this.goBack()
+      }).catch(e => {
+        message.error(e || '添加失败！');
+        return false;
+      })
+  }
+
+  // 更新商品
+  updateGoods = (data) => {
+    API.goodsManageApi.updateGoods(data)
+      .then(r => {
+        message.success('修改成功，退出等待语音生成！');
+        this.goBack()
+      }).catch(e => {
+        message.error(e || '更新失败！');
+        return false;
+      })
+  }
+
+  // 退回上一页
+  goBack = () => {
+    const timer = setTimeout(()=>{
+      this.props.history.goBack();
+      clearTimeout(timer);
+    }, 1000)
   }
 
   // 表单
@@ -236,36 +273,34 @@ class GoodsInfo extends React.Component {
 
   // 速度
   speed = [
-    {value: '0.5', label: '0.5'},
-    {value: '0.75', label: '0.75'},
-    {value: '1.0', label: '1.0'},
-    {value: '1.25', label: '1.25'},
-    {value: '1.5', label: '1.5'},
-    {value: '1.75', label: '1.75'},
-    {value: '2.0', label: '2.0'},
+    {value: 0.5, label: 0.5},
+    {value: 0.75, label: 0.75},
+    {value: 1.0, label: 1.0},
+    {value: 1.25, label: 1.25},
+    {value: 1.5, label: 1.5},
+    {value: 1.75, label: 1.75},
+    {value: 2.0, label: 2.0},
   ]
 
   componentDidMount = () => {
     if( this.props.location?.query ) {
       const query = JSON.parse(this.props.location.query)
       console.log( query )
-      const { speed_list } = query
+      const { word_list, speed_list, wav_url_list, action_tag_list, simple_sentence_id_list } = query
       const dataSource = []
-      speed_list.forEach((e, i) => {
+      word_list.forEach((e, i)=>{
         dataSource.push({
           key: i,
           index: i,
-          introduce: query.introduce,
+          introduce: e,
           action: this.action,
           speed: this.speed,
-          simple_sentence_id_list: query.simple_sentence_id_list,
-          speed_list: query.speed_list,
-          wav_url_list: query.wav_url_list,
-          action_tag_list: query.action_tag_list
+          simple_sentence_id_list: [simple_sentence_id_list[i]],
+          speed_list: [speed_list[i]],
+          wav_url_list: [wav_url_list[i]],
+          action_tag_list: [action_tag_list[i]]
         })
       })
-      
-
       const goodsInfo = {
         name: query.name,
         introduce: query.introduce,
@@ -274,7 +309,10 @@ class GoodsInfo extends React.Component {
         video_url: query.video_url
       }
 
+
       this.setState({
+        id: query.id,
+        isUpdate: true,
         dataSource,
         goodsInfo,
         radValue: query.video_url? 2 : 1
@@ -284,7 +322,20 @@ class GoodsInfo extends React.Component {
 
   render() {
     const { radValue, imageAccept, videoAccept, imageUrlList, dataSource, goodsInfo } = this.state
-    const { imgData, videoData, handleUpload, handleDeleteGoods, handleGoodsInfo, columns } = this
+    const { imgData, videoData, handleUpload, handleDeleteGoods, handleGoodsInfo, handleSubmit,  columns } = this
+    const Button = ()=>(
+      <>
+        {
+          (goodsInfo.name && goodsInfo.price && goodsInfo.introduce && ((radValue===1 && goodsInfo.image.length) && true || (radValue === 2 && goodsInfo.video_url) && true))?
+            (
+              <button className='flex items-center justify-center h_35px w_120px border rounded-full bg-ff8462 text-white' onClick={handleSubmit}>保存</button>
+            ):(
+              <button className='flex items-center justify-center h_35px w_120px border rounded-full text-white bg_ccc'>保存</button>
+            )
+        }
+      </>
+    )
+
     return(
       <div className='goodsinfo h-full overflow-hidden'>
         <div className='flex-1 goods_h_full p-6 bg-white'>
@@ -421,7 +472,9 @@ class GoodsInfo extends React.Component {
           </div>
           <div className='footer flex justify-center w-full mt-10'>
             <button className='flex items-center justify-center h_35px w_120px border rounded-full mr-10'>取消</button>
-            <button className='flex items-center justify-center h_35px w_120px border rounded-full bg-ff8462 text-white'>确定</button>
+            {
+              Button()
+            }
           </div>
         </div>
       </div>
