@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater')
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -51,16 +51,18 @@ if (!isDev(process.env.NODE_ENV)) {
   cwd = path.join(__dirname, '..', 'server');
 }
 
-
+console.log(path.join(__dirname, 'preload.js'))
 // 创建窗口
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1300,
     height: 875,
     frame: false,
+    resizable:false,
     titleBarStyle: 'hidden',
     center: true,
     webPreferences: {
+      contextIsolation: false, 
       nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js'),
       enableRemoteModule: true, // 允許在 Render Process 使用 Remote Module
@@ -77,7 +79,7 @@ function createWindow() {
   } else {
     mainWindow.loadURL(`file://${__dirname}/../app.asar.unpacked/index.html`);
   }
-
+  mainWindow.webContents.openDevTools()
   mainWindow.on('close', onCloseWindow);
   return mainWindow;
 }
@@ -138,10 +140,18 @@ function launchVideoProcess(flag) {
   }
 }
 
+// 进程间的通信
+function ProcessCommunicate () {
+  ipcMain.on('restart-server', (event, arg)=>{
+    launchVideoProcess()
+  })
+}
+
 function onReady() {
   launchVideoProcess()
   createWindow()
   checkUpdate()
+  ProcessCommunicate()
 }
 
 app.on('ready', onReady);

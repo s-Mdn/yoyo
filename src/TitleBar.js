@@ -18,9 +18,9 @@ function Titlebar(props) {
   const [maximized, setMaximized] = useState(currentWindow?.isMaximized());
 
   // 双击和点击控制窗口按钮来控制窗口
-  const handleMaximize = () => {
-    setMaximized((maximized) => !maximized);
-  };
+  // const handleMaximize = () => {
+  //   setMaximized((maximized) => !maximized);
+  // };
 
   // 退出
   const handleLoginOut = () => {
@@ -57,9 +57,9 @@ function Titlebar(props) {
       platform={process.platform}
       onClose={handleClose}
       onMinimize={() => currentWindow?.minimize()}
-      onMaximize={handleMaximize}
-      onDoubleClick={handleMaximize}
-      maximized={maximized}
+      // onMaximize={handleMaximize}
+      // onDoubleClick={handleMaximize}
+      // maximized={maximized}
     >
       {userInfo.token && (
         <Popover userInfo={userInfo} loginOut={handleLoginOut} />

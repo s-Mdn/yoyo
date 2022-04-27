@@ -15,6 +15,7 @@ import './index.less';
 const Clock = React.lazy(()=>import('./componets/Clock'))
 const { validURL, isImage } = validate;
 const { toString } = type;
+const { ipcRenderer } = window.electron;
 const localServerUrl = process.env.REACT_APP_LOCAL_SERVER_URL;
 
 const AutoPlay = (props) => {
@@ -277,6 +278,7 @@ const AutoPlay = (props) => {
     }))
     // console.log( data, 'data' )
     client.send('sequence->' + toString(data));
+    
   }
 
   // 修改状态
@@ -317,19 +319,22 @@ const AutoPlay = (props) => {
     let client = window.client
     
     if( client ) {
-      client.send(initData)
       goodsListData(client, goodsList)
+      client.send(initData)
+      handleUpdateStartPlay()
+      console.log(playState)
       updateState({'play_list_id': playItem.id})
     } else {
       client = new W3CWebSocket(localServerUrl)
       client.onopen = () => {
         handleUpdateStartPlay()
-        client.send(initData)
         goodsListData(client, goodsList)
+        client.send(initData)
         updateState({'play_list_id': playItem.id})
         window.client = client
       }
     }
+
     client.onerro = () => {
       handleUpdateStopPlay()
       message.warning({
@@ -338,34 +343,13 @@ const AutoPlay = (props) => {
         content: '初始化中，请耐心等待...'
       })
     }
+    // 监听server死机，需要重启server
     client.onclose = () => {
+      console.log('进程退出了')
       handleUpdateStopPlay()
       window.client = null;
+      ipcRenderer.send('restart-server', '重启server')
     }
-    // if( !client ) {
-    //   let client = new W3CWebSocket(localServerUrl)
-    //   client.onopen = () => {
-    //     handleUpdateStartPlay()
-    //     client.send(initData)
-    //     updateState({'play_list_id': playItem.id})
-    //     goodsListData(client, goodsList)
-    //     window.client = client
-    //   }
-    //   client.onerror = () => {
-    //     handleUpdateStopPlay()
-    //     message.warning({
-    //       icon: null,
-    //       top: 0,
-    //       content: '初始化中，请耐心等待...'
-    //     })
-    //   }
-    //   return false
-    // }
-    
-    // handleUpdateStartPlay()
-    // client.send(initData)
-    // updateState({'play_list_id': playItem.id})
-    // goodsListData(client, goodsList)
   }
 
   // 关闭播放
@@ -691,7 +675,6 @@ const mapDispatchToProps = (dispatch) => ({
 
   // 添加商品
   handleAddGoodsList: (data) => {
-    console.log(data)
     dispatch({
       type: PlayAutoActions.AddGoodsList,
       data
