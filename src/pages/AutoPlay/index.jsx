@@ -335,6 +335,10 @@ const AutoPlay = (props) => {
       }
     }
 
+
+    client.onmessage = (msg) => {
+      console.log( msg )
+    }
     client.onerro = () => {
       handleUpdateStopPlay()
       message.warning({

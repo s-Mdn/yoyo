@@ -5,7 +5,6 @@ import { Redirect } from 'react-router-dom';
 import './index.less';
 const SiderNav = React.lazy(()=>import('./components/SiderNav'))
 const ContentMain = React.lazy(()=>import('./components/ContentMain'))
-const Progress = React.lazy(()=>import('./components/Progress'))
 
 
 function _Layout(props) {
@@ -24,7 +23,6 @@ function _Layout(props) {
           <ContentMain />
         </Layout>
       </Layout>
-      <Progress />
     </div>
   );
 }

@@ -8,6 +8,7 @@ let workerProcess = null;
 let mainWindow = null;
 let cwd = path.join(__dirname, 'server')
 
+
 // 环境判断
 function isDev(env) {
   const reg = /^(development|test)$/.test(env);
@@ -47,19 +48,18 @@ function checkUpdate() {
   })
 }
 
-if (!isDev(process.env.NODE_ENV)) {
-  cwd = path.join(__dirname, '..', 'server');
-}
-
-console.log(path.join(__dirname, 'preload.js'))
+// if (!isDev(process.env.NODE_ENV)) {
+//   cwd = path.join(__dirname, '..', 'server');
+// }
+console.log( cwd )
 // 创建窗口
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1300,
     height: 875,
-    frame: false,
     resizable:false,
-    titleBarStyle: 'hidden',
+    // frame: false,
+    // titleBarStyle: 'hidden',
     center: true,
     webPreferences: {
       contextIsolation: false, 
@@ -74,7 +74,7 @@ function createWindow() {
   // 设置窗口最小尺寸
   mainWindow.setMinimumSize(1300, 875)
   // 根据环境执行
-  if (isDev(process.env.NODE_ENV)) {
+  if (!isDev(process.env.NODE_ENV)) {
     mainWindow.loadURL(`http://localhost:3000`);
   } else {
     mainWindow.loadURL(`file://${__dirname}/../app.asar.unpacked/index.html`);
@@ -150,7 +150,7 @@ function ProcessCommunicate () {
 function onReady() {
   launchVideoProcess()
   createWindow()
-  checkUpdate()
+  // checkUpdate()
   ProcessCommunicate()
 }
 
