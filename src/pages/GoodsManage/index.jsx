@@ -270,7 +270,7 @@ class GoodsManage extends React.Component {
             >
               {!reLoad ? <RedoOutlined /> : <SyncOutlined spin />}
             </div>
-            {this.state.tabActive === '1' ? (
+            {tabActive === '1' ? (
               <div
                 className='border flex items-center py-0.5 px-4 rounded cursor-pointer ml-3'
                 onClick={() =>
@@ -320,7 +320,7 @@ class GoodsManage extends React.Component {
             </div>
           ) : (
             <>
-              {tabActive == 1 ? (
+              {tabActive === '1' ? (
                 <>
                   {modalItem && modalItem.video_url ? (
                     <div className='w_80 h_80 overflow-hidden m-auto my-2'>

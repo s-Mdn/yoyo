@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Empty, message, Upload } from 'antd';
+import { Empty, message, Upload, Spin } from 'antd';
 import { CameraTwoTone, CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { PlayAutoActions } from '@/store/actions'
@@ -21,9 +21,9 @@ const localServerUrl = process.env.REACT_APP_LOCAL_SERVER_URL;
 const AutoPlay = (props) => {
   const {
     playList, playItem, backGroungListL, backGroungListH, playState,
-    wiwnDirection, goodsList, backGroundL, backGroundH,
+    wiwnDirection, goodsList, backGroundL, backGroundH, IsLoad,
     handleUpdatePlayList, handleAddPlayItem, handleClearPlayItem, handleClearGoodsList, handleAddGoodsList,
-    handleAddBackGroundListVertical, handleAddBackGroundListHorizontal, handleUpdateStartPlay,
+    handleAddBackGroundListVertical, handleAddBackGroundListHorizontal, handleUpdateStartPlay, handleUpdateload,
     handleUpdateBackGroundL, handleUpdateBackGroundH, handleWinDirection, handleUpdateStopPlay
   } = props;
   // 选中播放
@@ -69,8 +69,7 @@ const AutoPlay = (props) => {
       .then(r =>{
         const tempList = r.data.content
         // 匹配上一次选中的play
-        // console.log( playItem )
-        tempList.forEach(p =>p.checked = p.id == playItem.id)
+        tempList.forEach(p =>p.checked = p.id === playItem.id)
         handleUpdatePlayList(tempList)
         // 如果播放列表为空 || 没有匹配到上一次选中的，则清空playItem和goodsList
         // console.log(tempList.length, !tempList.length,  !tempList.some(e=>e.checked))
@@ -240,8 +239,6 @@ const AutoPlay = (props) => {
         y1: c.offsetTop,
         x2: c.offsetLeft + c.offsetWidth,
         y2: c.offsetTop + c.offsetHeight
-        // x2: o.offsetWidth - c.offsetLeft,
-        // y2: o.offsetHeight - c.offsetTop,
       },
     };
     return size;
@@ -256,11 +253,12 @@ const AutoPlay = (props) => {
       h: c.offsetHeight,
       x1: c.offsetLeft,
       y1: c.offsetTop,
-      x2: o.offsetWidth - c.offsetLeft,
-      y2: o.offsetHeight - c.offsetTop,
+      x2: o.offsetWidth + c.offsetLeft,
+      y2: o.offsetHeight + c.offsetTop,
     };
   };
 
+  // 当前播放的商品
   const goodsListData = (client, goods) => {
     const data = goods.map(e => ({
       action_tag_list: e.action_tag_list,
@@ -322,7 +320,6 @@ const AutoPlay = (props) => {
       goodsListData(client, goodsList)
       client.send(initData)
       handleUpdateStartPlay()
-      console.log(playState)
       updateState({'play_list_id': playItem.id})
     } else {
       client = new W3CWebSocket(localServerUrl)
@@ -334,13 +331,18 @@ const AutoPlay = (props) => {
         window.client = client
       }
     }
-
+    // 增加load，等待server下载数据
+    handleUpdateload(true)
 
     client.onmessage = (msg) => {
-      console.log( msg )
+      const state = msg.data
+      if( state === 'success' ) {
+        handleUpdateload(false)
+      }
     }
     client.onerro = () => {
       handleUpdateStopPlay()
+      handleUpdateload(false)
       message.warning({
         icon: null,
         top: 0,
@@ -349,8 +351,8 @@ const AutoPlay = (props) => {
     }
     // 监听server死机，需要重启server
     client.onclose = () => {
-      console.log('进程退出了')
       handleUpdateStopPlay()
+      handleUpdateload(false)
       window.client = null;
       ipcRenderer.send('restart-server', '重启server')
     }
@@ -390,10 +392,6 @@ const AutoPlay = (props) => {
       handleScale('goods_level', 'window_level');
     }
   })
-
-  // loading效果
-  
-
 
   return (
     <div className='auto_play relactive flex justify-between h-full overflow-hidden'>
@@ -622,6 +620,13 @@ const AutoPlay = (props) => {
           </div>
         </div>
       </div>
+      {
+        IsLoad && (
+          <div className='absolute load_h flex items-center justify-center bg-black bg-opacity-40'>
+            <Spin tip='加载中...'/>
+          </div>
+        )
+      }
     </div>
   );
 };
@@ -635,7 +640,7 @@ const mapStateToProps = (state) => ({
   backGroungListH: state.backGroungListH,
   backGroundL: state.backGroundL,
   backGroundH: state.backGroundH,
-
+  IsLoad: state.IsLoad,
   wiwnDirection: state.winDirection
 });
 
@@ -730,6 +735,14 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch({
       type: PlayAutoActions.UpdateDirection,
       data
+    })
+  },
+
+  // 更新加载状态
+  handleUpdateload: (state) => {
+    dispatch({
+      type: PlayAutoActions.IsLoad,
+      state
     })
   }
 });

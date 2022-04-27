@@ -86,6 +86,7 @@ class PlayInfo extends React.Component {
       name: this.state.goodsName,
       user: this.props.user,
     };
+
     try {
       if (this.props?.location?.query) {
         data.id = this.props.location.query.id;
@@ -147,7 +148,6 @@ class PlayInfo extends React.Component {
       return false;
     }
     if (response && response.code === 200) {
-      console.log( response )
       response.data.forEach((e, i) => {
         e.key = nanoid();
       });
@@ -334,7 +334,6 @@ class PlayInfo extends React.Component {
             ) : (
               <button
                 className='px-8 rounded bg-gray-300 height_30px'
-                onClick={this.handleSubmit}
               >
                 保 存
               </button>

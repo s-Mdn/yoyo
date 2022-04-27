@@ -48,21 +48,20 @@ function checkUpdate() {
   })
 }
 
-// if (!isDev(process.env.NODE_ENV)) {
-//   cwd = path.join(__dirname, '..', 'server');
-// }
-console.log( cwd )
+if (!isDev(process.env.NODE_ENV)) {
+  cwd = path.join(__dirname, '..', 'server');
+}
+
 // 创建窗口
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1300,
     height: 875,
     resizable:false,
-    // frame: false,
-    // titleBarStyle: 'hidden',
+    frame: false,
+    titleBarStyle: 'hidden',
     center: true,
     webPreferences: {
-      contextIsolation: false, 
       nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js'),
       enableRemoteModule: true, // 允許在 Render Process 使用 Remote Module
@@ -79,7 +78,6 @@ function createWindow() {
   } else {
     mainWindow.loadURL(`file://${__dirname}/../app.asar.unpacked/index.html`);
   }
-  mainWindow.webContents.openDevTools()
   mainWindow.on('close', onCloseWindow);
   return mainWindow;
 }
@@ -150,10 +148,10 @@ function ProcessCommunicate () {
 function onReady() {
   launchVideoProcess()
   createWindow()
-  // checkUpdate()
+  checkUpdate()
   ProcessCommunicate()
 }
 
 app.on('ready', onReady);
 app.on('window-all-closed', onWindowAllClosed);
-app.on('quit', destoryVideoProcess)
+app.on('quit', destoryVideoProcess);
