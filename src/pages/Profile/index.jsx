@@ -556,9 +556,7 @@ const mapDispatchToProps = (dispatch) => ({
    * 退出
    */
   handleLoginOut: () => {
-    const isLoad = localStorage.getItem('isLoad')
     localStorage.clear()
-    localStorage.setItem('isLoad', isLoad)
     /**
      * 清除选中的播放
      */
