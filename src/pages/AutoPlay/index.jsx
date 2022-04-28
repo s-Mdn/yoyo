@@ -277,8 +277,6 @@ const AutoPlay = (props) => {
     console.log( data, 'data' )
     client.send('sequence->' + toString(data));
 
-    // 更新播放列表和商品列表的播放状态
-    updateGoodsAndPlaysState()
   };
 
   // 修改状态
@@ -306,28 +304,38 @@ const AutoPlay = (props) => {
     }
 
     const initData = 'start->' + toString({bg: backGround, clarity: 'MEDIUM'})
-    let { client } = window
-    if( !client ) {
-      let client = new W3CWebSocket(localServerUrl)
+    let client = window.client
+
+    if( client ) {
+      goodsListData(client, goodsList)
+      client.send(initData)
+      handleUpdateStartPlay()
+    } else {
+      client = new W3CWebSocket(localServerUrl)
       client.onopen = () => {
         handleUpdateStartPlay()
-        client.send(initData)
         goodsListData(client, goodsList)
+        client.send(initData)
         window.client = client
       }
-      client.onerror = () => {
-        handleUpdateStopPlay()
-        message.warning({
-          icon: null,
-          top: 0,
-          content: '初始化中，请耐心等待...'
-        })
-      }
-      return false
     }
-    handleUpdateStartPlay()
-    client.send(initData)
-    goodsListData(client, goodsList)
+    // 增加load，等待server下载数据
+    handleUpdateload(true)
+    client.onmessage = (msg) => {
+      const state = msg.data
+      if( state === 'success' ) {
+        handleUpdateload(false)
+      }
+    }
+    client.onerro = () => {
+      handleUpdateStopPlay()
+    }
+    // 监听server死机，需要重启server
+    client.onclose = () => {
+      handleUpdateStopPlay()
+      window.client = null;
+      ipcRenderer.send('restart-server', '重启server')
+    }
   };
 
   // 关闭播放
