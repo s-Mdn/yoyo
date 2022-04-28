@@ -124,8 +124,16 @@ const GoodsManage = ( props )=> {
         message.warning('语音合成中，无法删除！')
         return false
       }
+      if( e.status === 'z') {
+        message.warning('该商品直播中，无法删除！')
+        return false
+      }
       setModalTitle('删除商品')
     } else {
+      if( e.status === 'z') {
+        message.warning('正在直播，无法删除！')
+        return false
+      }
       setModalTitle('删除播放')
     }
     setModalVis(true)
