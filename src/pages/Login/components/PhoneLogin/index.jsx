@@ -34,6 +34,7 @@ const PhoneLogin = (props) => {
         setTime((t) => t - 1);
       }
     }, 1000);
+    return () =>clearTimeout(timer)
   }, [time]);
 
   // 获取验证码
