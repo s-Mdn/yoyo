@@ -14,7 +14,7 @@ const rootReducer = combineReducers({
   backGroundL: PlayAutoReducer.UpdateBackGroundL,
   backGroundH: PlayAutoReducer.UpdateBackGroundH,
   winDirection: PlayAutoReducer.UpdateDirection,
-  IsLoad: PlayAutoReducer.IsLoad,
+  IsLoad: PlayAutoReducer.Updateload,
 })
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose

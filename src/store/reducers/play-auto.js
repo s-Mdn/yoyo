@@ -144,8 +144,19 @@ const PlayAutoReducer = {
     }
   },
 
-  // 更新加载状态
-  
+  /**
+   * @description 播放前等待server下载数据load
+   * @param {bolean} state
+   * @param {*} action
+   */
+  Updateload: (state = false, action) => {
+    switch( action.type ) {
+      case PlayAutoActions.IsLoad:
+        return action.state
+      default:
+        return state
+    }
+  }
 };
 
 export default PlayAutoReducer;
