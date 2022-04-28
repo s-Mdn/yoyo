@@ -60,11 +60,39 @@ function addBackground(data) {
   })
 }
 
+/**
+ * @description 更新播放列表和商品列表的播放状态
+ * @param {object} data 
+ * @returns 
+ */
+ function updateGoodsAndPlaysState(data) {
+  return request({
+    url: '/api/play_list/update_live_status',
+    method: 'POST',
+    data
+  })
+}
+
+/**
+ * @description 还原播放列表和商品列表的播放状态
+ *  @param {object} data 
+ * @returns 
+ */
+function resetGoodsAndPlaysState(data) {
+  return request({
+    url: '/api/play_list/recover_status',
+    method: 'POST',
+    data
+  })
+}
+
 
 export {
   getPlaylist,
   getGoodsList,
   getBackground,
   addBackground,
-  deleteBackground
+  deleteBackground,
+  updateGoodsAndPlaysState,
+  resetGoodsAndPlaysState,
 }
