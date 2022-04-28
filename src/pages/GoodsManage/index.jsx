@@ -22,16 +22,19 @@ const GoodsManage = ( props )=> {
   // 获取列表
   const getGoodsAndPlaylist = () => {
     Promise.all([API.goodsManageApi.getGoodsList(), API.goodsManageApi.getPlaylist()]).then(r => {
+      console.log( r )
       r[0].data.content.forEach(e => {
         e.url = e.video_url || e.image[0]
       })
       r[1].data.content.forEach(e => {
         e.url = e.cover_image
       })
+      console.log(r[0].data.content)
       setGoodsList([...r[0].data.content])
       setPlayList([...r[1].data.content])
       setReload(false)
     }).catch(e=>{
+      console.log( e )
       return false
     })
   }

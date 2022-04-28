@@ -5,7 +5,8 @@ import API from '@/services';
 import './index.less';
 
 
-const $Upload = React.lazy(()=>import('@/components/Upload'))
+const UploadGoods = React.lazy(()=>import('@/components/Upload'));
+
 class GoodsInfo extends React.Component {
   constructor(props) {
     super(props)
@@ -98,6 +99,7 @@ class GoodsInfo extends React.Component {
         simple_id: dataSource[i].simple_sentence_id_list[0],
         file_link: file.response.data,
       }
+
       API.goodsManageApi.updataVoice(data)
         .then(r => {
           dataSource[i].wav_url_list[0] = file.response.data
@@ -123,23 +125,24 @@ class GoodsInfo extends React.Component {
 
   // 保存
   handleSubmit = () => {
-    const { goodsInfo, dataSource, isUpdate, id } = this.state;
+    const { goodsInfo, dataSource, isUpdate, id, radValue } = this.state;
+    const data = {...goodsInfo, id}
+    data.video_url = (radValue===1)? '': data.video_ur
+    data.image = (radValue===2)? [] : data.image
 
     if( !isUpdate ) {
-      this.addGoods(goodsInfo)
+      this.addGoods(data)
     } else {
-      const data = {
-        ...goodsInfo,
-        action_tag_list: [],
-        speed_list: [],
-        simple_sentence_id_list:[],
-        id
-      }
+      data.action_tag_list = []
+      data.speed_list = []
+      data.simple_sentence_id_list = []
+
       dataSource.forEach(e => {
         data.action_tag_list.push(...e.action_tag_list)
         data.speed_list.push(...e.speed_list)
         data.simple_sentence_id_list.push(...e.simple_sentence_id_list)
       })
+
       console.log( data )
       this.updateGoods(data)
     }
@@ -326,7 +329,7 @@ class GoodsInfo extends React.Component {
     const Button = ()=>(
       <>
         {
-          (goodsInfo.name && goodsInfo.price && goodsInfo.introduce && ((radValue===1 && goodsInfo.image.length) && true || (radValue === 2 && goodsInfo.video_url) && true))?
+          (goodsInfo.name && goodsInfo.price && goodsInfo.introduce && ((radValue===1 && goodsInfo.image?.length) && true || (radValue === 2 && goodsInfo.video_url) && true))?
             (
               <button className='flex items-center justify-center h_35px w_120px border rounded-full bg-ff8462 text-white' onClick={handleSubmit}>保存</button>
             ):(
@@ -377,38 +380,41 @@ class GoodsInfo extends React.Component {
                       <>
                         <div className='relative w_100px h_100px border rounded m_r_20px'>
                           <video src={goodsInfo.video_url} className='w-full h-full object-fit-cover' alt=''/>
-                          <i className='flex items-center absolute -top_5px -right_5px'>
+                          <i className='flex items-center absolute -top_5px -right_5px' onClick={handleDeleteGoods.bind(this)}>
                             <CloseCircleTwoTone twoToneColor='#ff8462'/>
                           </i>
                         </div>
                       </>
                     )
                   }
-                  <div className='w_100px h_100px border rounded'>
-                    {
-                      (radValue===1)? (
-                        <$Upload
+                  {
+                    (radValue===1)? (
+                      <div className='w_100px h_100px border rounded'>
+                        <UploadGoods
                           multiple={true}
                           accept={imageAccept}
                           data={imgData}
                           handleUpload={handleUpload}
                         />
-                      ):(
-                        <>
-                          {
-                            !goodsInfo.video_url && (
-                              <$Upload
+                      </div>
+                    ):(
+                      <>
+                        {
+                          ( !goodsInfo?.video_url) && (
+                            <div className='w_100px h_100px border rounded'>
+                              <UploadGoods
                                 multiple={false}
                                 accept={videoAccept}
                                 data={videoData}
                                 handleUpload={handleUpload}
                               />
-                            )
-                          }
-                        </>
-                      )
-                    }
-                  </div>
+                            </div>
+                          )
+                        }
+                      </>
+                    )
+                  }
+
                 </div>
               </div>
             </div>
