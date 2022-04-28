@@ -28,7 +28,9 @@ export const PlayAutoActions = {
   // 清除横背景图列表
   ClearBackGroungHorizontal: 'CLEAR_BACK_GROUND_LIST_H',
   // 横竖屏切换
-  UpdateDirection: 'UPDATE_DIRECTION'
+  UpdateDirection: 'UPDATE_DIRECTION',
+  // 是否加载等待
+  IsLoad: 'IS_LOAD'
 }
 
 export const LoginActions = {

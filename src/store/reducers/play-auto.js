@@ -142,8 +142,10 @@ const PlayAutoReducer = {
       default:
         return state
     }
-  }
+  },
 
+  // 更新加载状态
+  
 };
 
 export default PlayAutoReducer;
