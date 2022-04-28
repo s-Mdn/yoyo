@@ -22,19 +22,16 @@ const GoodsManage = ( props )=> {
   // 获取列表
   const getGoodsAndPlaylist = () => {
     Promise.all([API.goodsManageApi.getGoodsList(), API.goodsManageApi.getPlaylist()]).then(r => {
-      console.log( r )
       r[0].data.content.forEach(e => {
         e.url = e.video_url || e.image[0]
       })
       r[1].data.content.forEach(e => {
         e.url = e.cover_image
       })
-      console.log(r[0].data.content)
       setGoodsList([...r[0].data.content])
       setPlayList([...r[1].data.content])
       setReload(false)
     }).catch(e=>{
-      console.log( e )
       return false
     })
   }
@@ -139,7 +136,11 @@ const GoodsManage = ( props )=> {
   const handleItemEdit = (e) => {
     switch( tabsKey ) {
       case '1':
-        history.push({pathname: '/goods', query: JSON.stringify(e)})
+        if( e.status === 'f') {
+          message.warning('语音合成中，无法编辑！')
+        } else {
+          history.push({pathname: '/goods', query: JSON.stringify(e)})
+        }
         break
       case '2':
         history.push({pathname: '/plays', query: JSON.stringify(e)})
