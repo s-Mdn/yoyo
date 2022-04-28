@@ -117,6 +117,7 @@ class GoodsManage extends React.Component {
 
   // Tabs切换
   handleTabChange = (activeKey) => {
+    localStorage.setItem('tabActive', activeKey)
     this.setState({ tabActive: activeKey });
   };
 
@@ -172,6 +173,11 @@ class GoodsManage extends React.Component {
   // 生命周期
   componentDidMount() {
     this.getGoodsAndPlaylist();
+    const tabActive = localStorage.getItem('tabActive')
+    console.log(tabActive)
+    if( tabActive ) {
+      this.setState({tabActive})
+    }
   }
 
   render() {
@@ -240,7 +246,7 @@ class GoodsManage extends React.Component {
     return (
       <div className='box-border goodsmanage overflow-hidden'>
         <div className='pb-6 pt-4 pl-6 pr-6 bg-white rounder relative goodsmanage_h_full box-border'>
-          <Tabs onChange={this.handleTabChange} defaultActiveKey='1'>
+          <Tabs onChange={this.handleTabChange}  activeKey={tabActive}>
             <Tabs.TabPane tab='所有商品' key='1'>
               <Content
                 isView={false}
@@ -273,16 +279,20 @@ class GoodsManage extends React.Component {
             {tabActive === '1' ? (
               <div
                 className='border flex items-center py-0.5 px-4 rounded cursor-pointer ml-3'
-                onClick={() =>
+                onClick={() =>{
+                  localStorage.setItem('tabActive', tabActive)
                   history.push({ pathname: '/goods', query: { isAdd: true } })
-                }
+                }}
               >
                 新增
               </div>
             ) : (
               <div
                 className='border flex items-center py-0.5 px-4 rounded cursor-pointer ml-3'
-                onClick={() => history.push({ pathname: '/plays' })}
+                onClick={()=>{
+                  localStorage.setItem('tabActive', tabActive)
+                  history.push({ pathname: '/plays'})
+                }}
               >
                 新增
               </div>

@@ -183,7 +183,7 @@ class PlayInfo extends React.Component {
               <ArrowLeftOutlined />
             </div>
             <span className='text-black font-semibold font_20 ml-3'>
-              直播列表/新增播放
+              直播列表/新增列表
             </span>
           </div>
 
