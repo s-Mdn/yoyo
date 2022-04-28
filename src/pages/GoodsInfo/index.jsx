@@ -10,26 +10,26 @@ const UploadGoods = React.lazy(()=>import('@/components/Upload'));
 class GoodsInfo extends React.Component {
   constructor(props) {
     super(props)
-  }
-  state = {
-    // 单选框
-    radValue: 1,
-    // 上传的图片
-    imageUrlList: [],
-    // 上传的视频
-    videoUrl:'',
-    // 上传图片内容格式
-    imageAccept:'.jpg, .png, .gif, .webp, .bmp,',
-    // 上传视频内容格式
-    videoAccept: '.mp4, .avi .flv',
-    // 表单数据
-    dataSource: [],
-    // 商品信息
-    goodsInfo: {},
-    // 商品ID
-    id: '',
-    // 更新或添加
-    isUpdate: false,
+    this.state = {
+      // 单选框
+      radValue: 1,
+      // 上传的图片
+      imageUrlList: [],
+      // 上传的视频
+      videoUrl:'',
+      // 上传图片内容格式
+      imageAccept:'.jpg, .png, .gif, .webp, .bmp,',
+      // 上传视频内容格式
+      videoAccept: '.mp4, .avi .flv',
+      // 表单数据
+      dataSource: [],
+      // 商品信息
+      goodsInfo: {},
+      // 商品ID
+      id: '',
+      // 更新或添加
+      isUpdate: false,
+    }
   }
 
   // 上传
@@ -43,8 +43,9 @@ class GoodsInfo extends React.Component {
           return {goodsInfo: state.goodsInfo }
         })
       } else {
-        this.state.goodsInfo.video.url = file.response.data
-        this.setState({goodsInfo: this.state.goodsInfo})
+        const goodsInfo = this.state.goodsInfo
+        goodsInfo.video.url = file.response.data
+        this.setState({goodsInfo})
       }
     }
     if( file.status === 'error' ) {
@@ -88,8 +89,9 @@ class GoodsInfo extends React.Component {
 
   // 修改商品名称 价格 介绍
   handleGoodsInfo = (t, e) => {
-    this.state.goodsInfo[t] = e.target.value
-    this.setState({goodsInfo: this.state.goodsInfo})
+    const goodsInfo = this.state.goodsInfo
+    goodsInfo[t] = e.target.value
+    this.setState({goodsInfo})
   }
 
   // 更新语音

@@ -258,6 +258,7 @@ const AutoPlay = (props) => {
     };
   };
 
+  // 获取播放的商品
   const goodsListData = (client, goods) => {
     const data = goods.map(e => ({
       action_tag_list: e.action_tag_list,
@@ -275,7 +276,20 @@ const AutoPlay = (props) => {
     }))
     console.log( data, 'data' )
     client.send('sequence->' + toString(data));
+
+    // 更新播放列表和商品列表的播放状态
+    updateGoodsAndPlaysState()
   };
+
+  // 修改状态
+  const updateGoodsAndPlaysState = (data) =>{
+    API.autoPlayApi.updateGoodsAndPlaysState(data).catch(e=>{return false})
+  }
+
+  // 恢复状态
+  const resetGoodsAndPlaysState = (data) => {
+    API.autoPlayApi.resetGoodsAndPlaysState(data).catch(e=>{return false})
+  }
 
   // 开始播放
   const handleStartPlay = () => {
@@ -320,7 +334,8 @@ const AutoPlay = (props) => {
   const handleClosePlay = () => {
     const { client } = window
     client.send('stop->{}');
-    handleUpdateStopPlay()
+    handleUpdateStopPlay();
+    resetGoodsAndPlaysState()
   };
 
   // 初始化背景图

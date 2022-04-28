@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Tabs, message } from 'antd';
 import { withRouter, Link } from 'react-router-dom';
-import { RedoOutlined, AudioTwoTone, CheckCircleTwoTone, LoadingOutlined } from '@ant-design/icons';
+import { RedoOutlined, AudioOutlined, CheckCircleOutlined, LoadingOutlined, AudioMutedOutlined } from '@ant-design/icons';
 import { validate } from '@/utils';
 import API from '@/services';
 import './index.less';
@@ -9,6 +9,7 @@ import './index.less';
 const { isImage } = validate;
 const Content = React.lazy(()=>import('./component/Content'));
 const Modal = React.lazy(()=>import('@/components/Modal'));
+const AudioIcon = React.lazy(()=>import('./component/AudioIcon'));
 const GoodsManage = ( props )=> {
   const { history } = props;
   const [goodsList, setGoodsList] = useState([]);
@@ -36,6 +37,46 @@ const GoodsManage = ( props )=> {
     })
   }
 
+  // 商品图标
+  const goodsIconVNdom = (e) => (
+    <>
+      {
+        (e.status==='f')? (
+          <div className='flex items-center absolute top-0 left-0 color-ee6843 ml-1'>
+            <AudioIcon Icon={AudioMutedOutlined} color='#ff8462' />
+          </div>
+        ):(
+          <>
+            {
+              (e.status==='z')?(
+                <div className='flex items-center absolute top-1 left-0 color-ee6843 ml-1'>
+                  <AudioIcon Icon={AudioOutlined} color='#ff8462' />
+                </div>
+              ):(
+                <div className='flex items-center absolute -top_5px -right_5px color-ee6843 ml-1'>
+                  <CheckCircleOutlined twoToneColor='#ff8462'/>
+                </div>
+              )
+            }
+          </>
+        )
+      }
+    </>
+  )
+
+  // 播放图标
+  const playsIconVNdom = (e) =>(
+    <>
+      {
+        (e.status==='z') && (
+          <div className='flex items-center absolute top-1 left-0 color-ee6843 ml-1'>
+            <AudioIcon Icon={AudioOutlined} color='#ff8462' />
+          </div>
+        )
+      }
+    </>
+  )
+
   // 列表个体
   const itemVNdom = (e, bol) => (
     <>
@@ -54,14 +95,16 @@ const GoodsManage = ( props )=> {
         <span className='flex-1 text-center overflow-hidden' onClick={handleItemDelete.bind(this, e)}>删除</span>
       </div>
       {
-        bol && (
+        bol? (
           <>
             {
-              (e.status==='f')? (
-                <div className='flex items-center absolute top-0 left-0 color-ee6843 ml-1'><AudioTwoTone twoToneColor='#ff8462'/>...</div>
-              ):(
-                <div className='flex items-center absolute -top_7px -right_7px color-ee6843 ml-1'><CheckCircleTwoTone twoToneColor='#ff8462'/></div>
-              )
+              goodsIconVNdom(e)
+            }
+          </>
+        ):(
+          <>
+            {
+              playsIconVNdom(e)
             }
           </>
         )
@@ -121,17 +164,17 @@ const GoodsManage = ( props )=> {
   const handleItemDelete = (e) => {
     if( tabsKey === '1' ) {
       if( e.status === 'f') {
-        message.warning('语音合成中，无法删除！')
+        message.warning('语音合成中，无法删除！', 0.5)
         return false
       }
       if( e.status === 'z') {
-        message.warning('该商品直播中，无法删除！')
+        message.warning('该商品直播中，无法删除！', 0.5)
         return false
       }
       setModalTitle('删除商品')
     } else {
       if( e.status === 'z') {
-        message.warning('正在直播，无法删除！')
+        message.warning('播放中，无法删除！', 0.5)
         return false
       }
       setModalTitle('删除播放')
@@ -144,8 +187,8 @@ const GoodsManage = ( props )=> {
   const handleItemEdit = (e) => {
     switch( tabsKey ) {
       case '1':
-        if( e.status === 'f') {
-          message.warning('语音合成中，无法编辑！')
+        if( e.status === 'f' ) {
+          message.warning('语音合成中，无法编辑！', 0.5)
         } else {
           history.push({pathname: '/goods', query: JSON.stringify(e)})
         }
@@ -181,11 +224,11 @@ const GoodsManage = ( props )=> {
   const deleteGoodsItem = (e) =>{
     API.goodsManageApi.deleteGoods(e.id)
       .then(r =>{
-        message.success('删除成功')
+        message.success('删除成功', 0.5)
         getGoodsAndPlaylist()
         setModalVis(false)
       }).catch(e => {
-        message.error(e || '删除失败！')
+        message.error(e || '删除失败！', 0.5)
         return false
       })
   }
@@ -194,11 +237,11 @@ const GoodsManage = ( props )=> {
   const deletePlaysItem = (e) => {
     API.goodsManageApi.deletePlay(e.id)
       .then(r => {
-        message.success('删除成功')
+        message.success('删除成功', 0.5)
         getGoodsAndPlaylist()
         setModalVis(false)
       }).catch(e => {
-        message.error(e || '删除失败！')
+        message.error(e || '删除失败！', 0.5)
         return false
       })
   }

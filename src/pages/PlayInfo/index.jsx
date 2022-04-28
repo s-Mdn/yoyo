@@ -112,63 +112,43 @@ class PlayInfo extends React.Component {
   };
 
   // 获取商品列表
-  getGoodsList = async () => {
-    let response = null;
+  getGoodsList = () => {
     const data = {
       page: this.state.page,
       size: this.state.size,
     };
-
-    try {
-      response = await API.goodsManageApi.getGoodsList(data);
-    } catch (error) {
-      return false;
-    }
-
-    if (response && response.code === 200) {
-      const {
-        data: { pagination, content },
-      } = response;
-
-      this.setState({
-        total: pagination.total,
-        goodsList: content.filter(e => {return e.status !== 'f'}),
-      });
-    }
+    API.goodsManageApi.getGoodsList(data)
+      .then(r => {
+        const {data: { pagination, content }} = r
+        this.setState({
+          total: pagination.total,
+          goodsList: content.filter(e => {return e.status !== 'f'}),
+        })
+      }).catch(e =>{return false})
   };
 
   // 获取已经选中的商品
-  getSelectedGoods = async (id) => {
-    let response = null;
-    const data = { play_list_id: id };
-    try {
-      response = await API.goodsManageApi.selectGoodsList(data);
-    } catch (error) {
-      return false;
-    }
-    if (response && response.code === 200) {
-      console.log( response )
-      response.data.forEach((e, i) => {
-        e.key = nanoid();
-      });
-      this.setState({
-        chosenList: response.data,
-      });
-    }
+  getSelectedGoods = (id) => {
+    const data = { play_list_id: id }
+
+    API.goodsManageApi.selectGoodsList(data)
+      .then(r =>{
+        r.data.forEach((e, i)=>{e.key = nanoid()})
+        this.setState({chosenList: r.data})
+      }).catch(e => {return false})
   };
 
-  async componentDidMount() {
-    await this.getGoodsList();
-    const { query } = this.props.location;
-    if (query) {
-      this.setState({ goodsName: query.goodsName });
+  componentDidMount() {
+    this.getGoodsList();
+    if ( this.props.location?.query ) {
+      const query = JSON.parse(this.props.location.query)
+      this.setState({ goodsName: query.name });
       this.getSelectedGoods(query.id);
     }
   }
 
   render() {
-    const { total, goodsList, page, chosenList, goodsName, droppableId } =
-      this.state;
+    const { total, goodsList, page, chosenList, goodsName, droppableId } = this.state;
     const showTotal = (total) => {
       return `总共 ${total} 页`;
     };
@@ -190,20 +170,14 @@ class PlayInfo extends React.Component {
           <div className='goods-wrap mt-6 ml_30px'>
             <div className='goods-name flex items-center'>
               <span className='w_80px'>列表名称：</span>
-              <div>
+              <div className='border w_535px rounded'>
                 <Input
                   placeholder='请定义名称'
                   value={goodsName}
                   onChange={(e) => this.setState({ goodsName: e.target.value })}
                   maxLength={30}
                   showCount
-                  style={{
-                    borderWidth: '1px',
-                    height: '30px',
-                    borderColor: 'rgb(204,204,204)',
-                    width: '535px',
-                    outline: 'none',
-                  }}
+                  bordered={false}
                 />
               </div>
             </div>
@@ -334,7 +308,6 @@ class PlayInfo extends React.Component {
             ) : (
               <button
                 className='px-8 rounded bg-gray-300 height_30px'
-                onClick={this.handleSubmit}
               >
                 保 存
               </button>

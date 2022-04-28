@@ -65,7 +65,7 @@ function addBackground(data) {
  * @param {object} data 
  * @returns 
  */
- function updateGoodsAndPlaysState(data) {
+function updateGoodsAndPlaysState(data) {
   return request({
     url: '/api/play_list/update_live_status',
     method: 'POST',
