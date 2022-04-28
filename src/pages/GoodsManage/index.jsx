@@ -174,7 +174,6 @@ class GoodsManage extends React.Component {
   componentDidMount() {
     this.getGoodsAndPlaylist();
     const tabActive = localStorage.getItem('tabActive')
-    console.log(tabActive)
     if( tabActive ) {
       this.setState({tabActive})
     }

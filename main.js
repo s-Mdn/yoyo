@@ -73,7 +73,7 @@ function createWindow() {
   // 设置窗口最小尺寸
   mainWindow.setMinimumSize(1300, 875)
   // 根据环境执行
-  if (!isDev(process.env.NODE_ENV)) {
+  if (isDev(process.env.NODE_ENV)) {
     mainWindow.loadURL(`http://localhost:3000`);
   } else {
     mainWindow.loadURL(`file://${__dirname}/../app.asar.unpacked/index.html`);
