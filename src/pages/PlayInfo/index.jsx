@@ -9,6 +9,7 @@ import API from '@/services';
 import './index.less';
 
 const {isImage} = validate;
+let timeOut
 class PlayInfo extends React.Component {
   constructor(props) {
     super(props);
@@ -104,7 +105,7 @@ class PlayInfo extends React.Component {
       const that = this;
 
       // 延迟清空数据
-      let timeOut = setTimeout(() => {
+      timeOut = setTimeout(() => {
         that.handleClearContent();
         this.props.history.goBack();
         clearTimeout(timeOut);
@@ -165,6 +166,10 @@ class PlayInfo extends React.Component {
       this.getSelectedGoods(query.id);
     }
   }
+  
+  componentWillUnmount() {
+    clearTimeout(timeOut)
+  }
 
   render() {
     const { total, goodsList, page, chosenList, goodsName, droppableId } =
@@ -222,7 +227,7 @@ class PlayInfo extends React.Component {
                           <img
                             alt=''
                             src={e.image[0]}
-                            className='cursor-pointer'
+                            className='cursor-pointer object-fit h-full w-full'
                           />
                         ) : (
                           <video
@@ -286,7 +291,7 @@ class PlayInfo extends React.Component {
                                     {e.image && isImage(e.image[0]) ? (
                                       <img
                                         src={e.image[0]}
-                                        className='cursor-pointer'
+                                        className='cursor-pointer object-fit h-full w-full'
                                         alt=''
                                       />
                                     ) : (

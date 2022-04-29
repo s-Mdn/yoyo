@@ -13,7 +13,7 @@ import './index.less';
 
 const { downloadUrlFile } = common
 const { isImage } = validate
-
+let timeOut
 
 class GoodsInfo extends React.Component {
   constructor(props) {
@@ -210,7 +210,7 @@ class GoodsInfo extends React.Component {
     }
     if (response && response.code === 200 && response.data) {
       message.success('添加成功，退出等待语音生成！');
-      let timeOut = setTimeout(() => {
+      timeOut = setTimeout(() => {
         this.props.history.goBack();
         clearTimeout(timeOut);
       }, 1000);
@@ -260,7 +260,7 @@ class GoodsInfo extends React.Component {
     }
     if (response && response.code === 200 && response.data) {
       message.success('修改成功！');
-      let timeOut = setTimeout(() => {
+      timeOut = setTimeout(() => {
         clearTimeout(timeOut);
         this.props.history.goBack();
       }, 1000);
@@ -380,6 +380,9 @@ class GoodsInfo extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    clearTimeout(timeOut)
+  }
   render() {
     const {
       columns,

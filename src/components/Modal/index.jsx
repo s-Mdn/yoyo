@@ -19,6 +19,7 @@ const modal = (props) => {
         title={title}
         visible={visible}
         closable={closable || false}
+        maskClosable={false}
         onCancel={onCancel}
         footer={
           footer || (

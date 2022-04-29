@@ -61,9 +61,7 @@ const Profile = ( props ) => {
         setTime((t) => t - 1);
       }
     }, 1000);
-    return function () {
-      clearInterval(timer)
-    }
+    return ()=>clearInterval(timer)
   }, [time]);
 
   // 修改密码VNdom
@@ -172,7 +170,19 @@ const Profile = ( props ) => {
             onChange={e=>setNewPhoneNumber(e.target.value)}
           />
         </div>
-        <button className='flex-none border-t border-r border-b px-2 font_12'>获取验证码</button>
+        <div className='flex items-center justify-center flex-none border-t border-r border-b px-2 font_12'>
+          {
+            time?(
+              <span>{time}秒后重发</span>
+            ):(
+              <button onClick={handleCode.bind(this, VNdom)}>
+                {
+                  initTime?(<>重新发送</>):(<>获取验证码</>)
+                }
+              </button>
+            )
+          }
+        </div>
       </div>
       <div className='item flex h_32px mb-4 border-b'>
         <Input
@@ -206,9 +216,8 @@ const Profile = ( props ) => {
     // 已经获取验证码
     setIsGetCode(true)
 
-    let tag = (vndom === 3) && resetPasswordTag
-    tag = (vndom === 1) && checkPhoneNumTag
-    tag = (vndom === 2) && resetPhoneNumTag
+    const tag = (vndom === 1)?checkPhoneNumTag:(vndom === 2)?resetPhoneNumTag:resetPasswordTag
+
     getValidateCode(phoneNum, tag)
   };
 
@@ -221,8 +230,7 @@ const Profile = ( props ) => {
     API.loginApi.getValidCode(data)
       .then(r => {
         setIsSubmit(false)
-        setIsGetCode(false)
-        message.error(r || '获取验证码失败！', 0.5);
+        setIsGetCode(true)
       }).catch(e => {
         setIsSubmit(false)
         setIsGetCode(false)
@@ -234,7 +242,7 @@ const Profile = ( props ) => {
   // 弹出弹窗
   const handleOpenModal = (txt, VNdom) => {
     if( playState ) {
-      message.warning('播放中，无法进行修改手机哈或密码操作！', 0.5)
+      message.warning('播放中，无法进行修改手机哈或密码操作！', [0.5])
       return false
     }
     setModalTitle(txt)
@@ -287,7 +295,7 @@ const Profile = ( props ) => {
       return false
     }
     const data = {
-      phone_num: this.props.userInfo.phone_num,
+      phone_num: props.userInfo.phone_num,
       new_password: newPassWord,
       code: pasCode,
       sms_use: resetPasswordTag,
@@ -362,7 +370,7 @@ const Profile = ( props ) => {
           clearTimeout(timeOut);
         }, 1000)
       }).catch(e => {
-        message.error(e || '修改失败！');
+        message.error(e || '修改失败！', 0.5);
         return false
       })
   };
@@ -501,8 +509,8 @@ const Profile = ( props ) => {
             </Radio.Group>
           </div>
         </div>
-        <div className='item m_l_120px p_y_25px w_60 flex items-center justify-center' onClick={handleLoginOut}>
-          <button className='py-2 px-16 rounded-full border bg-FF8462 text-white'>退 出</button>
+        <div className='item m_l_120px p_y_25px w_60 flex items-center justify-center' >
+          <button className='py-2 px-16 rounded-full border bg-FF8462 text-white' onClick={handleLoginOut}>退 出</button>
         </div>
       </div>
       <Modal
