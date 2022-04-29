@@ -26,7 +26,6 @@ class GoodsManage extends React.Component {
       modelTitle: '', // Model标题
       modelVisible: false, // Model显示状态
       modelWidth: '400px', // Model宽度
-      modelContent: '', // Model文本
       bodyStyle: { height: 'auto', textAlign: 'center', padding: '10px' }, // Model的中间内容样式
       goods: {}, // 商品
       modalItem: {},
@@ -39,7 +38,11 @@ class GoodsManage extends React.Component {
   // 编辑商品
   handleGoodsEdit = (goods) => {
     if (goods.status === 'f') {
-      message.info('语音合成中，无法进行操作！');
+      message.info('语音合成中，无法进行操作！', 0.5);
+      return;
+    }
+    if( goods.status === 'z' ) {
+      message.info('该商品直播中，无法编辑！', 0.5);
       return;
     }
 
@@ -51,6 +54,7 @@ class GoodsManage extends React.Component {
 
   // 删除商品
   handleGoodsDelete = (goods) => {
+    console.log( goods )
     if (goods.status === 'f') {
       message.info('语音合成中，无法进行操作！');
       return;
@@ -59,16 +63,20 @@ class GoodsManage extends React.Component {
       return;
     }else {
       this.setState({
-        isViewGoods: true,
+        isViewGoods: false,
         modalItem: goods,
         modelVisible: true,
-        modelContent: '确定删除该商品？',
+        modelTitle: '删除商品',
       });
     }
   };
 
   // 编辑播放列表
   handlePlaysEdit = (play) => {
+    if(play.status === 'z') {
+      message.info('该商品直播中，无法编辑！', 0.5);
+      return;
+    }
     this.props.history.push({
       pathname: `/plays/${play.id}`,
       query: { id: play.id, goodsName: play.name },
@@ -77,6 +85,7 @@ class GoodsManage extends React.Component {
 
   // 播放列表删除
   handlePlaysDelete = (play) => {
+    console.log( play )
     if( play.status === 'z' ) {
       message.info('正在播放，无法删除！');
       return;
@@ -84,8 +93,8 @@ class GoodsManage extends React.Component {
     this.setState({
       modelVisible: true,
       modalItem: play,
-      isViewGoods: true,
-      modelContent: '确定删除该播放？',
+      isViewGoods: false,
+      modelTitle: '删除播放',
     });
   };
 
@@ -109,8 +118,9 @@ class GoodsManage extends React.Component {
       });
       this.setState({
         modelVisible: true,
-        isViewGoods: false,
+        isViewGoods: true,
         imgList,
+        modelTitle: play.name
       });
     }
   };
@@ -129,6 +139,13 @@ class GoodsManage extends React.Component {
 
   // 弹窗点击确定回调
   handleOk = async () => {
+    if( this.state.isViewGoods ){
+      this.setState({
+        isViewGoods: false,
+        modelVisible: false,
+      })
+      return false
+    }
     const { modalItem, tabActive } = this.state;
     let response = null;
     try {
@@ -147,6 +164,16 @@ class GoodsManage extends React.Component {
       this.setState({ modelVisible: false, isViewGoods: false });
     }
   };
+
+  // 取消
+  handleCancel = () => {
+    this.setState({
+      modelVisible: false,
+      isViewGoods: false,
+      modalItem: {},
+      imgList: []
+    })
+  }
 
   // 商品 && 播放列表请求
   getGoodsAndPlaylist = async () => {
@@ -174,7 +201,6 @@ class GoodsManage extends React.Component {
   componentDidMount() {
     this.getGoodsAndPlaylist();
     const tabActive = localStorage.getItem('tabActive')
-    console.log(tabActive)
     if( tabActive ) {
       this.setState({tabActive})
     }
@@ -189,7 +215,6 @@ class GoodsManage extends React.Component {
       reLoad,
       playList,
       goodsList,
-      modelContent,
       modalItem,
       tabActive,
       isViewGoods,
@@ -220,7 +245,7 @@ class GoodsManage extends React.Component {
           </div>
           {
             (g.status === 'z') && (
-              <div className='absolute right-0 top-0 z-10 color-ee6843 font_12'>直播中...</div>
+              <div className='absolute left-0 top-0 z-10 color-ee6843 font_12'>直播中...</div>
             )
           }
         </>
@@ -237,7 +262,10 @@ class GoodsManage extends React.Component {
             <video className='object-fit h-full' src={p.cover_image} />
           )}
           {
-            (p.status === 'z') && (<div className='absolute right-0 top-0 z-10 color-ee6843 font_12'>直播中...</div>)
+            (p.status === 'z') && (<div className='absolute left-0 top-0 z-10 color-ee6843 font_12'>直播中...</div>)
+          }
+          {
+            <div className='absolute right-1 top-0 z-10 color-ee6843 font_12'>{p.commodity_total}件</div>
           }
         </>
       );
@@ -256,7 +284,7 @@ class GoodsManage extends React.Component {
                 handleEdit={this.handleGoodsEdit}
               />
             </Tabs.TabPane>
-            <Tabs.TabPane tab='播放列表' key='2'>
+            <Tabs.TabPane tab='直播列表' key='2'>
               <Content
                 isView={true}
                 content={playList}
@@ -305,74 +333,60 @@ class GoodsManage extends React.Component {
           visible={modelVisible}
           width={modelWidth}
           bodyStyle={bodyStyle}
-          onCancel={() =>
-            this.setState({ modelVisible: false, isViewGoods: false })
-          }
+          onCancel={this.handleCancel}
           onOk={this.handleOk}
         >
-          <div>{modelContent}</div>
-          {!isViewGoods ? (
-            <div className='flex flex-wrap _ml_5px'>
-              {imgList.map((e, i) => {
-                return (
-                  <div
-                    key={i}
-                    className='w_80 h_80 overflow-hidden ml_20px mb_20px rounded'
-                  >
-                    {isImage(e) ? (
-                      <img src={e} alt='' />
-                    ) : (
-                      <video src={e} className='w-full h-full object-fit' />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <>
-              {tabActive === '1' ? (
-                <>
-                  {modalItem && modalItem.video_url ? (
-                    <div className='w_80 h_80 overflow-hidden m-auto my-2'>
-                      <video
-                        src={modalItem.video_url}
-                        className='object-fit w-full h-full'
-                      />
-                    </div>
-                  ) : (
-                    <div className='flex flex-wrap _ml_5px'>
-                      {modalItem.image.map((e, i) => {
-                        return (
-                          <div
-                            className='w_80 h_80 overflow-hidden ml_20px mb_20px rounded'
-                            key={i}
-                          >
-                            <img src={e} alt='' />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </>
-              ) : (
+          {
+            (tabActive === '1')?(
+              (modalItem.video_url)?(
                 <div className='w_80 h_80 overflow-hidden m-auto my-2'>
-                  {modalItem && (
-                    <div className='w_80 h_80 overflow-hidden m-auto my-2'>
-                      {isImage(modalItem.cover_image) ? (
-                        <img src={modalItem.cover_image} alt='' />
-                      ) : (
-                        <video
-                          src={modalItem.cover_image}
-                          className='object-fit w-full h-full'
-                        />
-                      )}
-                    </div>
-                  )}
+                  <video src={modalItem.video_url} className='object-fit w-full h-full' />
                 </div>
-              )}
-            </>
-          )}
-
+              ):(
+                <div className='flex flex-wrap _ml_5px'>
+                  {
+                    modalItem?.image?.map((e, i)=>(
+                      <div key={i} className='w_80 h_80 overflow-hidden ml_20px mb_20px rounded'>
+                        <img src={e} alt='' className='w-full h-full object-fit' />
+                      </div>
+                    ))
+                  }
+                </div>
+              )
+            ):(
+              <>
+                {
+                  (!isViewGoods)?(
+                    <div className='w_80 h_80 overflow-hidden m-auto my-2'>
+                      {
+                        isImage(modalItem.cover_image)?(
+                          <img src={modalItem.cover_image} alt='' className='object-fit w-full h-full' />
+                        ):(
+                          <video src={modalItem.cover_image} className='object-fit w-full h-full' />
+                        )
+                      }
+                    </div>
+                  ):(
+                    <div className='flex flex-wrap _ml_5px'>
+                      {
+                        imgList.map((e, i)=>(
+                          <div key={i} className='w_80 h_80 overflow-hidden ml_20px mb_20px rounded'>
+                            {
+                              (isImage(e))?(
+                                <img src={e} alt='' className='w-full h-full object-fit'/>
+                              ):(
+                                <video src={e} className='w-full h-full object-fit' />
+                              )
+                            }
+                          </div>
+                        ))
+                      }
+                    </div>
+                  )
+                }
+              </>
+            )
+          }
           <div>{modalItem.name}</div>
         </Modal>
       </div>
