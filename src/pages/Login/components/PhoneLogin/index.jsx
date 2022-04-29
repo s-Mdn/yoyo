@@ -95,6 +95,8 @@ const PhoneLogin = (props) => {
         setTime(0)
         setIntTime(false)
         setSubmitRes(false)
+        localStorage.setItem('token', r.data.token)
+        localStorage.setItem('userInfo', JSON.stringify(r.data))
         handleUpdateUserInfo(r.data)
       }).catch(e => {
         setSubmitRes(false)

@@ -58,7 +58,7 @@ const Login = (props) => {
         setSubmitRes(false)
         localStorage.setItem('token', r.data.token)
         localStorage.setItem('userInfo', JSON.stringify(r.data))
-
+        console.log( r.data.token )
         handleUpdateUserInfo(r.data)
       }).catch(e => {
         setSubmitRes(false)
