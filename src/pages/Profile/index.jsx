@@ -61,9 +61,7 @@ const Profile = ( props ) => {
         setTime((t) => t - 1);
       }
     }, 1000);
-    return function () {
-      clearInterval(timer)
-    }
+    return ()=>clearInterval(timer)
   }, [time]);
 
   // 修改密码VNdom

@@ -119,6 +119,7 @@ class GoodsManage extends React.Component {
       this.setState({
         modelVisible: true,
         isViewGoods: true,
+        modalItem: play,
         imgList,
         modelTitle: play.name
       });
@@ -387,7 +388,18 @@ class GoodsManage extends React.Component {
               </>
             )
           }
-          <div>{modalItem.name}</div>
+          {
+            isViewGoods && (
+              <div className='absolute top-0 left-0 text-white font_12'>
+                {
+                  (modalItem.status === 'z') && <span className='color-ee6843'>直播中...</span>
+                }
+              </div>
+            )
+          }
+          {
+            !isViewGoods && (<div>{modalItem.name}</div>)
+          }
         </Modal>
       </div>
     );
