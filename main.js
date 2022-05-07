@@ -1,9 +1,9 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater')
-const path = require('path');
 const { spawn, exec } = require('child_process');
-
-const log = console;
+// const log = require('electron-log');
+const path = require('path');
+const fs = require('fs-extra');
 let workerProcess = null;
 let mainWindow = null;
 let cwd = path.join(__dirname, 'server')
@@ -17,22 +17,45 @@ function isDev(env) {
 
 // 版本更新
 function checkUpdate() {
-  autoUpdater.setFeedURL('https://yoyolivewebpack-test.oss-cn-shenzhen.aliyuncs.com/yoyo/win32-x64')
+  //更新前，删除本地的安装包
+  const updaterCacheDirName = 'yoyoliveweb-updater'
+  const updatePending = path.join(autoUpdater.app.baseCachePath, updaterCacheDirName, 'pending')
+  fs.emptyDir(updatePending)
 
-  // 检测更新
+  const message = {
+    error: '检查更新出错',
+    checking: '正在检测更新...',
+    updateAva: '检测到新版本，正在下载...',
+    updateNote: '现在就是最新版本，不用更新'
+  }
+
+  autoUpdater.setFeedURL('https://yoyolivewebpack-test.oss-cn-shenzhen.aliyuncs.com/yoyo/win32-x64')
   autoUpdater.checkForUpdates()
 
-  //监听'error'事件
-  autoUpdater.on('error', (err) => {
-    console.log(err)
-  })
+  if(isDev(process.env.NODE_ENV)) {
+    autoUpdater.updateConfigPath = path.join(__dirname, './dist/win-unpacked/resources/app-update.yml')
+  }
+  
 
-  //监听'update-available'事件，发现有新版本时触发
-  autoUpdater.on('update-available', () => {
-    console.log('found new version')
-  })
 
-  //监听'update-downloaded'事件，新版本下载完成时触发
+  autoUpdater.on('error', (err)=>{
+    mainWindow.webContents.send(message.error)
+  })
+  autoUpdater.on('checking-for-update', ()=>{
+    mainWindow.webContents.send(message.updateAva)
+  })
+  autoUpdater.on('update-available', (info) => {
+    // mainWindow.webContents.send(message.updateAva)
+    console.log(info, 'update-available')
+  })
+  autoUpdater.on('update-not-availabel', (info)=>{
+    console.log(info, 'update-not-availabel')
+    mainWindow.webContents.send(message.updateAva)
+  })
+  autoUpdater.on('download-progress', (process)=>{
+    console.log(process, 'download-progress')
+    // log.warn('触发下载...')
+  })
   autoUpdater.on('update-downloaded', () => {
     dialog.showMessageBox({
       type: 'info',
@@ -40,9 +63,8 @@ function checkUpdate() {
       message: '发现新版本，是否更新？',
       buttons: ['是', '否']
     }).then((buttonIndex) => {
-      if(buttonIndex.response == 0) {  //选择是，则退出程序，安装新版本
+      if(buttonIndex.response == 0) {
         autoUpdater.quitAndInstall()
-        app.quit()
       }
     })
   })
@@ -58,8 +80,8 @@ function createWindow() {
     width: 1300,
     height: 875,
     resizable:false,
-    frame: false,
-    titleBarStyle: 'hidden',
+    // frame: false,
+    // titleBarStyle: 'hidden',
     center: true,
     webPreferences: {
       nodeIntegration: true,
@@ -109,10 +131,10 @@ function launchVideoProcess(flag) {
   if (!workerProcess || flag) {
     let childProcessCallback = (err, stdout, stderr) => {
       if (err) {
-        log.error('error:', err);
+        // log.error('error:', err);
       }
-      log.warn('stdout:', stdout);
-      log.error('stderr:', stderr);
+      // log.warn('stdout:', stdout);
+      // log.error('stderr:', stderr);
     };
 
     const cmdStr = 'server.exe'; // 本地需要启动的后台服务可执行文件的路径
@@ -122,18 +144,18 @@ function launchVideoProcess(flag) {
       workerProcess = exec(cmdStr, { cwd: cwd }, childProcessCallback);
     }
     workerProcess.on('close', () => {
-      console.log('close!!!!');
+      // console.log('close!!!!');
       workerProcess = null;
     })
     workerProcess.on('exit', () => {
-      console.log('出错了')
+      // console.log('出错了')
       workerProcess = null;
     })
     workerProcess.on('data', () => {
-      log.info(`workerProcess.stdout:${data}`);
+      // log.info(`workerProcess.stdout:${data}`);
     })
     workerProcess.stderr.on('data', (error) => {
-      log.error(`workerProcess.stderr:${error}`);
+      // log.error(`workerProcess.stderr:${error}`);
     });
   }
 }
@@ -146,9 +168,9 @@ function ProcessCommunicate () {
 }
 
 function onReady() {
-  launchVideoProcess()
   createWindow()
   checkUpdate()
+  launchVideoProcess()
   ProcessCommunicate()
 }
 
