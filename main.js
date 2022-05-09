@@ -80,8 +80,8 @@ function createWindow() {
     width: 1300,
     height: 875,
     resizable:false,
-    // frame: false,
-    // titleBarStyle: 'hidden',
+    frame: false,
+    titleBarStyle: 'hidden',
     center: true,
     webPreferences: {
       nodeIntegration: true,
