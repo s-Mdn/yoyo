@@ -50,18 +50,18 @@ const Login = (props) => {
 
     // 请求还没有结果，限制第二次触发
     if( isSubmitRes ) { return false }
-    setSubmitRes(false)
+    setSubmitRes(true)
 
     const data = { phone_num: account, password }
     API.loginApi.loginByPassword(data)
       .then(r => {
-        setSubmitRes(true)
+        setSubmitRes(false)
         localStorage.setItem('token', r.data.token)
         localStorage.setItem('userInfo', JSON.stringify(r.data))
-
+        console.log( r.data.token )
         handleUpdateUserInfo(r.data)
       }).catch(e => {
-        setSubmitRes(true)
+        setSubmitRes(false)
         setWarnings(e || '账号或密码不对')
         return false
       })
