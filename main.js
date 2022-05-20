@@ -41,7 +41,7 @@ function checkUpdate() {
       message: '发现新版本，是否更新？',
       buttons: ['是', '否']
     }).then((buttonIndex) => {
-      if(buttonIndex.response == 0) {  //选择是，则退出程序，安装新版本
+      if(buttonIndex.response === 0) {  //选择是，则退出程序，安装新版本
         autoUpdater.quitAndInstall()
         app.quit()
       }
@@ -75,7 +75,7 @@ function createWindow() {
   mainWindow.setMinimumSize(1300, 875)
   // 根据环境执行
   if (isDev(process.env.NODE_ENV)) {
-    mainWindow.loadURL(`http://localhost:3000`);
+    mainWindow.loadURL('http://localhost:3000');
   } else {
     mainWindow.loadURL(`file://${__dirname}/../app.asar.unpacked/index.html`);
   }
