@@ -238,10 +238,11 @@ const AutoPlay = (props) => {
         h: c.offsetHeight,
         x1: c.offsetLeft,
         y1: c.offsetTop,
-        x2: o.offsetWidth - c.offsetLeft,
-        y2: o.offsetHeight - c.offsetTop,
+        x2: c.offsetLeft + c.offsetWidth,
+        y2: c.offsetTop + c.offsetHeight
       },
     };
+
     return size;
   };
 
