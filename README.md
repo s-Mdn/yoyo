@@ -1,62 +1,56 @@
 # YOYOLiveWeb
 
 Data: 2022-2-12
-Author: zhangyunbin
 
-基于Create React App搭建基础项目架构
-Craco 修改默认配置项目
-  - React脚手架的react-scripts和Craco存在版本冲突，当前脚手架生成的react-scripts版本是5.0.0，不指定Craco版本安装的版本是6.4.3，会出现无法安装的情况，可以通过 --force(强制安装)，又或者通过 --legacy-peer-deps可以安装成功(https://blog.csdn.net/weixin_41876046/article/details/120952621)
+# 简介
 
-tailwind 实现响应式 (https://www.tailwindcss.cn/)
-  - 如果react-scripts版本是5以上，运行项目可能会出现第三方npm包报错的问题，项目中解决打方案是将react-scripts降级4版本
-  - tailwind没有热更新，目前的做法的是在执行脚本前增加TAILWIND_MODE=watch，监视改变
+[yoyo-live-web]是一个基于`React` 和 `Electron` 的客户端系统。`React`框架开发成web端，`tailwindcss` 作为css库， `Electron`打包成客户端， `electron-updater` 实现更新迭代(https://www.electron.build/)
 
-主进程中通过loadURL加载web资源到渲染进程，所以需要先执行start命令，再执行electron:start，又或者可以通过concurrently来控制先后执行，此处我们是先执行start，在执行electron:start来实现
+# 目录结构
 
-Create React App脚手架已经集成了eslint的配置，项目中也增加部分rules实现统一，具体请看package.json文件
+```bash
+├─ public                     # 静态资源
+│   ├─ favicon.ico            # favicon图标
+│   └─ index.html             # html模板
+├─ src                        # 项目源代码
+│   ├─ services               # 接口封装函数、所有请求接口
+│   ├─ assets                 # 图片 字体等静态资源
+│   ├─ components             # 全局公用组件
+│   ├─ config                 # 全局配置
+│   │   ├─ menuConfig.js      # 导航菜单配置
+│   │   └─ routeMap.js        # 路由配置
+│   ├─ store                  # 全局 store管理
+│   ├─ utils                  # 全局公用方法
+│   ├─ layout                 # layout 页面结构
+│   ├─ pages                  # pages 所有页面
+│   ├─ App.jsx                # 入口页面
+│   └─index.js                # 源码入口
+├── .env.development          # 开发环境变量配置
+├── .env.prod                 # 生产环境变量配置
+├── .env.test                 # 测试环境变量配置
+├── main.js                   # electron主进程文件
+├── preload.js                # 主进程和渲染进程通信桥梁
+├── craco.config.js           # 对cra的webpack自定义配置
+└── package.json              # package.json
+```
 
-PlayAuto 播放页
-  - 函数组件
-  - 播放列表，选中的播放，商品，背景图，播放状态，横竖屏的数据信息都用redux存放(要求保留状态)
-GoodsManage 商品管理也
-Profile个人中心也
-  - 函数组件
-  - 播放中，不可以修改账号和密码和退出，因为修改了要退出重新登录
-  - 清晰度是硬代码
+# 安装
+```shell
+# 安装依赖
+npm install
 
-项目结构
-public
-  - 模版
-src
-  - assets
-    - 静态资源(图片)
-  - components
-    - 通用组件
-  - layout
-    - 页面容器
-  - pages
-    - 页面组件
-  - router
-    - 路由配置
-  - services
-    - Axios封装
-  - utils
-    - 工具函数
-  - index.js
-    - react 入口
-  - TitleBar.js
-    - electron标题看
-.editorconfig
-  - 统一编译器的风格
-.env.development
-  - 开发环境配置
-.env.prod
-  -
-.env.test
-  -
-craco.config.js
-  - craco 配置文件
-main.js
-  - 主进程逻辑
-preload.js
-  - 渲染进程和主进程的通信
+# 切换淘宝源，解决 npm 下载速度慢的问题
+npm install --registry=https://registry.npm.taobao.org
+
+# 启动开发服务
+npm run start
+
+# 启动开发环境下的Electron服务
+npm run electron:start
+
+# 打包成客户端
+  - 执行npm run build-prod，打包成功会出现一个 `build` 文件夹
+  - 当目录中有 `build`文件说明web端已经打包成功，在执行npm run build-electron，打包成功成出现一个`dist`文件夹，将`latest.yml、***.exe、***exe.blockmap`上传到服务器，完成更新
+
+接下来你可以修改代码进行业务开发了。
+```
