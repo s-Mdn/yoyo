@@ -15,7 +15,7 @@ import './index.less';
 const Clock = React.lazy(()=>import('./componets/Clock'))
 const { validURL, isImage } = validate;
 const { toString } = type;
-const { ipcRenderer } = window.electron;
+// const { ipcRenderer } = window.electron;
 const localServerUrl = process.env.REACT_APP_LOCAL_SERVER_URL;
 
 const AutoPlay = (props) => {
@@ -354,7 +354,7 @@ const AutoPlay = (props) => {
       handleUpdateStopPlay()
       handleUpdateload(false)
       window.client = null;
-      ipcRenderer.send('restart-server', '重启server')
+      // ipcRenderer.send('restart-server', '重启server')
     }
   }
 

@@ -19,8 +19,6 @@ class GoodsInfo extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // 添加的商品列表图
-      goodsList: [],
       // tabel数据头
       columns: [
         {
@@ -120,14 +118,13 @@ class GoodsInfo extends React.Component {
               <div className='w-full flex items-center justify-center font_12'>
                 <Upload
                   beforeUpload={({ file }) => {
-                    this.handleUploadBefore(i);
+                    this.handleAudioUploadBefore(i);
                   }}
                   onChange={({ file }) => this.handleUpdateVioce(i, file)}
                   showUploadList={false}
                   maxCount={1}
                   data={this.audioData}
                   action={`${process.env.REACT_APP_API}/api/common/upload`}
-                  // action={`${process.env.REACT_APP_API}/api/commodity/voice_replace`}
                   accept='audio/ogg,audio/mp3,audio/wav,audio/m4a,audio/flac'
                 >
                   <div className='flex items-center justify-center h-7 w-20 border rounded mr-4'>
@@ -163,84 +160,66 @@ class GoodsInfo extends React.Component {
       isAdd: false,
       // 选中的radio
       selectRadio: 1,
+      // 图片
+      fileListImg: [],
+      // 视频
+      fileListVedio: [],
+      // 是否可以提交
+      isSubmit: false
     };
   }
 
-  // Upload回调
-  handleChange = ({ fileList, file }) => {
-    if (file.status === 'done') {
-      this.state.goodsList.push(file.response.data);
-      this.setState({ goodsList: this.state.goodsList });
+  handleChange = ({ fileList }) => {
+    if(this.state.selectRadio === 1) {
+      this.setState({fileListImg: fileList})
+    } else {
+      this.setState({fileListVedio: fileList})
     }
+    this.isSubmit()
   };
 
-  // 删除商品
-  handleDeleteGoods = (i) => {
-    this.state.goodsList.splice(i, 1);
-    this.setState({ goodsList: this.state.goodsList });
-  };
-
-  // 添加商品
-  handleAddGoods = async () => {
-    const { goodsList, introduce, goodsName, goodsPrice, selectRadio } =
-      this.state;
-    if (goodsList.length === 0 || !introduce || !goodsName || !goodsPrice) {
-      message.warning('请添加完整的商品信息！');
-      return false;
+  handleRemove = (file) => {
+    if(file.response.status === 'success') {
+      this.isSubmit()
     }
-
-    let response = null;
-    const data = {
-      image: goodsList.map((e) => {
-        return e;
-      }),
-      introduce,
-      name: goodsName,
-      price: goodsPrice,
-    };
-    if (selectRadio == 2) {
-      delete data.image;
-      data.video_url = goodsList[0];
-    }
-    try {
-      response = await API.goodsManageApi.addGoods(data);
-    } catch (error) {
-      message.error(error || '语音生成失败！');
-      return false;
-    }
-    if (response && response.code === 200 && response.data) {
-      message.success('添加成功，退出等待语音生成！');
-      timeOut = setTimeout(() => {
-        this.props.history.goBack();
-        clearTimeout(timeOut);
-      }, 1000);
-    }
-  };
+  }
 
   // 更新商品
   handleUpdataGoods = async () => {
-    const { goodsName, goodsPrice, introduce, goodsList, dataSource, selectRadio } =
-      this.state;
-
-    if (goodsList.length === 0 || !goodsName || !goodsName || !introduce) {
-      message.warning('请添加商品信息！');
-      return false;
-    }
+    const { 
+      goodsName, 
+      goodsPrice, 
+      introduce, 
+      dataSource, 
+      selectRadio,
+      fileListImg,
+      fileListVedio
+    } = this.state;
 
     const data = {
       tag_list: [],
       speed_list: [],
       simple_sentence_id_list: [],
-      image: goodsList,
       name: goodsName,
       price: goodsPrice,
       introduce,
-      id: this.props.location.query.goods.id,
+      id: this.props?.location?.query?.goods?.id,
     };
 
-    if (selectRadio == 2) {
-      delete data.image;
-      data.video_url = goodsList[0];
+    if (selectRadio === 1) {
+      const image = []
+      fileListImg.forEach(e =>{
+        if(e.url) {
+          image.push(e.url)
+        } else {
+          image.push(e.response.data)
+        }
+      })
+      data.image = image
+    } else {
+      fileListVedio.forEach(e=>{
+        data.video_url = e.response.data
+      })
     }
 
     dataSource.forEach((e, i) => {
@@ -248,24 +227,47 @@ class GoodsInfo extends React.Component {
       data.speed_list.push(dataSource[i].speedNum);
       data.simple_sentence_id_list.push(dataSource[i].sentenceId);
     });
+    
 
-    let response = null;
-    try {
-      response = await API.goodsManageApi.updateGoods(data);
-    } catch (error) {
-      message.warning(
-        error || '语音正则合成中，请稍后在做修改！'
-      );
-      return false;
+    if(!data.id) {
+      delete data.simple_sentence_id_list
+      delete data.speed_list
+      delete data.tag_list
+      delete data.id
     }
-    if (response && response.code === 200 && response.data) {
-      message.success('修改成功！');
-      timeOut = setTimeout(() => {
-        clearTimeout(timeOut);
-        this.props.history.goBack();
-      }, 1000);
-    }
+    API.goodsManageApi.updateGoods(data)
+      .then(r => {
+        if(r && r.code === 200 && r.data) {
+          message.success('修改成功！', 0.5)
+
+          const timeOut = setTimeout(()=>{
+            clearTimeout(timeOut)
+            this.props.history.goBack()
+          }, 1000)
+        }
+      }).catch(e => {
+        message.warning(e || '语音合成中，请稍后在做修改！', 0.5)
+        return false;
+      })
   };
+
+  isSubmit = () => {
+    const { 
+      goodsName, 
+      goodsPrice, 
+      introduce, 
+      selectRadio,
+      fileListImg,
+      fileListVedio,
+    } = this.state;
+
+    let fileList = selectRadio === 1? fileListImg : fileListVedio
+    this.setState({isSubmit: false})
+
+    if(goodsName && goodsPrice && introduce && fileList.length > 0) {
+      this.setState({isSubmit: true})
+    }
+  }
 
   // 图片参数
   data = (file) => {
@@ -291,6 +293,7 @@ class GoodsInfo extends React.Component {
       suffix: suffix,
     };
   };
+
   // 更新音频
   handleUpdateVioce = async (i, file) => {
     const { dataSource } = this.state;
@@ -312,7 +315,7 @@ class GoodsInfo extends React.Component {
   };
 
   // 上传前
-  handleUploadBefore = (i) => {
+  handleAudioUploadBefore = (i) => {
     const { dataSource } = this.state;
     dataSource[i].updateStatus = true;
     this.setState({ dataSource: this.state.dataSource });
@@ -335,8 +338,8 @@ class GoodsInfo extends React.Component {
     downloadUrlFile(url.voice);
   };
 
-  async componentDidMount() {
-    if (!this.props.location?.query?.isAdd) {
+  componentDidMount() {
+    if (this.props.location?.query?.goods) {
       const {
         word_list: introduce,
         action_tag_list: label,
@@ -349,6 +352,7 @@ class GoodsInfo extends React.Component {
         price,
         introduce: introduceTxt,
       } = this.props.location?.query?.goods;
+
       // tabel数据源
       const dataSource = [];
       label.forEach((e, i) => {
@@ -364,19 +368,34 @@ class GoodsInfo extends React.Component {
           updateStatus: false,
         });
       });
+
+
+      const fileListImg = []
+      const fileListVedio = []
+
+      if(image) {
+        image.forEach(e => {
+          fileListImg.push({
+            status: 'done',
+            url: e
+          })
+        })
+      } else {
+        fileListVedio.push({
+          status: 'done',
+          url: video
+        })
+      }
+      
       this.setState({
         dataSource,
         goodsName: name,
-        goodsList: image || [video],
+        fileListImg,
+        fileListVedio,
         goodsPrice: price,
         selectRadio: video ? 2 : 1,
         introduce: introduceTxt,
-        isAdd: this.props.location.query.isAdd,
-      });
-    } else {
-      this.setState({
-        isAdd: this.props.location.query.isAdd,
-      });
+      }, this.isSubmit);
     }
   }
 
@@ -390,9 +409,8 @@ class GoodsInfo extends React.Component {
       goodsName,
       goodsPrice,
       introduce,
-      goodsList,
-      isAdd,
       selectRadio,
+      isSubmit
     } = this.state;
 
     return (
@@ -419,56 +437,28 @@ class GoodsInfo extends React.Component {
                     onChange={(e) => {
                       this.setState({
                         selectRadio: e.target.value,
-                        goodsList: [],
-                      });
+                      }, this.isSubmit);
                     }}
                   >
                     <Radio value={1}>上传图片</Radio>
                     <Radio value={2}>上传视频</Radio>
                   </Radio.Group>
                 </div>
-                <div className='flex'>
-                  <div className='goods_wrap flex flex-wrap'>
-                    {goodsList.map((e, i) => (
-                      <div
-                        className={[
-                          'w_100px h_100px border relative',
-                          i > 0 && 'ml_15px',
-                        ].join(' ')}
-                        key={e}
-                      >
-                        <div className='w-full h-full overflow-hidden border_radius_5px'>
-                          {isImage(e) ? (
-                            <img src={e} alt='' className='w-full h-full' />
-                          ) : (
-                            <video
-                              className='w-full h-full object-fit'
-                              src={e}
-                            />
-                          )}
-                        </div>
-                        <div
-                          className='absolute top-0 _right_7px _top_7px z-20 flex justify-center items-center'
-                          onClick={() => this.handleDeleteGoods(i)}
-                        >
-                          <CloseCircleTwoTone twoToneColor='#ee6843' />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  {selectRadio == 1 ? (
+                <div className='flex upload'>
+                  {selectRadio === 1 ? (
                     <Upload
-                      showUploadList={false}
+                      listType="picture-card"
                       data={this.data}
                       action={`${process.env.REACT_APP_API}/api/common/upload`}
                       accept='.jpg, .png, .gif, .webp, .bmp,'
                       multiple={true}
+                      fileList={this.state.fileListImg}
                       onChange={this.handleChange}
+                      onRemove={this.handleRemove}
                     >
                       <div
                         className={[
-                          'w_100px h_100px border_radius_5px border flex justify-center items-center flex-col',
-                          goodsList.length && 'ml_15px',
+                          'w-full h-full border_radius_5px border flex justify-center items-center flex-col',
                         ].join(' ')}
                       >
                         <PlusOutlined />
@@ -476,32 +466,27 @@ class GoodsInfo extends React.Component {
                       </div>
                     </Upload>
                   ) : (
-                    <>
-                      {selectRadio == 2 && (
-                        <>
-                          {!(goodsList.length >= 1) && (
-                            <Upload
-                              showUploadList={false}
-                              data={this.videoData}
-                              action={`${process.env.REACT_APP_API}/api/common/upload`}
-                              accept='.mp4, .avi .flv'
-                              multiple={true}
-                              onChange={this.handleChange}
-                            >
-                              <div
-                                className={[
-                                  'w_100px h_100px border_radius_5px border flex justify-center items-center flex-col',
-                                  goodsList.length && 'ml_15px',
-                                ].join(' ')}
-                              >
-                                <PlusOutlined />
-                                <div style={{ marginTop: 8 }}>video</div>
-                              </div>
-                            </Upload>
-                          )}
-                        </>
-                      )}
-                    </>
+                    <Upload
+                      listType="picture-card"
+                      data={this.videoData}
+                      fileList={this.state.fileListVedio}
+                      action={`${process.env.REACT_APP_API}/api/common/upload`}
+                      accept='.mp4, .avi .flv'
+                      onChange={this.handleChange}
+                    >
+                      {
+                        !this.state.fileListVedio.length && (
+                          <div
+                            className={[
+                              'w-full h-full border_radius_5px border flex justify-center items-center flex-col',
+                            ].join(' ')}
+                          >
+                            <PlusOutlined />
+                            <div style={{ marginTop: 8 }}>video</div>
+                          </div>
+                        )
+                      }
+                    </Upload>
                   )}
                 </div>
               </div>
@@ -513,7 +498,9 @@ class GoodsInfo extends React.Component {
                   style={{ width: '50%' }}
                   placeholder='请输入商品名称'
                   value={goodsName}
-                  onChange={(e) => this.setState({ goodsName: e.target.value })}
+                  onChange={(e) => {
+                    this.setState({ goodsName: e.target.value }, this.isSubmit)
+                  }}
                 />
               </div>
               <div className='goods_price flex mb-6 mt-6 ml_30px'>
@@ -522,9 +509,9 @@ class GoodsInfo extends React.Component {
                   style={{ width: '50%' }}
                   placeholder='请输入商品价格'
                   value={goodsPrice}
-                  onChange={(e) =>
-                    this.setState({ goodsPrice: e.target.value })
-                  }
+                  onChange={(e) =>{
+                    this.setState({ goodsPrice: e.target.value }, this.isSubmit)
+                  }}
                 />
               </div>
               <div className='goods_introduce flex ml_30px'>
@@ -534,9 +521,9 @@ class GoodsInfo extends React.Component {
                     style={{ height: '100%', resize: 'none' }}
                     placeholder='请输入商品介绍'
                     value={introduce}
-                    onChange={(e) =>
-                      this.setState({ introduce: e.target.value })
-                    }
+                    onChange={(e) =>{
+                      this.setState({ introduce: e.target.value }, this.isSubmit)
+                    }}
                   />
                   <div className='font_12'>介绍文案以句号为段落结束</div>
                 </div>
@@ -565,21 +552,23 @@ class GoodsInfo extends React.Component {
             >
               取消
             </button>
-            {isAdd ? (
-              <button
-                className='save_btn foonter_btn py-1 px-8 border rounded-full bg-FF8462 border-color text-white'
-                onClick={this.handleAddGoods}
-              >
+            {
+              isSubmit?(
+                <button
+                  className='save_btn foonter_btn py-1 px-8 border rounded-full bg-FF8462 border-color text-white'
+                  onClick={this.handleUpdataGoods}
+                >
                 保存
-              </button>
-            ) : (
-              <button
-                className='save_btn foonter_btn py-1 px-8 border rounded-full bg-FF8462 border-color text-white'
-                onClick={this.handleUpdataGoods}
-              >
+                </button>
+              ):(
+                <button
+                  className='save_btn foonter_btn py-1 px-8 border rounded-full text-white bg_ccc'
+                  onClick={this.handleUpdataGoods}
+                >
                 保存
-              </button>
-            )}
+                </button>
+              )
+            }
           </div>
         </div>
       </div>
